@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cellar</title>
+<style>
+:root{--bg:#F3F5F1;--panel:#fff;--ink:#12302E;--mute:#5B6F6C;--line:#D9E0DC;--nav:#0F3D3A;--navink:#EDEFE9;--wine:#D6456B;--lamp:#FFC857;--ok:#1E7F5C;--okbg:#E3F3EC;--badbg:#FBE6EC}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0B1C1B;--panel:#12292A;--ink:#E7EEEA;--mute:#8FA7A3;--line:#234341;--nav:#08201F;--ok:#5FD3A2;--okbg:#10382D;--badbg:#44202D}}
+:root[data-theme=dark]{--bg:#0B1C1B;--panel:#12292A;--ink:#E7EEEA;--mute:#8FA7A3;--line:#234341;--nav:#08201F;--ok:#5FD3A2;--okbg:#10382D;--badbg:#44202D}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 Inter,system-ui,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);display:flex;min-height:100vh}
+nav{width:230px;background:var(--nav);color:var(--navink);padding:20px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+nav .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:22px;padding:0 8px 16px}
+nav button{all:unset;cursor:pointer;padding:10px 12px;border-radius:10px;color:var(--navink);opacity:.8}
+nav button:hover,nav button:focus-visible{background:#ffffff1a;opacity:1}nav button[aria-current=page]{background:var(--lamp);color:#12302E;opacity:1;font-weight:600}
+nav .sp{flex:1}nav small{opacity:.6;padding:0 12px}
+main{flex:1;padding:28px;max-width:960px}h1{margin:0 0 4px;font-size:26px}p.sub{margin:0 0 20px;color:var(--mute)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 14px;border-radius:10px}
+.btn:hover{border-color:var(--mute)}.btn.pri{background:var(--wine);border-color:var(--wine);color:#fff;font-weight:600}.btn.pri:hover{filter:brightness(1.08)}
+:focus-visible{outline:3px solid var(--lamp);outline-offset:2px}
+textarea,input[type=text]{font:13px/1.5 ui-monospace,Consolas,monospace;width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px}
+textarea{min-height:110px;resize:vertical}.drop{border:2px dashed var(--line);border-radius:12px;padding:10px}.drop.over{border-color:var(--wine)}
+.banner{padding:12px 16px;border-radius:12px;font-weight:600;margin-bottom:12px}.banner.ok{background:var(--okbg);color:var(--ok)}.banner.bad{background:var(--badbg);color:var(--wine)}
+.res{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}.tag{font-weight:700;font-size:12px;padding:3px 9px;border-radius:99px}
+.tag.p{background:var(--okbg);color:var(--ok)}.tag.f{background:var(--badbg);color:var(--wine)}
+.chip{display:inline-block;font:12px ui-monospace,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 7px;margin:2px 4px 2px 0}.chip.m{border-color:var(--wine);color:var(--wine)}
+.int{display:grid;grid-template-columns:1fr 2fr auto;gap:8px;margin-bottom:10px}.mute{color:var(--mute)}.hide{display:none}
+@media(max-width:760px){body{flex-direction:column}nav{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;align-items:center}nav .sp,nav small{display:none}nav .brand{padding:0 8px 0 0}.int{grid-template-columns:1fr}main{padding:16px}}
+</style></head><body>
+<nav aria-label="Main">
+<div class="brand"><svg width="30" height="30" viewBox="0 0 256 256" aria-hidden="true"><rect width="256" height="256" rx="58" fill="#0F3D3A" stroke="#EDEFE9" stroke-opacity=".35" stroke-width="8"/><path d="M60 212V128A68 68 0 0 1 196 128V212Z" fill="#EDEFE9"/><path d="M72 212V128A56 56 0 0 1 184 128V212Z" fill="#0F3D3A"/><rect x="80" y="104" width="28" height="28" rx="7" fill="#D6456B"/><rect x="114" y="104" width="28" height="28" rx="7" fill="#D6456B"/><rect x="148" y="104" width="28" height="28" rx="7" fill="#D6456B"/><rect x="114" y="138" width="28" height="28" rx="7" fill="#FFC857"/></svg>cellar</div>
+<button data-v="check" aria-current="page">Check a CSV</button><button data-v="contracts">Contracts</button><button data-v="history">History</button><button data-v="help">Help</button>
+<div class="sp"></div><button id="theme">Switch theme</button><small>v__VERSION__</small></nav>
+<main>
+<section id="check"><h1>Check a CSV</h1><p class="sub">Choose an export (or paste its header row) and see which integrations it would break.</p>
+<div class="card"><div class="drop" id="drop"><textarea id="csv" aria-label="CSV text" placeholder="Drop a CSV file here, or paste text:&#10;order_id,sku,total_cents,currency"></textarea></div>
+<div class="row" style="margin-top:12px"><input type="file" id="file" accept=".csv,text/csv,text/plain" class="hide"><button class="btn" id="pick">Choose file</button><button class="btn" id="sample">Load sample</button><button class="btn" id="brk">Simulate rename</button><button class="btn" id="clr">Clear</button><span class="mute" id="fname"></span><span style="flex:1"></span><button class="btn pri" id="run">Run check</button></div></div>
+<div id="out"></div></section>
+<section id="contracts" class="hide"><h1>Contracts</h1><p class="sub">The columns each integration needs. Names match exactly, including case.</p>
+<div class="card"><div id="ints"></div><div class="row"><button class="btn" id="add">Add integration</button><button class="btn" id="reload">Reload</button><span style="flex:1"></span><span class="mute" id="saved"></span><button class="btn pri" id="save">Save to file</button></div></div></section>
+<section id="history" class="hide"><h1>History</h1><p class="sub">Checks you ran in this browser.</p><div class="card" id="hist"></div><button class="btn" id="hclr">Clear history</button></section>
+<section id="help" class="hide"><h1>Help</h1><p class="sub">Everything here also works from the command line.</p><div class="card">
+<p><b>Run in CI:</b> <span class="chip">cellar check --csv build/sales_export.csv --summary</span></p><p><b>Machine-readable:</b> <span class="chip">cellar check --csv export.csv --format json</span></p>
+<p><b>Exit codes:</b> <span class="chip">0</span> all pass &nbsp;<span class="chip">1</span> a contract failed &nbsp;<span class="chip">2</span> invalid input</p>
+<p class="mute">A pass means the header meets the declared requirements. Value formats, units and data rows are not checked. Only the header leaves your file; this page runs on your computer.</p></div></section>
+</main>
+<script>
+const $=s=>document.querySelector(s),esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let contracts={integrations:[]},last=null,fname="";
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function show(v){document.querySelectorAll("main>section").forEach(s=>s.classList.toggle("hide",s.id!==v));document.querySelectorAll("nav [data-v]").forEach(b=>b.toggleAttribute("aria-current",b.dataset.v===v)&&b.setAttribute("aria-current","page"));document.querySelectorAll("nav [data-v]").forEach(b=>{if(b.dataset.v!==v)b.removeAttribute("aria-current")});if(v==="history")drawHist();location.hash=v}
+document.querySelectorAll("nav [data-v]").forEach(b=>b.onclick=()=>show(b.dataset.v));
+$("#theme").onclick=()=>{const d=document.documentElement,dark=getComputedStyle(d).getPropertyValue("--bg").trim()==="#0B1C1B";d.dataset.theme=dark?"light":"dark";store.set("cellar.theme",d.dataset.theme)};
+if(store.get("cellar.theme"))document.documentElement.dataset.theme=store.get("cellar.theme");
+const SAMPLE="order_id,sku,total_cents,currency\nORD-0001,MUG-01,1250,USD\n";
+$("#sample").onclick=()=>{$("#csv").value=SAMPLE;fname="sample"; $("#fname").textContent="sample export"};
+$("#brk").onclick=()=>{$("#csv").value=SAMPLE.replace("order_id","id");fname="sample (renamed)";$("#fname").textContent="order_id renamed to id";run()};
+$("#clr").onclick=()=>{$("#csv").value="";$("#out").innerHTML="";$("#fname").textContent="";last=null};
+$("#pick").onclick=()=>$("#file").click();$("#file").onchange=e=>load(e.target.files[0]);
+const dz=$("#drop");dz.ondragover=e=>{e.preventDefault();dz.classList.add("over")};dz.ondragleave=()=>dz.classList.remove("over");dz.ondrop=e=>{e.preventDefault();dz.classList.remove("over");load(e.dataTransfer.files[0])};
+function load(f){if(!f)return;fname=f.name;$("#fname").textContent=f.name;const r=new FileReader();r.onload=()=>{$("#csv").value=r.result;run()};r.readAsText(f.slice(0,65536))}
+async function api(path,body){const r=await fetch(path,body?{method:"POST",body:JSON.stringify(body)}:{});return{ok:r.ok,data:await r.json()}}
+async function run(){const {ok,data}=await api("/api/check",{csv:$("#csv").value,config:readInts()});
+ if(!ok){$("#out").innerHTML=`<div class="banner bad">Could not run: ${esc(data.error)}</div>`;return}
+ last=data;const bad=data.results.filter(r=>!r.passed).length;
+ $("#out").innerHTML=`<div class="banner ${bad?"bad":"ok"}">${bad?bad+" of "+data.results.length+" integrations would break":"All "+data.results.length+" integrations pass"}</div><div class="card">`+
+ data.results.map(r=>`<div class="res"><span class="tag ${r.passed?"p":"f"}">${r.passed?"PASS":"FAIL"}</span><div><b>${esc(r.id)}</b><br>${r.passed?'<span class="mute">satisfies its declared requirements</span>':"requires "+r.missing.map(m=>`<span class="chip m">${esc(m)}</span>`).join("")}</div></div>`).join("")+
+ `<div class="res"><div class="mute">Header found:&nbsp;${data.header.map(h=>`<span class="chip">${esc(h)}</span>`).join("")}</div></div>
+ <div class="row"><button class="btn" id="cp">Copy report</button><button class="btn" id="dmd">Download .md</button><button class="btn" id="djs">Download .json</button></div></div>`;
+ $("#cp").onclick=async e=>{await navigator.clipboard.writeText(md());e.target.textContent="Copied"};$("#dmd").onclick=()=>dl("cellar-report.md",md());$("#djs").onclick=()=>dl("cellar-report.json",JSON.stringify(last,null,2));
+ const h=store.get("cellar.history",[]);h.unshift({t:new Date().toLocaleString(),f:fname||"pasted text",bad,n:data.results.length,fails:data.results.filter(r=>!r.passed).map(r=>r.id)});store.set("cellar.history",h.slice(0,50))}
+$("#run").onclick=run;
+const md=()=>"### Cellar: CSV compatibility\n\n| Status | Integration | Details |\n|---|---|---|\n"+last.results.map(r=>`| ${r.passed?"PASS":"FAIL"} | ${r.id} | ${r.passed?"All required columns are present":"Missing "+r.missing.join(", ")} |`).join("\n")+"\n";
+function dl(n,t){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t]));a.download=n;a.click()}
+function drawInts(){$("#ints").innerHTML=contracts.integrations.map((x,i)=>`<div class="int"><input type="text" data-i="${i}" data-k="id" value="${esc(x.id)}" aria-label="Integration id"><input type="text" data-i="${i}" data-k="req" value="${esc(x.required.join(", "))}" aria-label="Required columns, comma separated"><button class="btn" data-del="${i}">Remove</button></div>`).join("")||'<p class="mute">No integrations yet. Add one to start.</p>';
+ document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{contracts.integrations=readInts().integrations;contracts.integrations.splice(+b.dataset.del,1);drawInts()})}
+function readInts(){const rows=[...document.querySelectorAll("#ints .int")];if(!rows.length&&!document.querySelector("#ints .int"))return contracts;
+ return{integrations:rows.map(r=>({id:r.children[0].value,required:r.children[1].value.split(",").map(s=>s.trim()).filter(Boolean)}))}}
+$("#add").onclick=()=>{contracts=readInts();contracts.integrations.push({id:"",required:[]});drawInts()};
+$("#reload").onclick=loadCfg;
+$("#save").onclick=async()=>{contracts=readInts();const {ok,data}=await api("/api/config",{config:contracts});$("#saved").textContent=ok?"Saved to "+data.saved:data.error};
+async function loadCfg(){const {data}=await api("/api/config");contracts=data.config;drawInts();$("#saved").textContent=""}
+function drawHist(){const h=store.get("cellar.history",[]);$("#hist").innerHTML=h.map(x=>`<div class="res"><span class="tag ${x.bad?"f":"p"}">${x.bad?x.bad+" FAIL":"PASS"}</span><div><b>${esc(x.f)}</b><br><span class="mute">${esc(x.t)}${x.bad?" · "+esc(x.fails.join(", ")):""}</span></div></div>`).join("")||'<p class="mute">No checks yet.</p>'}
+$("#hclr").onclick=()=>{store.set("cellar.history",[]);drawHist()};
+loadCfg().then(()=>{const v=location.hash.slice(1);if(["check","contracts","history","help"].includes(v))show(v)});
+</script></body></html>

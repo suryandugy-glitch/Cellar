@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cellar-check"
+dynamic = ["version"]
+description = "Catch CSV export changes that would break your customers' imports, before you ship."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = []
+keywords = ["csv", "ci", "github-actions", "data-contracts", "schema"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Software Development :: Testing",
+]
+
+[project.scripts]
+cellar = "cellar.cli:main"
+
+[tool.setuptools]
+packages = ["cellar"]
+
+[tool.setuptools.dynamic]
+version = { attr = "cellar.__version__" }
+
+[tool.setuptools.package-data]
+cellar = ["web/*.html"]
