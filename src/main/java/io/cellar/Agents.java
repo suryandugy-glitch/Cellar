@@ -8,7 +8,8 @@ public final class Agents {
     private Agents() {}
 
     /** Triage + release-gate + reporter agents, run on every check. */
-    public static List<Object> run(Map<String, Object> report) {
+    public static List<Object> run(Map<String, Object> report) { return run(report, null); }
+    public static List<Object> run(Map<String, Object> report, List<?> baseline) {
         List<?> header = (List<?>) report.get("header"); Set<String> claimed = new HashSet<>(); List<Object> failing = new ArrayList<>();
         for (Object o : (List<?>) report.get("results")) { Map<String, Object> r = Json.object(o); if (!Boolean.TRUE.equals(r.get("passed"))) failing.add(r); }
         List<Object> triage = new ArrayList<>(); StringBuilder md = new StringBuilder("### Cellar check\n\n");
@@ -32,7 +33,14 @@ public final class Agents {
         if (failing.isEmpty()) md.append("All integrations satisfy their declared requirements.\n");
         boolean blocked = Boolean.TRUE.equals(report.get("blocking"));
         String verdict = blocked ? "Block the release" : failing.isEmpty() ? "Safe to ship" : "Ship with warnings";
+        List<Object> drift = new ArrayList<>();
+        if (baseline != null && !baseline.equals(header)) {
+            for (Object c : header) if (!baseline.contains(c)) drift.add(Json.map("title", "New column `" + c + "`", "detail", "Not in the last passing export.", "action", "Safe for readers that look columns up by name."));
+            for (Object c : baseline) if (!header.contains(c)) drift.add(Json.map("title", "Column `" + c + "` disappeared", "detail", "It was in the last passing export.", "action", "Check who reads it before shipping."));
+            if (drift.isEmpty()) drift.add(Json.map("title", "Columns were reordered", "detail", "Same columns, different order.", "action", "Only matters to readers that use column positions."));
+        }
         return List.of(
+            Json.map("agent", "Drift watch", "findings", drift.isEmpty() ? List.of(Json.map("title", baseline == null ? "No baseline yet" : "No drift", "detail", baseline == null ? "A passing check sets the baseline." : "Columns match the last passing export.", "action", "")) : drift),
             Json.map("agent", "Triage", "findings", triage),
             Json.map("agent", "Release gate", "findings", List.of(Json.map("title", verdict, "detail", failing.size() + " of " + ((List<?>) report.get("results")).size() + " integrations need attention.", "action", blocked ? "Fix or migrate before merging." : "No action required."))),
             Json.map("agent", "Reporter", "markdown", md.toString(), "findings", List.of()));

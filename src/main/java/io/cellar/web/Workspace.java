@@ -49,6 +49,8 @@ public final class Workspace {
     }
     public synchronized List<Object> history() { Map<String, Object> d = vault.read("history.enc"); return d == null ? new ArrayList<>() : new ArrayList<>((List<?>) d.get("history")); }
 
+    public synchronized List<?> baseline() { Map<String, Object> d = vault.read("baseline.enc"); return d == null ? null : (List<?>) d.get("header"); }
+    public synchronized void setBaseline(List<?> header) { vault.write("baseline.enc", Json.map("header", header)); }
     private Map<String, Object> rev(String actor) { return Json.map("hash", FilesEx.hash(contractText), "actor", actor, "at", Instant.now().toString()); }
     private void persistContract() { vault.write("workspace.enc", Json.map("contract", contractText, "revisions", revisions)); }
 }

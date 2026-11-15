@@ -16,6 +16,10 @@ sh run.sh            # Windows: run.bat   (needs JDK 21+)
 
 Open `http://127.0.0.1:8080`. **No account or sign-in on localhost.** Click *Try the breaking demo*: only `inventory-report` fails, and the Triage agent notices `order_id` was probably renamed to `id`.
 
+**Repository:** https://github.com/suryandugy-glitch/Cellar · In-app docs: open the *Docs* page (or press `Ctrl K` and search).
+
+**Live inbox:** drop a `.csv` into `data/inbox/` (or `CELLAR_INBOX`) and it is checked automatically. A *Drift watch* agent compares each export with the last passing one.
+
 **Automatic agents** (offline, rule-based, no model or network): *Triage* (rename detection), *Release gate* (ship or block) and *Reporter* (PR comment) run on every check; *Scout* drafts a contract from a sample CSV. Press `Ctrl K` for the command palette.
 
 **Sharing it on a server:** set `CELLAR_BIND`, `CELLAR_PUBLIC_URL` and one shared `CELLAR_ACCESS_KEY` (12+ characters), and put it behind HTTPS. There are no users, roles or passwords.

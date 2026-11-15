@@ -2,7 +2,7 @@
 /* Cellar web UI. Presentation only: rules, checks and agents run on the server. Text is only inserted as text nodes; the CSP forbids inline script and style. */
 (function () {
   var root = document.getElementById('app');
-  var state = { page: 'home', csv: '', advisory: false, result: null, scout: null, before: '', after: '' };
+  var state = { page: 'home', doc: 'intro', csv: '', advisory: false, result: null, scout: null, before: '', after: '' };
   var store = { get: function (k) { try { return sessionStorage.getItem(k) || localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v, s) { try { (s ? sessionStorage : localStorage).setItem(k, v); } catch (e) {} } };
   document.documentElement.setAttribute('data-theme', store.get('cellar_theme') || 'dark');
 
@@ -28,22 +28,31 @@
   function th(list) { return h('thead', {}, h('tr', {}, list.map(function (x) { return h('th', {}, x); }))); }
 
   // ---------- navigation ----------
-  var PAGES = [['home', 'Home'], ['check', 'Check'], ['contracts', 'Contracts'], ['diff', 'Compare'], ['history', 'History'], ['activity', 'Activity']];
+  var REPO = 'https://github.com/suryandugy-glitch/Cellar';
+  var SITE = [['home', 'Home'], ['features', 'Features'], ['docs', 'Docs'], ['roadmap', 'Roadmap']];
+  var APP = [['check', 'Check'], ['contracts', 'Contracts'], ['diff', 'Compare'], ['history', 'History'], ['live', 'Live inbox'], ['activity', 'Activity']];
+  var PAGES = SITE.concat(APP);
   function go(p) { location.hash = '#' + p; }
+  function ext(href, label, cls) { return h('a', { class: cls || 'chip', href: href, target: '_blank', rel: 'noopener noreferrer' }, label); }
   function shell(body) {
-    return h('div', {}, h('header', { class: glass('top') }, h('img', { src: '/logo.svg', alt: '' }), h('span', { class: 'brand', onclick: function () { go('home'); } }, 'Cellar'),
-      h('nav', { class: 'tabs', 'aria-label': 'Sections' }, PAGES.map(function (p) { return h('button', { 'aria-current': state.page === p[0] ? 'page' : null, onclick: function () { go(p[0]); } }, p[1]); })), h('span', { class: 'spacer' }),
-      h('button', { class: 'chip', onclick: palette, 'aria-label': 'Open command palette' }, 'Search ', h('kbd', {}, 'Ctrl K')),
-      h('button', { class: 'chip', onclick: toggleTheme, 'aria-label': 'Toggle theme' }, 'Theme')), h('main', {}, body), h('footer', {}, 'Cellar ' + (state.version || '') + ' · agents run offline on your server · no cell values are stored'));
+    var inApp = APP.some(function (p) { return p[0] === state.page; });
+    function tabs(list, label) { return h('nav', { class: 'tabs', 'aria-label': label }, list.map(function (p) { return h('button', { 'aria-current': state.page === p[0] ? 'page' : null, onclick: function () { go(p[0]); } }, p[1]); })); }
+    return h('div', {}, h('header', { class: glass('top') }, h('img', { src: '/logo.svg', alt: '' }), h('span', { class: 'brand', onclick: function () { go('home'); } }, 'Cellar'), tabs(SITE, 'Site'), h('span', { class: 'spacer' }),
+      h('button', { class: 'chip', onclick: palette, 'aria-label': 'Search the docs and commands' }, 'Search ', h('kbd', {}, 'Ctrl K')), ext(REPO, 'GitHub'), h('button', { class: 'chip', onclick: toggleTheme, 'aria-label': 'Toggle theme' }, 'Theme'),
+      h('button', { class: 'btn primary nowrap', onclick: function () { go('check'); } }, 'Open the app')),
+      h('main', {}, inApp ? h('div', { class: glass('subnav') }, tabs(APP, 'Workbench')) : null, body),
+      h('footer', {}, h('div', {}, 'Cellar ' + (state.version || '') + ' · MIT licensed · agents run offline on your own server · no cell values are stored'), h('div', {}, ext(REPO, 'GitHub repository'), ' ', ext(REPO + '/issues', 'Report an issue'), ' ', ext(REPO + '/releases', 'Releases'))));
   }
   function toggleTheme() { var t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', t); store.set('cellar_theme', t); }
 
-  // ---------- command palette ----------
+  // ---------- command palette (pages, docs, actions) ----------
   function palette() {
-    var items = PAGES.map(function (p) { return ['Go to ' + p[1], function () { go(p[0]); }]; }).concat([['Run breaking demo', function () { demo('bad', true); }], ['Run passing demo', function () { demo('ok', true); }], ['Toggle theme', toggleTheme], ['Copy run command', function () { copy('sh run.sh'); }]]);
-    var list = h('div'), input = h('input', { type: 'text', placeholder: 'Type a command…', 'aria-label': 'Command' }), sel = 0, shown = [];
+    var items = PAGES.map(function (p) { return ['Go to ' + p[1], function () { go(p[0]); }]; })
+      .concat(DOCS.map(function (d) { return ['Docs: ' + d.title, function () { state.doc = d.id; go('docs'); route(); }]; }))
+      .concat([['Run the breaking demo', function () { demo('bad', true); }], ['Run the passing demo', function () { demo('ok', true); }], ['Toggle theme', toggleTheme], ['Open GitHub repository', function () { window.open(REPO, '_blank', 'noopener'); }], ['Copy start command', function () { copy('sh run.sh'); }]]);
+    var list = h('div'), input = h('input', { type: 'text', placeholder: 'Search docs and commands…', 'aria-label': 'Search' }), sel = 0, shown = [];
     var wrap = h('div', { class: 'pal', onclick: function (e) { if (e.target === wrap) wrap.remove(); } }, h('div', { class: glass('box') }, input, list));
-    function draw() { clear(list); shown = items.filter(function (i) { return i[0].toLowerCase().indexOf(input.value.toLowerCase()) >= 0; }); sel = Math.min(sel, Math.max(0, shown.length - 1));
+    function draw() { clear(list); shown = items.filter(function (i) { return i[0].toLowerCase().indexOf(input.value.toLowerCase()) >= 0; }).slice(0, 9); sel = Math.min(sel, Math.max(0, shown.length - 1));
       shown.forEach(function (i, n) { list.appendChild(h('button', { class: n === sel ? 'sel' : '', onclick: function () { wrap.remove(); i[1](); } }, i[0])); }); }
     input.addEventListener('input', function () { sel = 0; draw(); });
     input.addEventListener('keydown', function (e) { if (e.key === 'Escape') wrap.remove(); else if (e.key === 'ArrowDown') { sel = Math.min(sel + 1, shown.length - 1); draw(); e.preventDefault(); } else if (e.key === 'ArrowUp') { sel = Math.max(sel - 1, 0); draw(); e.preventDefault(); } else if (e.key === 'Enter' && shown[sel]) { wrap.remove(); shown[sel][1](); } });
@@ -51,23 +60,77 @@
   }
   document.addEventListener('keydown', function (e) { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); if (!document.querySelector('.pal')) palette(); } });
 
-  // ---------- home ----------
+  // ---------- home: plain language ----------
   function homeView() {
+    function card(t, d, b) { return h('div', { class: glass('card lift') }, b ? h('span', { class: 'badge' }, b) : null, h('h3', {}, t), h('p', { class: 'muted' }, d)); }
     function step(n, t, d) { return h('div', { class: glass('card lift') }, h('div', { class: 'num' }, n), h('h3', {}, t), h('p', { class: 'muted' }, d)); }
-    function feat(t, d, b) { return h('div', { class: glass('card lift') }, h('span', { class: 'badge' }, b || 'Available'), h('h3', {}, t), h('p', { class: 'muted' }, d)); }
+    var faq = [['Do I need to be a developer?', 'To set it up once, a little. To use it day to day, no. You paste or drop a file, press Check, and read a plain-English result.'], ['Does it store my customers’ data?', 'No. It only looks at column names and counts. Cell values are never saved or shown in reports.'], ['Does it need the internet or an AI account?', 'No. Everything runs on your own computer or server. The helper agents are built-in rules, not a cloud service.'], ['What is a “contract”?', 'A short list that says what each customer’s report needs from your file: which columns, and what kind of values. You write it once.'], ['Is it free?', 'Yes. It is open source under the MIT license. The code is on GitHub.']];
     return h('div', {},
-      h('section', { class: 'hero' }, h('span', { class: 'pill' }, 'Cellar ' + (state.version || '') + ' · no sign-in needed'),
-        h('h1', {}, 'CSV changes shouldn’t ', h('span', { class: 'grad' }, 'break customers silently.')),
-        h('p', { class: 'lead' }, 'Cellar checks every export against what each customer workflow needs, names the integration that breaks, and lets automatic agents explain the fix before you ship.'),
-        h('div', {}, h('button', { class: 'btn primary', onclick: function () { demo('bad', true); } }, 'Try the breaking demo'), h('button', { class: 'btn', onclick: function () { go('check'); } }, 'Open the workbench')),
-        h('div', { class: glass('cmd') }, h('code', {}, '$ java -jar dist/cellar.jar check --csv build/sales.csv'), h('button', { class: 'btn', onclick: function () { copy('java -jar dist/cellar.jar check --csv build/sales.csv'); } }, 'Copy')),
-        h('div', { class: glass('term') }, h('div', { class: 'bar' }, h('span', { class: 'dot' }), h('span', { class: 'dot y' }), h('span', { class: 'dot g' }), ' cellar check'),
-          h('pre', {}, h('span', { class: 'dim' }, '$ cellar check --csv build/sales.csv\n'), h('span', { class: 'fail' }, 'FAIL'), '  inventory-report  requires order_id\n', h('span', { class: 'pass' }, 'PASS'), '  finance-summary   satisfies its contract\n', h('span', { class: 'dim' }, 'Triage agent: order_id likely renamed to id\nGate: BLOCK  (exit code 1)')))),
-      h('h2', {}, 'How it works'), h('div', { class: 'grid' }, step('01', 'Declare', 'Record what each customer workflow needs in a small contract: columns, types, ranges.'), step('02', 'Check', 'Every export is validated on the server. Reports never contain cell values.'), step('03', 'Resolve', 'Agents triage the break, name the owner and write the PR comment for you.')),
-      h('h2', {}, 'Automatic agents'), h('div', { class: 'grid' }, feat('Triage', 'Spots renamed columns like order_id → id and proposes a safe migration.'), feat('Release gate', 'Gives a clear ship or block verdict on every run.'), feat('Reporter', 'Writes a ready-to-paste pull request comment.'), feat('Scout', 'Drafts a contract from a sample CSV in one click.')),
-      h('h2', {}, 'Built in'), h('div', { class: 'grid' }, feat('Contract editor', 'Revision-guarded edits so two people never overwrite each other.'), feat('Compare exports', 'See added, removed and reordered columns and who they affect.'), feat('History and activity', 'Trend of the last 100 runs and a tamper-evident activity log.'), feat('CLI and CI', 'Same engine, exit codes 0, 1 and 2 for GitHub Actions.')),
-      h('h2', {}, 'Manual vs Cellar'), h('div', { class: glass('card scroll') }, h('table', {}, th(['Task', 'Ad hoc', 'With Cellar']), h('tbody', {}, [['Spotting a break', 'A customer reports a failed import', 'Fails the pull request check'], ['Finding the cause', 'Diff sample files by hand', 'Names the column and likely rename'], ['Telling the owner', 'Chase who owns the report', 'Owner is in the contract'], ['Writing it up', 'Copy findings into a ticket', 'Reporter agent drafts it']].map(function (r) { return h('tr', {}, r.map(function (c) { return h('td', {}, c); })); })))),
-      h('div', { class: glass('card'), }, h('h2', {}, 'Ready to see it?'), h('button', { class: 'btn primary', onclick: function () { go('check'); } }, 'Run your first check')));
+      h('section', { class: 'hero' }, ext(REPO + '/releases', 'v' + (state.version || '3.0') + ' released', 'pill'),
+        h('h1', {}, 'Don’t let a small file change ', h('span', { class: 'grad' }, 'break your customers.')),
+        h('p', { class: 'lead' }, 'Cellar is a safety check for CSV files (the spreadsheets your software sends to other people’s tools). Before you ship a change, it tells you in plain words who would break and what to do about it.'),
+        h('div', {}, h('button', { class: 'btn primary', onclick: function () { demo('bad', true); } }, 'See it catch a problem'), h('button', { class: 'btn', onclick: function () { go('docs'); } }, 'Read the docs'), ext(REPO, 'Star on GitHub', 'btn')),
+        h('div', { class: glass('cmd') }, h('code', {}, '$ sh run.sh'), h('button', { class: 'btn', onclick: function () { copy('sh run.sh'); } }, 'Copy'), h('span', { class: 'muted small' }, 'Windows: run.bat · needs Java 21+')),
+        h('div', { class: glass('term') }, h('div', { class: 'bar' }, h('span', { class: 'dot' }), h('span', { class: 'dot y' }), h('span', { class: 'dot g' }), ' what you see'),
+          h('pre', {}, h('span', { class: 'fail' }, 'FAIL'), '  Inventory report needs “order_id”\n', h('span', { class: 'pass' }, 'PASS'), '  Finance summary is fine\n', h('span', { class: 'dim' }, 'Helper: “order_id” was probably renamed to “id”.\nVerdict: do not ship yet.')))),
+      h('h2', {}, 'In plain words'), h('div', { class: glass('card') }, h('p', {}, 'Think of Cellar as ', h('strong', {}, 'spell-check for the files other software reads'), '. Your app makes a CSV file. Your customers’ tools read it and expect certain columns. If someone renames or removes a column, nothing looks wrong on your side, but their import quietly fails days later.'), h('p', { class: 'muted' }, 'Cellar catches that on your side, before release, and names the customer report that would break.')),
+      h('h2', {}, 'A real example'), h('div', { class: glass('card') }, h('p', {}, 'A developer renames ', h('code', {}, 'order_id'), ' to ', h('code', {}, 'id'), '. Her tests pass. A week later the client’s weekly stock report fails to import. With Cellar, the same change is flagged the moment it is proposed: “Inventory report needs order_id. Likely renamed to id. Keep both until the report is updated.”')),
+      h('h2', {}, 'Who it is for'), h('div', { class: 'grid' }, card('Small software agencies', 'You send recurring exports to several clients and want to stop fixing surprise breakages.'), card('Team leads and owners', 'You want a clear ship or do-not-ship answer without reading code.'), card('Developers and support', 'You want the exact column, the likely cause and a ready-to-paste note for the ticket.')),
+      h('h2', {}, 'How it works'), h('div', { class: 'grid' }, step('1', 'Tell it what customers need', 'Write a short contract once, or let the Scout helper draft it from a sample file.'), step('2', 'Check your file', 'Drop a CSV in the app, run the command in CI, or put it in the Live inbox folder.'), step('3', 'Read the answer', 'Green means safe. Red names the customer, the column and what to do.')),
+      h('h2', {}, 'What you get'), h('div', { class: 'grid' }, card('Automatic helper agents', 'Triage spots renames, Release gate says ship or block, Reporter writes the note, Drift watch notices changes since last time.', 'Automatic'), card('Live inbox', 'Drop CSV files in a folder and they are checked automatically within seconds.', 'Automatic'), card('Contract editor and revisions', 'Edit rules safely. Two people can’t overwrite each other.', 'Available'), card('Compare two files', 'See added, removed and reordered columns and who is affected.', 'Available'), card('History and activity', 'Trend chart of recent checks and a tamper-evident log.', 'Available'), card('Works in CI', 'Same engine on the command line with simple exit codes for GitHub Actions.', 'Available')),
+      h('h2', {}, 'Cellar vs doing it by hand'), h('div', { class: glass('card scroll') }, h('table', {}, th(['Task', 'By hand', 'With Cellar']), h('tbody', {}, [['Noticing a break', 'A customer complains', 'The check fails before release'], ['Finding the cause', 'Compare files line by line', 'Names the column and likely rename'], ['Knowing who to tell', 'Ask around', 'Owner is written in the contract'], ['Writing it up', 'Copy things into a ticket', 'One-click pull request note'], ['Catching it again later', 'Hope someone remembers', 'Runs on every change, automatically']].map(function (r) { return h('tr', {}, r.map(function (c) { return h('td', {}, c); })); })))),
+      h('h2', {}, 'Common questions'), faq.map(function (q) { return h('details', { class: glass('card faq') }, h('summary', {}, q[0]), h('p', { class: 'muted' }, q[1])); }),
+      h('div', { class: glass('card cta') }, h('h2', {}, 'Make your exports safer today'), h('p', { class: 'muted' }, 'Open source, runs on your machine, no sign-in.'), h('button', { class: 'btn primary', onclick: function () { go('check'); } }, 'Open the app'), ext(REPO, 'Explore on GitHub', 'btn')));
+  }
+
+  // ---------- features ----------
+  function featuresView() {
+    var F = [['Checks', 'Contract checks', 'Columns, types, ranges, allowed values, unique and not-empty rules, row counts.', 'Available'], ['Agents', 'Triage agent', 'Detects likely column renames and suggests a safe migration.', 'Available'], ['Agents', 'Release gate agent', 'Plain ship or block verdict on every run.', 'Available'], ['Agents', 'Reporter agent', 'Writes the pull request comment for you.', 'Available'], ['Agents', 'Drift watch agent', 'Compares every export with the last passing one.', 'Available'], ['Agents', 'Scout agent', 'Drafts a contract from a sample CSV.', 'Available'], ['Automation', 'Live inbox', 'Folder watcher checks new CSV files within seconds.', 'Available'], ['Automation', 'CLI and CI', 'check, diff, validate, export-demo with exit codes 0, 1, 2.', 'Available'], ['Team', 'Revision-guarded contracts', 'Stale edits are rejected, every revision is listed.', 'Available'], ['Team', 'Activity log', 'Chained log that shows if it was edited.', 'Available'], ['Safety', 'No cell values stored', 'Reports hold column names, counts and record numbers only.', 'Available'], ['Safety', 'Encrypted storage and limits', 'AES-256-GCM at rest, size limits, rate limits, optional access key.', 'Available'], ['Safety', 'Per-customer workspaces', 'Separate contracts per client repository.', 'Planned'], ['Team', 'Slack and email alerts', 'Tell the owner when their report is at risk.', 'Planned']];
+    return h('div', {}, h('h1', {}, 'Features'), h('p', { class: 'muted' }, 'Everything marked Available is in this repository today.'), h('div', { class: 'grid' }, F.map(function (f) { return h('div', { class: glass('card lift') }, h('span', { class: 'badge ' + (f[3] === 'Planned' ? 'plan' : '') }, f[3]), ' ', h('span', { class: 'muted small' }, f[0]), h('h3', {}, f[1]), h('p', { class: 'muted' }, f[2])); })));
+  }
+
+  // ---------- roadmap ----------
+  function roadmapView() {
+    var R = [['Now', ['Contract checks and compare', 'Automatic agents and Live inbox', 'Docs and command palette', 'Shared access key for servers']], ['Next', ['Scoped API tokens for CI', 'Per-repository workspaces', 'Restore an older contract revision', 'Alerts to Slack and email']], ['Later', ['GitHub App with pull request comments', 'Other file formats (JSON, XML)', 'Optional AI explanations you can turn on', 'Sign-in with SSO for larger teams']]];
+    return h('div', {}, h('h1', {}, 'Roadmap'), h('p', { class: 'muted' }, 'Plans can change. Ideas and votes are welcome on GitHub.'), h('div', { class: 'grid' }, R.map(function (c) { return h('div', { class: glass('card') }, h('span', { class: 'badge' }, c[0]), h('ul', {}, c[1].map(function (x) { return h('li', {}, x); }))); })), ext(REPO + '/issues', 'Suggest a feature', 'btn'));
+  }
+
+  // ---------- docs ----------
+  var CI = 'name: cellar\non: pull_request\npermissions:\n  contents: read\njobs:\n  check:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-java@v4\n        with: { distribution: temurin, java-version: 21 }\n      - run: java Build.java package\n      - run: java -jar dist/cellar.jar export-demo --out build/sales.csv\n      - run: java -jar dist/cellar.jar check --csv build/sales.csv --summary --format markdown';
+  var CONTRACT = '{\n  "version": 2,\n  "integrations": [\n    {\n      "id": "inventory-report",\n      "owner": "Inventory team",\n      "required": ["order_id", "sku"],\n      "rules": { "order_id": { "notEmpty": true, "unique": true } }\n    }\n  ]\n}';
+  var DOCS = [
+    { id: 'intro', title: 'Introduction', body: [['p', 'Cellar checks the CSV files your software produces against what each customer workflow needs, and tells you in plain language who would break before you ship.'], ['h', 'Who is it for?'], ['p', 'Agencies and product teams that send recurring exports to customers or other systems.'], ['h', 'What it is not'], ['p', 'It checks column names and the rules you declare. A pass does not prove every value is right for every importer.']] },
+    { id: 'quick', title: 'Quick start', body: [['p', 'You need Java 21 or newer.'], ['code', 'sh run.sh'], ['p', 'On Windows run run.bat. Open the address it prints (usually http://127.0.0.1:8080). There is no sign-in.'], ['list', ['Open Check and press “Breaking demo”, then Run check.', 'Read the result: Inventory fails, Finance passes.', 'Open Contracts to see and edit the rules.']]] },
+    { id: 'install', title: 'Installation', body: [['p', 'Download or clone the repository, then run the start script. The first run builds dist/cellar.jar.'], ['code', 'git clone ' + REPO + '.git\ncd Cellar\nsh run.sh'], ['p', 'Manual build with tests:'], ['code', 'java Build.java test'], ['p', 'If port 8080 is busy Cellar tries the next ports automatically, or use --port 9090.']] },
+    { id: 'contracts', title: 'Contracts', body: [['p', 'A contract lists integrations (customer workflows) and what each needs.'], ['code', CONTRACT], ['list', ['required: columns that must exist.', 'rules: per column, type (string, integer, decimal, boolean, date, datetime), notEmpty, unique, enum, min, max.', 'minRows, maxRows: row count limits. severity: error blocks, warning does not.', 'allowed and order: lock the exact extra columns or column order.']]] },
+    { id: 'cli', title: 'CLI commands', body: [['p', 'Same engine as the web app. Exit code 0 is ok, 1 is blocked, 2 is invalid input.'], ['code', 'java -jar dist/cellar.jar web [--port N]'], ['code', 'java -jar dist/cellar.jar check --csv FILE --format text|json|markdown [--advisory] [--summary]'], ['code', 'java -jar dist/cellar.jar diff --baseline OLD.csv --csv NEW.csv'], ['code', 'java -jar dist/cellar.jar validate'], ['code', 'java -jar dist/cellar.jar export-demo --out build/sales.csv [--demo-break]'], ['code', 'java -jar dist/cellar.jar audit-verify']] },
+    { id: 'ci', title: 'GitHub Actions', body: [['p', 'Run the check on every pull request. Point the export step at your real exporter with synthetic data.'], ['code', CI]] },
+    { id: 'agents', title: 'Agents', body: [['p', 'Agents are built-in, offline rules. They run automatically on every check and never see cell values.'], ['list', ['Triage: finds likely renamed columns.', 'Release gate: ship or block.', 'Reporter: pull request comment.', 'Drift watch: changes since the last passing export.', 'Scout: drafts a contract from a sample CSV (Check page).']]] },
+    { id: 'inbox', title: 'Live inbox', body: [['p', 'Drop any .csv into the inbox folder and it is checked automatically within a couple of seconds. Results appear on the Live inbox page and in History.'], ['code', 'data/inbox/   (or set CELLAR_INBOX=/path/to/folder)'], ['p', 'Files over 8 MiB, non-CSV files and shortcuts (symlinks) are ignored.']] },
+    { id: 'deploy', title: 'Deploy and security', body: [['p', 'Local use needs no settings. To share on a network set these, and put Cellar behind HTTPS.'], ['code', 'CELLAR_BIND=0.0.0.0\nCELLAR_PUBLIC_URL=https://cellar.example.com\nCELLAR_ACCESS_KEY=a-long-shared-key\nCELLAR_TRUST_PROXY=true\nCELLAR_DATA=/var/lib/cellar\nCELLAR_MASTER_KEY=<base64 of 32 random bytes>'], ['list', ['Without CELLAR_ACCESS_KEY it refuses to listen beyond localhost.', 'Data is encrypted at rest. Back up the data folder and the master key together.', 'Built-in protections: host and origin checks, rate limits, body size limits, strict content security policy.', 'No independent security audit has been done.']]] },
+    { id: 'api', title: 'API', body: [['p', 'JSON over HTTP. Send X-Access-Key if one is configured. POST and PUT need an Origin header from the same site.'], ['code', 'GET  /api/health   /api/session   /api/stats   /api/live\nGET  /api/config   /api/revisions /api/history /api/activity\nPUT  /api/config   {config, revision}\nPOST /api/check    {csv, advisory}\nPOST /api/diff     {before, after}\nPOST /api/scout    {csv}']] },
+    { id: 'trouble', title: 'Troubleshooting', body: [['h', '“Operation failed” on start'], ['p', 'Read the DETAIL line under it. Common causes: Java older than 21, or a folder you can’t write to. Use --data to pick another folder.'], ['h', 'Port in use'], ['p', 'Cellar tries the next ports. Or run with --port 9090.'], ['h', 'Access key asked on localhost'], ['p', 'CELLAR_ACCESS_KEY is set in your environment. Unset it for no-login mode.'], ['h', 'Check says a column is missing but it is there'], ['p', 'Names must match exactly, including capital letters and spaces.']] }
+  ];
+  function docBlock(b) {
+    if (b[0] === 'p') return h('p', {}, b[1]); if (b[0] === 'h') return h('h3', {}, b[1]); if (b[0] === 'list') return h('ul', {}, b[1].map(function (x) { return h('li', {}, x); }));
+    return h('div', { class: 'codeblock' }, h('button', { class: 'btn', onclick: function () { copy(b[1]); } }, 'Copy'), h('pre', {}, b[1]));
+  }
+  function docsView() {
+    var cur = DOCS.filter(function (d) { return d.id === state.doc; })[0] || DOCS[0], i = DOCS.indexOf(cur), q = h('input', { type: 'text', placeholder: 'Filter docs…', 'aria-label': 'Filter docs' }), side = h('nav', { class: 'side', 'aria-label': 'Docs' });
+    function drawSide() { clear(side); DOCS.filter(function (d) { var t = q.value.toLowerCase(); return !t || (d.title + JSON.stringify(d.body)).toLowerCase().indexOf(t) >= 0; }).forEach(function (d) { side.appendChild(h('button', { 'aria-current': d.id === cur.id ? 'page' : null, onclick: function () { state.doc = d.id; route(); } }, d.title)); }); }
+    q.addEventListener('input', drawSide); drawSide();
+    return h('div', { class: 'docs' }, h('div', { class: glass('card sidebox') }, q, side, ext(REPO, 'View on GitHub', 'btn')),
+      h('article', { class: glass('card doc') }, h('h1', {}, cur.title), cur.body.map(docBlock),
+        h('div', { class: 'pager' }, i > 0 ? h('button', { class: 'btn', onclick: function () { state.doc = DOCS[i - 1].id; route(); } }, '← ' + DOCS[i - 1].title) : h('span'), i < DOCS.length - 1 ? h('button', { class: 'btn', onclick: function () { state.doc = DOCS[i + 1].id; route(); } }, DOCS[i + 1].title + ' →') : null)));
+  }
+
+  // ---------- live inbox ----------
+  function liveView() {
+    var box = h('div'), info = h('p', { class: 'muted small' }), timer;
+    function load() { api('GET', '/api/live').then(function (d) { info.textContent = 'Watching folder: ' + d.inbox + ' (checks new or changed .csv files automatically)'; clear(box);
+      box.appendChild(d.entries.length ? h('div', { class: 'scroll' }, h('table', {}, th(['When', 'File', 'Result', 'Failing integrations']), h('tbody', {}, d.entries.map(function (e) { return h('tr', {}, h('td', {}, e.at), h('td', {}, h('code', {}, e.file)), h('td', {}, e.error ? h('span', { class: 'status warn' }, 'ERROR') : h('span', { class: 'status ' + (e.blocking ? 'fail' : e.passed ? 'pass' : 'warn') }, e.blocking ? 'BLOCKED' : e.passed ? 'PASSED' : 'WARN')), h('td', {}, e.error || (e.failing || []).join(', ') || '—')); })))) : h('p', { class: 'muted' }, 'Nothing yet. Drop a CSV file into the folder above.')); }).catch(function (e) { clearInterval(timer); showError(box, e); }); }
+    load(); timer = setInterval(function () { if (!document.body.contains(box)) clearInterval(timer); else load(); }, 3000);
+    return h('div', {}, h('h1', {}, 'Live inbox'), h('div', { class: glass('card') }, info, box));
   }
 
   // ---------- check ----------
@@ -167,7 +230,7 @@
     return h('form', { class: glass('gate'), onsubmit: function (e) { e.preventDefault(); store.set('cellar_key', k.value, true); route(); } }, h('h1', {}, 'Access key'), h('p', { class: 'muted small' }, 'This server is shared. Enter its access key.'), k, h('button', { class: 'btn primary', type: 'submit' }, 'Continue'), msg);
   }
 
-  var VIEWS = { home: homeView, check: checkView, contracts: contractsView, diff: diffView, history: historyView, activity: activityView };
+  var VIEWS = { home: homeView, features: featuresView, docs: docsView, roadmap: roadmapView, live: liveView, check: checkView, contracts: contractsView, diff: diffView, history: historyView, activity: activityView };
   function route(needKey) {
     var p = location.hash.slice(1); state.page = VIEWS[p] ? p : 'home'; clear(root);
     api('GET', '/api/session').then(function (s) {

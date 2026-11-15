@@ -4,6 +4,7 @@ import com.sun.net.httpserver.*;
 import io.cellar.*;
 import javax.net.ssl.*;
 import java.io.*;
+import java.nio.file.*;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
@@ -55,13 +56,13 @@ public final class WebServer implements AutoCloseable {
 
         loadStatic("/", "index.html", "text/html; charset=utf-8"); loadStatic("/app.js", "app.js", "text/javascript; charset=utf-8");
         loadStatic("/app.css", "app.css", "text/css; charset=utf-8"); loadStatic("/logo.svg", "logo.svg", "image/svg+xml");
-        registerRoutes();
+        registerRoutes(); startInbox();
         executor = Executors.newFixedThreadPool(16); server.setExecutor(executor); server.createContext("/", this::handle);
     }
 
     public void start() { server.start(); }
     public int port() { return server.getAddress().getPort(); }
-    @Override public void close() { server.stop(0); executor.shutdownNow(); }
+    @Override public void close() { server.stop(0); executor.shutdownNow(); if (inboxPool != null) inboxPool.shutdownNow(); }
 
     // ------------------------------------------------------------------ routes
     private void registerRoutes() {
@@ -75,6 +76,8 @@ public final class WebServer implements AutoCloseable {
         route("POST", "/api/diff", true, DIFF, this::diff);
         route("POST", "/api/scout", true, CHECK, c -> Agents.scout(str(c.body, "csv"), workspace.contract().delimiter()));
         route("GET", "/api/history", true, SMALL, c -> Json.map("history", workspace.history()));
+        route("GET", "/api/stats", true, SMALL, c -> stats());
+        route("GET", "/api/live", true, SMALL, c -> Json.map("inbox", inbox == null ? "" : inbox.toString(), "entries", new ArrayList<>(live)));
         route("GET", "/api/activity", true, SMALL, c -> Json.map("entries", audit.recent(200)));
         route("GET", "/api/activity/verify", true, SMALL, c -> { var v = audit.verify(); return Json.map("ok", v.ok(), "entries", v.entries(), "head", v.head(), "problem", v.problem()); });
     }
@@ -87,12 +90,47 @@ public final class WebServer implements AutoCloseable {
     }
     private Object check(Ctx c) throws Exception {
         if (c.body.containsKey("advisory") && !(c.body.get("advisory") instanceof Boolean)) throw new InputError("advisory must be boolean.");
-        return guarded(() -> {
-            var result = new LinkedHashMap<>(Checker.check(workspace.contract(), str(c.body, "csv"), Boolean.TRUE.equals(c.body.get("advisory"))));
-            workspace.record(result, ME); result.put("agents", Agents.run(result));
-            audit.log(ME, c.ip, "CHECK", "passed=" + result.get("passed") + " blocking=" + result.get("blocking") + " rows=" + result.get("rowsChecked"));
-            return result;
-        });
+        limit("check:" + c.ip, 30, 60);
+        return guarded(() -> runCheck(str(c.body, "csv"), Boolean.TRUE.equals(c.body.get("advisory")), c.ip, ME));
+    }
+    /** One path for manual and automatic checks, so agents, history and the activity log never disagree. */
+    private Map<String, Object> runCheck(String csv, boolean advisory, String ip, String source) {
+        var result = new LinkedHashMap<>(Checker.check(workspace.contract(), csv, advisory));
+        List<?> base = workspace.baseline(); workspace.record(result, source); result.put("agents", Agents.run(result, base));
+        if (Boolean.TRUE.equals(result.get("passed"))) workspace.setBaseline((List<?>) result.get("header"));
+        audit.log(source, ip, "CHECK", "passed=" + result.get("passed") + " blocking=" + result.get("blocking") + " rows=" + result.get("rowsChecked"));
+        return result;
+    }
+    // ---- inbox agent: drop a .csv into <data>/inbox (or CELLAR_INBOX) and it is checked automatically
+    private final List<Object> live = Collections.synchronizedList(new ArrayList<>()); private final Map<String, Long> seen = new HashMap<>();
+    private Path inbox; private final long started = System.currentTimeMillis();
+    private void startInbox() {
+        String env = System.getenv("CELLAR_INBOX"); inbox = (env != null && !env.isBlank() ? Path.of(env) : cfg.dataDir().resolve("inbox")).toAbsolutePath();
+        try { Files.createDirectories(inbox); } catch (IOException e) { System.err.println("WARNING  Inbox folder unavailable: " + inbox); return; }
+        ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor(r -> { Thread t = new Thread(r, "cellar-inbox"); t.setDaemon(true); return t; });
+        ex.scheduleWithFixedDelay(this::inboxTick, 1, 2, TimeUnit.SECONDS); inboxPool = ex;
+    }
+    private ScheduledExecutorService inboxPool;
+    void inboxTick() {
+        try (var files = Files.list(inbox)) {
+            for (Path p : files.sorted().toList()) {
+                String name = p.getFileName().toString();
+                if (!name.toLowerCase(Locale.ROOT).endsWith(".csv") || !Files.isRegularFile(p, LinkOption.NOFOLLOW_LINKS)) continue;
+                long size = Files.size(p), stamp = Files.getLastModifiedTime(p).toMillis() + size; Long prev = seen.put(name, stamp); if (prev != null && prev == stamp) continue;
+                Map<String, Object> entry = new LinkedHashMap<>(); entry.put("file", name); entry.put("at", java.time.Instant.now().toString());
+                try {
+                    if (size > FilesEx.MAX_BYTES) throw new InputError("File is larger than the size limit.");
+                    var r = guarded(() -> runCheck(FilesEx.decode(Files.readAllBytes(p)), false, "inbox", "inbox"));
+                    entry.put("passed", r.get("passed")); entry.put("blocking", r.get("blocking")); List<Object> bad = new ArrayList<>();
+                    for (Object o : (List<?>) r.get("results")) { var m = Json.object(o); if (!Boolean.TRUE.equals(m.get("passed"))) bad.add(m.get("integration")); } entry.put("failing", bad);
+                } catch (InputError e) { entry.put("error", e.getMessage()); } catch (Exception e) { entry.put("error", "Could not check this file."); }
+                live.add(0, entry); while (live.size() > 30) live.remove(live.size() - 1);
+            }
+        } catch (Exception e) { /* folder briefly unavailable: try again next tick */ }
+    }
+    private Object stats() {
+        var h = workspace.history(); int blocked = 0, passed = 0; for (Object o : h) { var m = Json.object(o); if (Boolean.TRUE.equals(m.get("blocking"))) blocked++; if (Boolean.TRUE.equals(m.get("passed"))) passed++; }
+        return Json.map("runs", h.size(), "passed", passed, "blocked", blocked, "integrations", workspace.contract().integrations().size(), "uptimeSeconds", (System.currentTimeMillis() - started) / 1000, "inbox", inbox == null ? "" : inbox.toString());
     }
     private Object diff(Ctx c) throws Exception {
         return guarded(() -> { var r = Checker.diff(workspace.contract(), str(c.body, "before"), str(c.body, "after")); audit.log(ME, c.ip, "DIFF", "added=" + ((List<?>) r.get("added")).size() + " removed=" + ((List<?>) r.get("removed")).size()); return r; });

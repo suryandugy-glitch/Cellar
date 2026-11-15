@@ -44,6 +44,16 @@ final class WebTests {
                 eq(200, r.status()); ok(r.body().contains("\"agents\"")); ok(send("GET", base + "/api/history", null, null, base).body().contains("inventory-report"));
             });
             test("scout and activity routes work", () -> { eq(200, send("POST", base + "/api/scout", "{\"csv\":\"a,b\\n1,x\\n\"}", null, base).status()); ok(send("GET", base + "/api/activity", null, null, base).body().contains("CHECK")); });
+            test("stats route reports runs", () -> ok(send("GET", base + "/api/stats", null, null, base).body().contains("\"runs\"")));
+            test("drift agent flags a new column after a passing run", () -> {
+                send("POST", base + "/api/check", "{\"csv\":\"order_id,sku,total_cents,currency\\nA,B,1,INR\\n\"}", null, base);
+                ok(send("POST", base + "/api/check", "{\"csv\":\"order_id,sku,total_cents,currency,note\\nA,B,1,INR,x\\n\"}", null, base).body().contains("New column `note`"));
+            });
+            test("inbox agent checks dropped files automatically", () -> {
+                Files.writeString(root.resolve("open/inbox/drop.csv"), "id,sku,total_cents,currency\nA,B,1,INR\n"); String body = "";
+                for (int i = 0; i < 20 && !body.contains("drop.csv"); i++) { Thread.sleep(500); body = send("GET", base + "/api/live", null, null, base).body(); }
+                ok(body.contains("drop.csv")); ok(body.contains("inventory-report"));
+            });
             test("cross-origin and wrong-host posts are rejected", () -> {
                 eq(403, send("POST", base + "/api/check", "{\"csv\":\"a\\n1\"}", null, "http://evil.example").status());
                 eq(403, send("POST", base + "/api/check", "{\"csv\":\"a\\n1\"}", null, null).status());

@@ -63,3 +63,12 @@ code{font:.85em ui-monospace,Menlo,Consolas,monospace;word-break:break-all}
 .toast{position:fixed;bottom:1.2rem;right:1.2rem;z-index:30;padding:.7rem 1rem}
 footer{text-align:center;color:var(--muted);padding:2rem 1rem;font-size:.85rem}
 .gate{max-width:380px;margin:12vh auto;padding:1.4rem}
+.subnav{padding:.3rem .5rem;margin-bottom:1.2rem}
+.nowrap{white-space:nowrap;margin:0}a.chip,a.btn,a.pill{text-decoration:none;color:inherit}a.chip:hover{color:var(--ink);background:var(--glass2)}
+.badge.plan{color:var(--warn)}
+.docs{display:grid;grid-template-columns:240px 1fr;gap:1rem;align-items:start}@media (max-width:760px){.docs{grid-template-columns:1fr}}
+.sidebox{position:sticky;top:5rem;margin:0}.side{display:flex;flex-direction:column;margin:.6rem 0}.side button{text-align:left;border:0;background:none;color:var(--muted);padding:.4rem .6rem;border-radius:10px;cursor:pointer;font:inherit}
+.side button:hover,.side button[aria-current=page]{background:var(--glass2);color:var(--ink)}
+.doc{margin:0;min-height:60vh}.doc h3{margin:1.3rem 0 .3rem}.codeblock{position:relative;margin:.8rem 0}.codeblock pre{margin:0;padding:1rem;border-radius:12px;background:var(--code);overflow-x:auto;font:.85rem/1.55 ui-monospace,Menlo,Consolas,monospace}
+.codeblock .btn{position:absolute;right:.5rem;top:.3rem;margin:0;padding:.2rem .6rem;font-size:.75rem}.pager{display:flex;justify-content:space-between;margin-top:2rem}
+.faq summary{cursor:pointer;font-weight:600}.cta{text-align:center;margin-top:2rem}footer div{margin:.3rem 0}
