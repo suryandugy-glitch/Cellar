@@ -1,0 +1,18 @@
+{
+  "integrations": [
+    {
+      "id": "inventory-report",
+      "required": [
+        "order_id",
+        "sku"
+      ]
+    },
+    {
+      "id": "finance-summary",
+      "required": [
+        "total_cents",
+        "currency"
+      ]
+    }
+  ]
+}
