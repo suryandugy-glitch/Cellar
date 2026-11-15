@@ -3,6 +3,7 @@
 <h3 align="center">Catch the CSV change that breaks a customer's import, before it ships.</h3>
 
 <p align="center">
+  <a href="https://suryandugy-glitch.github.io/Cellar/">Website</a> ·
   <a href="https://github.com/suryandugy-glitch/Cellar">GitHub</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#what-you-get">Features</a> ·
@@ -61,21 +62,28 @@ Open the address it prints (usually `http://127.0.0.1:8080`; if that port is bus
 | | Reporter | Writes the pull request comment for you |
 | | Drift watch | Flags changes since the last passing export |
 | | Scout | Drafts a contract from a sample CSV in one click |
-| | AI agents *(optional)* | Explain a result for your team, draft a message to the owner, review your contract, answer questions. Off until you set `CELLAR_AI_KEY` |
+| | AI agents *(optional)* | A small agent on each page (explain a result, suggest fixes, draft an owner message, explain a contract or comparison, summarize history and the inbox) and a chat assistant. Works with Anthropic or OpenAI keys. Off until you set `CELLAR_AI_KEY` |
 | **Automation** | Live inbox | Drop a `.csv` into `data/inbox/` and it is checked within seconds |
 | | CLI + CI | Same engine on the command line, exit codes `0` ok / `1` blocked / `2` invalid |
 | **Team** | Contract revisions | Stale edits are rejected; **restore** any earlier version in one click |
 | | Import / export | Move contracts as JSON; download reports as Markdown or JSON |
 | | Activity log | Chained log that shows if it was edited |
-| **Comfort** | Plain-English results | Every finding says what happened and what to do |
+| **Comfort** | Dashboard | Checks run, pass rate, and the health of every integration at a glance |
+| | Add integrations without JSON | A simple form: name, owner, columns |
+| | Filter and export | Show only failures; download history as CSV |
+| | Plain-English results | Every finding says what happened and what to do |
 | | Docs, search, themes | In-app docs, `Ctrl K` command palette, light and dark glass UI |
 | **Safety** | No cell values stored | Reports hold column names, counts and row numbers only |
 | | Hardened server | Encrypted storage, size and rate limits, host/origin checks, strict CSP |
 
-> The five agents above are **built-in rules**: offline, fast and private. The **AI agents** are optional and use your own API key (Anthropic or OpenAI-compatible). They receive only the contract, column names, counts and rule results, **never your CSV rows**.
+> The first five agents are **built-in rules**: offline, fast and private. The **AI agents** are optional and use your own API key. They receive only the contract, column names, counts, rule codes, recent history and inbox results, plus the question you type. **CSV rows are never sent.**
 
 ```sh
-CELLAR_AI_KEY=your-key  CELLAR_AI_PROVIDER=anthropic  sh run.sh
+CELLAR_AI_KEY=your-key
+CELLAR_AI_PROVIDER=anthropic      # or openai
+CELLAR_AI_MODEL=claude-sonnet-5-5 # optional
+CELLAR_AI_DAILY_LIMIT=200         # requests per day, default 200
+sh run.sh
 ```
 
 ## A contract in 10 lines

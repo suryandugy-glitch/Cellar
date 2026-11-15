@@ -10,7 +10,7 @@
 - Engine, CLI commands and exit codes unchanged. Removed `ui` and `serve` commands.
 - Test suite expanded to 73 groups including live attack scenarios against a running server.
 
-## 2.0.0-beta.1 — 2026-11-15
+## 2.0.0-beta.1, 2026-11-15
 
 ### Added
 

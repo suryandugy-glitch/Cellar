@@ -1,0 +1,9 @@
+build/
+*.class
+.cellar/
+.env
+*.log
+.idea/
+.vscode/
+data/
+master.key
