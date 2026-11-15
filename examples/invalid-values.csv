@@ -1,3 +1,0 @@
-order_id,sku,total_cents,currency
-ORD-001,SEED-01,-100,GBP
-ORD-001,,not-a-number,INR
