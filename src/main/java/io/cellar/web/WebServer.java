@@ -31,15 +31,16 @@ public final class WebServer implements AutoCloseable {
 
     private static final int SMALL = 64 * 1024, CONFIG = 1024 * 1024, CHECK = FilesEx.MAX_BYTES + 1024 * 1024, DIFF = 2 * FilesEx.MAX_BYTES + 1024 * 1024;
     private final WebConfig cfg; private final HttpServer server; private final ExecutorService executor;
-    private final Workspace workspace; private final Audit audit;
+    private final Workspace workspace; private final Audit audit; private final Ai ai; private final Semaphore aiPermits = new Semaphore(2);
     private final RateLimiter limiter = new RateLimiter(50_000);
     private final Semaphore checkPermits = new Semaphore(4), hashPermits = new Semaphore(4);
     private final Map<String, Route> routes = new HashMap<>(); private final Map<String, byte[]> statics = new HashMap<>(); private final Map<String, String> staticTypes = new HashMap<>();
     private final Set<String> allowedHosts = new HashSet<>(), allowedOrigins = new HashSet<>();
     
 
-    public WebServer(WebConfig cfg) throws Exception {
-        this.cfg = cfg;
+    public WebServer(WebConfig cfg) throws Exception { this(cfg, Ai.fromEnv(System.getenv())); }
+    public WebServer(WebConfig cfg, Ai ai) throws Exception {
+        this.cfg = cfg; this.ai = ai;
         Crypto crypto = Crypto.load(cfg.masterKeyEnv(), cfg.dataDir().toAbsolutePath().resolve("master.key"));
         Vault vault = new Vault(cfg.dataDir(), crypto);
         workspace = new Workspace(vault); audit = new Audit(vault, crypto);
@@ -67,11 +68,13 @@ public final class WebServer implements AutoCloseable {
     // ------------------------------------------------------------------ routes
     private void registerRoutes() {
         route("GET", "/api/health", false, SMALL, c -> Json.map("status", "ok"));
-        route("GET", "/api/session", false, SMALL, c -> Json.map("keyRequired", cfg.accessKey() != null, "version", Main.VERSION));
+        route("GET", "/api/session", false, SMALL, c -> Json.map("keyRequired", cfg.accessKey() != null, "version", Main.VERSION, "ai", ai.enabled()));
         route("GET", "/api/demo", true, SMALL, c -> Json.map("config", Json.parse(Demo.CONFIG), "csv", Demo.CSV, "brokenCsv", Demo.csv(true)));
         route("GET", "/api/config", true, SMALL, c -> workspace.config());
         route("PUT", "/api/config", true, CONFIG, this::saveConfig);
         route("GET", "/api/revisions", true, SMALL, c -> Json.map("revisions", workspace.revisions()));
+        route("POST", "/api/restore", true, SMALL, c -> { var r = workspace.restore(str(c.body, "hash"), ME); audit.log(ME, c.ip, "CONFIG_RESTORED", "revision " + str(c.body, "hash").substring(0, Math.min(12, str(c.body, "hash").length()))); return r; });
+        route("POST", "/api/ai", true, CONFIG, this::ai);
         route("POST", "/api/check", true, CHECK, this::check);
         route("POST", "/api/diff", true, DIFF, this::diff);
         route("POST", "/api/scout", true, CHECK, c -> Agents.scout(str(c.body, "csv"), workspace.contract().delimiter()));
@@ -131,6 +134,16 @@ public final class WebServer implements AutoCloseable {
     private Object stats() {
         var h = workspace.history(); int blocked = 0, passed = 0; for (Object o : h) { var m = Json.object(o); if (Boolean.TRUE.equals(m.get("blocking"))) blocked++; if (Boolean.TRUE.equals(m.get("passed"))) passed++; }
         return Json.map("runs", h.size(), "passed", passed, "blocked", blocked, "integrations", workspace.contract().integrations().size(), "uptimeSeconds", (System.currentTimeMillis() - started) / 1000, "inbox", inbox == null ? "" : inbox.toString());
+    }
+    private Object ai(Ctx c) throws Exception {
+        if (!ai.enabled()) throw new InputError("AI agents are off. Set CELLAR_AI_KEY on the server to turn them on.");
+        limit("ai:" + c.ip, 5, 10);
+        String task = str(c.body, "task"), q = c.body.get("question") instanceof String x ? x : "", ask = Ai.prompt(task, q);
+        if (!aiPermits.tryAcquire()) throw new HttpError(503, "The AI helper is busy. Try again shortly.");
+        try {
+            String text = ai.complete(Ai.SYSTEM, ask + "\n\n<data>" + Ai.context(workspace.config().get("config"), c.body.get("report")) + "</data>");
+            audit.log(ME, c.ip, "AI", task + " via " + ai.model()); return Json.map("text", text, "model", ai.model());
+        } finally { aiPermits.release(); }
     }
     private Object diff(Ctx c) throws Exception {
         return guarded(() -> { var r = Checker.diff(workspace.contract(), str(c.body, "before"), str(c.body, "after")); audit.log(ME, c.ip, "DIFF", "added=" + ((List<?>) r.get("added")).size() + " removed=" + ((List<?>) r.get("removed")).size()); return r; });

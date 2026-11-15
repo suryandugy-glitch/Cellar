@@ -22,7 +22,15 @@ public final class Workspace {
 
     public synchronized Contract contract() { return Contract.parse(contractText); }
     public synchronized Map<String, Object> config() { return Json.map("config", Json.parse(contractText), "revision", FilesEx.hash(contractText)); }
-    public synchronized List<Object> revisions() { List<Object> r = new ArrayList<>(revisions); Collections.reverse(r); return r; }
+    public synchronized List<Object> revisions() {
+        List<Object> r = new ArrayList<>(); for (Object o : revisions) { Map<String, Object> m = new LinkedHashMap<>(Json.object(o)); m.put("restorable", m.remove("text") instanceof String); r.add(m); }
+        Collections.reverse(r); return r;
+    }
+    /** Roll back to an earlier saved contract. The rollback is itself a new revision, so nothing is ever lost. */
+    public synchronized Map<String, Object> restore(String hash, String actor) {
+        for (Object o : revisions) { Map<String, Object> m = Json.object(o); if (Crypto.equal(String.valueOf(m.get("hash")), hash) && m.get("text") instanceof String t) return save(Json.parse(t), FilesEx.hash(contractText), actor); }
+        throw new InputError("That revision cannot be restored (it was saved before restore was available).");
+    }
 
     public synchronized Map<String, Object> save(Object config, String expectedRevision, String actor) {
         String text = Json.write(config);
@@ -51,6 +59,6 @@ public final class Workspace {
 
     public synchronized List<?> baseline() { Map<String, Object> d = vault.read("baseline.enc"); return d == null ? null : (List<?>) d.get("header"); }
     public synchronized void setBaseline(List<?> header) { vault.write("baseline.enc", Json.map("header", header)); }
-    private Map<String, Object> rev(String actor) { return Json.map("hash", FilesEx.hash(contractText), "actor", actor, "at", Instant.now().toString()); }
+    private Map<String, Object> rev(String actor) { return Json.map("hash", FilesEx.hash(contractText), "actor", actor, "at", Instant.now().toString(), "text", contractText); }
     private void persistContract() { vault.write("workspace.enc", Json.map("contract", contractText, "revisions", revisions)); }
 }

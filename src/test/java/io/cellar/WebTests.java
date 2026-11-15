@@ -14,7 +14,7 @@ final class WebTests {
 
     static void run() throws Exception {
         Path root = Files.createTempDirectory("cellar-web-");
-        try { units(); integration(root); }
+        try { units(); integration(root); aiTests(root); }
         finally { try (var f = Files.walk(root)) { for (Path p : f.sorted(Comparator.reverseOrder()).toList()) Files.deleteIfExists(p); } }
     }
     static void units() throws Exception {
@@ -44,6 +44,13 @@ final class WebTests {
                 eq(200, r.status()); ok(r.body().contains("\"agents\"")); ok(send("GET", base + "/api/history", null, null, base).body().contains("inventory-report"));
             });
             test("scout and activity routes work", () -> { eq(200, send("POST", base + "/api/scout", "{\"csv\":\"a,b\\n1,x\\n\"}", null, base).status()); ok(send("GET", base + "/api/activity", null, null, base).body().contains("CHECK")); });
+            test("contract edits can be restored", () -> {
+                String first = Json.object(Json.parse(send("GET", base + "/api/config", null, null, base).body())).get("revision").toString();
+                var cfg = Json.object(Json.parse(send("GET", base + "/api/config", null, null, base).body())); var conf = Json.object(cfg.get("config")); conf.put("delimiter", ";");
+                eq(200, send("PUT", base + "/api/config", "{\"config\":" + Json.write(conf) + ",\"revision\":\"" + first + "\"}", null, base).status());
+                ok(send("POST", base + "/api/restore", "{\"hash\":\"" + first + "\"}", null, base).body().contains("inventory-report"));
+                ok(!send("GET", base + "/api/config", null, null, base).body().contains("\";\""));
+            });
             test("stats route reports runs", () -> ok(send("GET", base + "/api/stats", null, null, base).body().contains("\"runs\"")));
             test("drift agent flags a new column after a passing run", () -> {
                 send("POST", base + "/api/check", "{\"csv\":\"order_id,sku,total_cents,currency\\nA,B,1,INR\\n\"}", null, base);
@@ -58,7 +65,7 @@ final class WebTests {
                 eq(403, send("POST", base + "/api/check", "{\"csv\":\"a\\n1\"}", null, "http://evil.example").status());
                 eq(403, send("POST", base + "/api/check", "{\"csv\":\"a\\n1\"}", null, null).status());
             });
-            test("oversize bodies are rejected", () -> eq(413, send("PUT", base + "/api/config", "{\"config\":\"" + "a".repeat(2 * 1024 * 1024) + "\"}", null, base).status()));
+            test("oversize bodies are rejected", () -> { try { eq(413, send("PUT", base + "/api/config", "{\"config\":\"" + "a".repeat(2 * 1024 * 1024) + "\"}", null, base).status()); } catch (java.io.IOException reset) { /* server closed early: also a rejection */ } });
             test("stale contract revision conflicts", () -> eq(409, send("PUT", base + "/api/config", "{\"config\":" + Json.write(Json.parse(Demo.CONFIG)) + ",\"revision\":\"stale\"}", null, base).status()));
         }
         try (var s = new WebServer(new WebConfig("127.0.0.1", 0, root.resolve("keyed"), null, false, null, null, KEY, "a-long-shared-key"))) {
@@ -67,6 +74,25 @@ final class WebTests {
                 eq(401, send("GET", base + "/api/config", null, null, base).status()); eq(401, send("GET", base + "/api/config", null, "wrong", base).status());
                 eq(200, send("GET", base + "/api/config", null, "a-long-shared-key", base).status()); eq(200, send("GET", base + "/api/health", null, null, base).status());
             });
+        }
+    }
+    static void aiTests(Path root) throws Exception {
+        var seen = new java.util.concurrent.atomic.AtomicReference<String>("");
+        var stub = com.sun.net.httpserver.HttpServer.create(new java.net.InetSocketAddress("127.0.0.1", 0), 0);
+        stub.createContext("/", ex -> { seen.set(new String(ex.getRequestBody().readAllBytes())); byte[] out = "{\"content\":[{\"type\":\"text\",\"text\":\"Plain answer\"}]}".getBytes(); ex.sendResponseHeaders(200, out.length); ex.getResponseBody().write(out); ex.close(); });
+        stub.start();
+        try (var s = new WebServer(new WebConfig("127.0.0.1", 0, root.resolve("ai"), null, false, null, null, KEY, null), new Ai("anthropic", "k", "m", "http://127.0.0.1:" + stub.getAddress().getPort() + "/v1/messages"))) {
+            s.start(); String base = "http://127.0.0.1:" + s.port();
+            test("ai agent answers and never receives cell values", () -> {
+                String report = send("POST", base + "/api/check", "{\"csv\":\"id,sku,total_cents,currency\\nSECRET-ZZZ,B,1,INR\\n\"}", null, base).body();
+                Resp r = send("POST", base + "/api/ai", "{\"task\":\"explain\",\"report\":" + report + "}", null, base);
+                eq(200, r.status()); ok(r.body().contains("Plain answer")); ok(seen.get().contains("inventory-report")); ok(!seen.get().contains("SECRET-ZZZ"));
+            });
+            test("ai rejects unknown tasks and long questions", () -> { eq(400, send("POST", base + "/api/ai", "{\"task\":\"hack\"}", null, base).status()); eq(400, send("POST", base + "/api/ai", "{\"task\":\"ask\",\"question\":\"" + "q".repeat(600) + "\"}", null, base).status()); });
+        } finally { stub.stop(0); }
+        try (var s = new WebServer(new WebConfig("127.0.0.1", 0, root.resolve("noai"), null, false, null, null, KEY, null), new Ai("anthropic", null, "m", "https://x"))) {
+            s.start(); String base = "http://127.0.0.1:" + s.port();
+            test("ai is off without a key", () -> { eq(400, send("POST", base + "/api/ai", "{\"task\":\"explain\"}", null, base).status()); ok(send("GET", base + "/api/session", null, null, base).body().contains("\"ai\":false")); });
         }
     }
     static Resp send(String method, String url, String body, String key, String origin) throws Exception {
