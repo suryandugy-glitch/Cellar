@@ -1,114 +1,66 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
-    <img src="assets/logo.svg" alt="Cellar" width="320">
-  </picture>
-</p>
+<p align="center"><img src="assets/logo.svg" alt="Cellar" width="280"></p>
 
-<p align="center"><strong>Catch the CSV change that would break a customer's import, before you ship it.</strong></p>
+# Cellar Web — Secure Java CSV Compatibility Platform
 
----
+**Catch the CSV change that breaks a customer's import before it ships — now as a hardened, server-side web application.**
 
-Cellar checks the CSV your software exports against the columns each customer workflow needs. When a pull request would break one of them, the check fails and names the workflow.
+Version **3.0.0-web.1** converts the Swing desktop app into a browser-based application. The validation engine is unchanged (same rules, same exit codes, same reports). What is new is everything around it: accounts and roles, encrypted storage, a tamper-evident audit log and a strict-CSP web UI, all in Java 21 with **no third-party libraries**.
 
-```
-FAIL  inventory-report requires order_id
-PASS  finance-summary satisfies its declared requirements
+**Design stance:** assume attackers have the source and the JAR. The browser gets only a thin UI; every decision, rule and permission lives on the server. Read [docs/WEB_SECURITY.md](docs/WEB_SECURITY.md), including its *what this does NOT protect against* section, before putting real data in it. No independent security audit has been done.
+
+## Start (local)
+
+```sh
+sh run.sh            # Windows: run.bat   (needs JDK 21+)
 ```
 
-## The problem
+Open `http://127.0.0.1:8080`. **No account or sign-in on localhost.** Click *Try the breaking demo*: only `inventory-report` fails, and the Triage agent notices `order_id` was probably renamed to `id`.
 
-A developer renames `order_id` to `id` in a sales export. The app still produces a valid CSV, so its tests pass. A customer's weekly inventory report still looks for `order_id` and fails on the next import. A second customer's finance report reads only `total_cents` and `currency`, and keeps working.
+**Automatic agents** (offline, rule-based, no model or network): *Triage* (rename detection), *Release gate* (ship or block) and *Reporter* (PR comment) run on every check; *Scout* drafts a contract from a sample CSV. Press `Ctrl K` for the command palette.
 
-Cellar tells you which of those two reports breaks, while the change is still a pull request.
+**Sharing it on a server:** set `CELLAR_BIND`, `CELLAR_PUBLIC_URL` and one shared `CELLAR_ACCESS_KEY` (12+ characters), and put it behind HTTPS. There are no users, roles or passwords.
 
-## Dashboard (no command line needed)
+## What changed from 2.0.0-beta.1
 
-Double-click **`run.bat`** (Windows) or **`run.sh`** (Mac/Linux), or run `python run.py`. A local page opens in your browser with a sidebar for **Check a CSV**, **Contracts**, **History** and **Help**. Drop in a CSV, click **Run check**, edit and save `cellar.json`, copy or download the report, and switch light/dark theme. It runs only on your computer.
+| Area | 2.0 | 3.0 web |
+|---|---|---|
+| Interface | Swing desktop | Browser UI served by the same JAR (no Node, no CDN) |
+| Access | Single local user, loopback bearer token | Accounts, roles, sessions, CSRF protection |
+| Storage | Plain JSON files | AES-256-GCM encrypted at rest, revision-guarded contracts |
+| Audit | Editable local history | HMAC-chained audit log, `audit-verify` command |
+| Exposure | Loopback only | Refuses plaintext network exposure; TLS direct or via proxy |
+| Engine, CLI, GitHub Action | — | **Unchanged** (CLI still the CI gate) |
 
-With the package installed you can also run `cellar ui`, and `cellar check --format json` prints machine-readable results.
+## Build and test
 
-## Quick start
-
-Requires Python 3.9 or newer and has no dependencies.
-
-```bash
-pip install .
-
-# 1. Generate a CSV with your real exporter, using synthetic data
-python examples/sales_exporter.py --out build/sales_export.csv
-
-# 2. Check it against the contracts in cellar.json
-cellar check --config cellar.json --csv build/sales_export.csv
+```sh
+java Build.java test      # compiles, runs 73 test groups (engine + web security), packages dist/cellar.jar
+java -jar dist/cellar.jar --version
 ```
 
-To watch it catch a break, simulate the rename:
+No Maven/Gradle or downloads are needed. The suite starts a real server and attacks it: forged cookies, missing CSRF, cross-origin posts, role escalation, oversize bodies, tampered files, tampered audit chain, brute force.
 
-```bash
-python examples/sales_exporter.py --out build/sales_export.csv --demo-break
-cellar check --csv build/sales_export.csv     # exits with code 1
+## CLI (unchanged, for CI)
+
+```sh
+java -jar dist/cellar.jar export-demo --out build/sales.csv
+java -jar dist/cellar.jar check --csv build/sales.csv --summary --format markdown
+java -jar dist/cellar.jar audit-verify          # web audit chain; needs CELLAR_MASTER_KEY or data/master.key
 ```
 
-## Declare your contracts
+Check exit codes: `0` allowed, `1` blocked, `2` invalid input or configuration. Contract format: [docs/CONTRACTS.md](docs/CONTRACTS.md).
 
-One JSON file lists each integration and the columns it requires.
+## Deploy on a server
 
-```json
-{
-  "integrations": [
-    { "id": "inventory-report", "required": ["order_id", "sku"] },
-    { "id": "finance-summary", "required": ["total_cents", "currency"] }
-  ]
-}
-```
+Terminate TLS in a reverse proxy (see `deploy/`), then set `CELLAR_PUBLIC_URL`, `CELLAR_TRUST_PROXY=true`, `CELLAR_MASTER_KEY` and `CELLAR_DATA`. The server refuses to listen on a network interface without TLS. Details and the full variable table: [docs/WEB_SECURITY.md](docs/WEB_SECURITY.md). Routes: [docs/API.md](docs/API.md).
 
-- Every integration needs a unique `id` and at least one required column.
-- Names match exactly, including case and spaces.
-- Extra and reordered columns pass, which fits importers that read fields by name.
+## Status and honest limits
 
-## Exit codes
+Working beta for pilots. Single process and single shared workspace; sessions are in memory; no API tokens for machine clients, SSO, MFA, billing or GitHub App yet. Documents `HLD.md`, `LLD.md`, `OPERATIONS.md` describe the 2.0 desktop design and carry a banner; `WEB_SECURITY.md` is authoritative for 3.0.
 
-| Code | Meaning |
-|---|---|
-| `0` | Every contract passed |
-| `1` | At least one contract failed |
-| `2` | Invalid input or configuration, so nothing was verified |
+## Roadmap (smallest steps toward the startup plan)
 
-Cellar reads only the header row. Reports are deterministic and never include cell values.
-
-Cellar rejects an empty file, a blank first line, blank or duplicate header names, invalid UTF-8 (a byte order mark is fine), and header rows the CSV parser cannot read. Each error says what to fix.
-
-## Run it on every pull request
-
-`.github/workflows/cellar.yml` generates the CSV through your exporter, runs the check with read-only repository permissions, and shows the result in the job summary:
-
-```yaml
-- name: Check integrations
-  run: cellar check --config cellar.json --csv build/sales_export.csv --summary
-```
-
-Replace the example exporter step with your own, run on synthetic seed data. If fixture generation fails, the job fails. In your repository settings, mark the check as required before merging.
-
-## Planned changes
-
-- Edits or removals of a contract need the owner's review. Set your handle in `.github/CODEOWNERS`.
-- For a deliberate rename, keep both columns until the affected importer migrates. Then update the contract and remove the old column.
-- Record the migration owner in the pull request. The template has a field for it.
-
-## What a pass means
-
-A pass means the generated header meets the declared requirements. It does not cover value formats, units, malformed data rows, positional imports or production-only export variants. A change in date format or price units can pass a header check and still break an import.
-
-## Develop
-
-```bash
-python -m unittest discover -s tests -v
-```
-
-## Status
-
-Early prototype. Planned next: advisory mode for first rollout, a shared integration registry across repositories, and an audit trail for approved changes.
-
-## License
-
-MIT
+1. TOTP multi-factor for owners and maintainers.
+2. Scoped API tokens so CI can post fixtures without a browser session.
+3. Per-repository workspaces (tenant isolation) once a second pilot team needs it.
+4. External audit-head anchoring and key-rotation tooling.

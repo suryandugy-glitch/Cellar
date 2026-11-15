@@ -1,0 +1,4 @@
+{
+  "csv": "id,sku,total_cents,currency\nORD-001,SEED-01,25000,INR\nORD-002,TOOL-02,79900,INR\n",
+  "advisory": false
+}
