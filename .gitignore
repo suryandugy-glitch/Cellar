@@ -2,6 +2,7 @@ build/
 *.class
 .cellar/
 .env
+.vercel/
 *.log
 .idea/
 .vscode/
