@@ -14,7 +14,7 @@ final class WebTests {
 
     static void run() throws Exception {
         Path root = Files.createTempDirectory("cellar-web-");
-        try { units(); integration(root); aiTests(root); }
+        try { units(); persistence(root); integration(root); aiTests(root); }
         finally { try (var f = Files.walk(root)) { for (Path p : f.sorted(Comparator.reverseOrder()).toList()) Files.deleteIfExists(p); } }
     }
     static void units() throws Exception {
@@ -30,15 +30,86 @@ final class WebTests {
         test("scout agent drafts a contract from a CSV", () -> {
             var draft = Agents.scout(Demo.CSV, ','); ok(Json.write(draft).contains("\"required\":[\"order_id\",\"sku\",\"total_cents\",\"currency\"]")); Contract.from(Json.map("integrations", List.of(draft)));
         });
-        test("network exposure needs an access key", () -> {
-            invalid(() -> WebConfig.fromEnv(Map.of("CELLAR_BIND", "0.0.0.0", "CELLAR_PUBLIC_URL", "https://c.example.com"), -1, null));
-            WebConfig.fromEnv(Map.of("CELLAR_BIND", "0.0.0.0", "CELLAR_PUBLIC_URL", "https://c.example.com", "CELLAR_ACCESS_KEY", "a-long-shared-key"), -1, null);
+        test("shared deployments require an HTTPS origin, proxy or TLS, and both keys", () -> {
+            var env = new HashMap<>(Map.of("CELLAR_BIND", "0.0.0.0", "CELLAR_PUBLIC_URL", "https://C.example.com:443/",
+                "CELLAR_ACCESS_KEY", "a-long-shared-key", "CELLAR_MASTER_KEY", KEY, "CELLAR_TRUST_PROXY", "true"));
+            for (String name : List.of("CELLAR_ACCESS_KEY", "CELLAR_MASTER_KEY", "CELLAR_PUBLIC_URL", "CELLAR_TRUST_PROXY")) {
+                String value = env.remove(name);
+                invalid(() -> WebConfig.fromEnv(env, -1, null));
+                env.put(name, value);
+            }
+            eq("https://c.example.com", WebConfig.fromEnv(env, -1, null).publicOrigin().toString());
+            for (String url : List.of("http://c.example.com", "https://c.example.com/prefix", "https://c.example.com/?q=1")) {
+                env.put("CELLAR_PUBLIC_URL", url);
+                invalid(() -> WebConfig.fromEnv(env, -1, null));
+            }
+            invalid(() -> WebConfig.fromEnv(Map.of("CELLAR_TRUST_PROXY", "true"), -1, null));
+        });
+    }
+    static void persistence(Path root) throws Exception {
+        test("workspace lock prevents concurrent server writers and releases on close", () -> {
+            var config = new WebConfig("127.0.0.1", 0, root.resolve("lock"), null, false, null, null, KEY, null);
+            try (var first = new WebServer(config)) {
+                first.start();
+                try (var unexpected = new WebServer(config)) {
+                    throw new AssertionError("More than one server acquired the workspace");
+                } catch (InputError e) {
+                    ok(e.getMessage().contains("Another Cellar server"));
+                }
+            }
+            try (var reopened = new WebServer(config)) {
+                reopened.start();
+                eq(200, send("GET", "http://127.0.0.1:" + reopened.port() + "/api/ready", null, null, null).status());
+            }
+        });
+        test("failed contract write leaves the current contract and revisions intact", () -> {
+            Path data = root.resolve("failed-write");
+            var vault = new Vault(data, new Crypto(Base64.getDecoder().decode(KEY)));
+            var workspace = new Workspace(vault);
+            var previous = workspace.config();
+            var revisions = workspace.revisions();
+            var edit = Json.object(previous.get("config"));
+            edit.put("delimiter", ";");
+            Path stored = data.resolve("workspace.enc");
+            Path backup = data.resolve("saved.enc");
+            Files.move(stored, backup);
+            Files.createDirectory(stored);
+            Files.writeString(stored.resolve("keep"), "fixture");
+            invalid(() -> workspace.save(edit, (String) previous.get("revision"), "test"));
+            eq(previous.get("revision"), workspace.config().get("revision"));
+            eq(revisions, workspace.revisions());
+            Files.delete(stored.resolve("keep"));
+            Files.delete(stored);
+            Files.move(backup, stored);
+            eq(previous.get("revision"), new Workspace(vault).config().get("revision"));
+        });
+        test("existing history and passing baseline survive the first new check", () -> {
+            var vault = new Vault(root.resolve("legacy-history"), new Crypto(Base64.getDecoder().decode(KEY)));
+            var legacyHeader = List.of("legacy_column");
+            vault.write("baseline.enc", Json.map("header", legacyHeader));
+            vault.write("history.enc", Json.map("history", List.of(Json.map("id", "legacy-run"))));
+            var workspace = new Workspace(vault);
+            var contract = workspace.contract();
+            var report = Checker.check(contract, Demo.CSV, false);
+            eq(legacyHeader, workspace.record(report, "test"));
+            // A failed CSV check keeps the last passing header after a server restart.
+            var reopened = new Workspace(vault);
+            eq(report.get("header"), reopened.record(Checker.check(contract, Demo.csv(true), false), "test"));
+            eq("legacy-run", Json.object(reopened.history().get(2)).get("id"));
         });
     }
     static void integration(Path root) throws Exception {
         try (var s = new WebServer(new WebConfig("127.0.0.1", 0, root.resolve("open"), null, false, null, null, KEY, null))) {
             s.start(); String base = "http://127.0.0.1:" + s.port();
             test("no login needed locally", () -> eq(200, send("GET", base + "/api/config", null, null, base).status()));
+            test("diff accepts a JSON envelope larger than a single CSV limit", () -> {
+                String rows = "a,b,c,d\n" + "x".repeat(62) + "\n";
+                String before = "order_id,sku,total_cents,currency\n" + rows.repeat(65_000);
+                String after = "id,sku,total_cents,currency\n" + rows.repeat(65_000);
+                Resp result = send("POST", base + "/api/diff", Json.write(Json.map("before", before, "after", after)), null, base);
+                eq(200, result.status());
+                ok(result.body().contains("inventory-report"));
+            });
             test("check returns agents and records history", () -> {
                 Resp r = send("POST", base + "/api/check", "{\"csv\":\"id,sku,total_cents,currency\\nA,B,1,INR\\n\"}", null, base);
                 eq(200, r.status()); ok(r.body().contains("\"agents\"")); ok(send("GET", base + "/api/history", null, null, base).body().contains("inventory-report"));
@@ -73,6 +144,11 @@ final class WebTests {
             test("access key gates the api when configured", () -> {
                 eq(401, send("GET", base + "/api/config", null, null, base).status()); eq(401, send("GET", base + "/api/config", null, "wrong", base).status());
                 eq(200, send("GET", base + "/api/config", null, "a-long-shared-key", base).status()); eq(200, send("GET", base + "/api/health", null, null, base).status());
+            });
+            test("failed access keys are throttled without blocking authenticated requests", () -> {
+                for (int i = 0; i < 20; i++) send("GET", base + "/api/config", null, "wrong", base);
+                eq(429, send("GET", base + "/api/config", null, "wrong", base).status());
+                eq(200, send("GET", base + "/api/config", null, "a-long-shared-key", base).status());
             });
         }
     }

@@ -8,16 +8,26 @@ import java.util.*;
 public final class Workspace {
     public static final class Conflict extends RuntimeException { public Conflict() { super("The contract changed since you loaded it. Reload before saving."); } }
     private static final int MAX_CONTRACT_CHARS = 512 * 1024, MAX_REVISIONS = 50, MAX_HISTORY = 100;
+    private static final int MAX_REVISION_CHARS = 4 * 1024 * 1024;
     private final Vault vault;
-    private String contractText; private final List<Object> revisions = new ArrayList<>();
+    private String contractText;
+    private List<Object> revisions;
 
     public Workspace(Vault vault) {
         this.vault = vault;
-        Map<String, Object> d = vault.read("workspace.enc");
-        if (d == null) {
+        Map<String, Object> saved = vault.read("workspace.enc");
+        Map<String, Object> runs = vault.read("history.enc");
+        if (runs != null) Json.array(runs.get("history"));
+        readBaseline(runs); // Check existing files before the server can accept traffic.
+        if (saved == null) {
             contractText = Json.write(Json.parse(Demo.CONFIG)); Contract.parse(contractText);
-            revisions.add(rev("system")); persistContract();
-        } else { contractText = (String) d.get("contract"); revisions.addAll((List<?>) d.get("revisions")); Contract.parse(contractText); }
+            revisions = List.of(rev(contractText, "system"));
+            persistContract(contractText, revisions);
+        } else {
+            contractText = (String) saved.get("contract");
+            Contract.parse(contractText);
+            revisions = Json.array(saved.get("revisions"));
+        }
     }
 
     public synchronized Contract contract() { return Contract.parse(contractText); }
@@ -38,13 +48,28 @@ public final class Workspace {
         Contract.parse(text);                                           // validate BEFORE touching state
         if (expectedRevision == null || !Crypto.equal(FilesEx.hash(contractText), expectedRevision)) throw new Conflict();
         if (text.equals(contractText)) return config();
-        contractText = text; revisions.add(rev(actor));
-        while (revisions.size() > MAX_REVISIONS) revisions.remove(0);
-        persistContract(); return config();
+        List<Object> next = new ArrayList<>(revisions);
+        next.add(rev(text, actor));
+        int first = next.size() - 1;
+        int size = text.length();
+        while (first > 0 && next.size() - first < MAX_REVISIONS) {
+            Object oldText = Json.object(next.get(first - 1)).get("text");
+            if (oldText instanceof String revisionText) size += revisionText.length();
+            if (size > MAX_REVISION_CHARS) break;
+            first--;
+        }
+        next = new ArrayList<>(next.subList(first, next.size()));
+        persistContract(text, next);
+        contractText = text;
+        revisions = next;
+        return config();
     }
 
-    public synchronized void record(Map<String, Object> report, String actor) {
+    /** Atomically persist the result and latest passing header, returning the prior header for drift analysis. */
+    public synchronized List<?> record(Map<String, Object> report, String actor) {
         Map<String, Object> d = vault.read("history.enc"); List<Object> history = d == null ? new ArrayList<>() : new ArrayList<>((List<?>) d.get("history"));
+        List<?> previousHeader = readBaseline(d);
+        List<?> nextHeader = Boolean.TRUE.equals(report.get("passed")) ? (List<?>) report.get("header") : previousHeader;
         List<Object> summary = new ArrayList<>();
         for (Object obj : (List<?>) report.get("results")) {
             Map<String, Object> r = Json.object(obj);
@@ -53,12 +78,25 @@ public final class Workspace {
         history.add(0, Json.map("id", UUID.randomUUID().toString(), "timestamp", Instant.now().toString(), "actor", actor, "passed", report.get("passed"),
             "blocking", report.get("blocking"), "scope", report.get("scope"), "advisory", report.get("advisory"), "rowsChecked", report.get("rowsChecked"),
             "contractHash", report.get("contractHash"), "results", summary));
-        vault.write("history.enc", Json.map("history", history.subList(0, Math.min(MAX_HISTORY, history.size()))));
+        vault.write("history.enc", Json.map("history", history.subList(0, Math.min(MAX_HISTORY, history.size())), "header", nextHeader));
+        return previousHeader;
     }
     public synchronized List<Object> history() { Map<String, Object> d = vault.read("history.enc"); return d == null ? new ArrayList<>() : new ArrayList<>((List<?>) d.get("history")); }
 
-    public synchronized List<?> baseline() { Map<String, Object> d = vault.read("baseline.enc"); return d == null ? null : (List<?>) d.get("header"); }
-    public synchronized void setBaseline(List<?> header) { vault.write("baseline.enc", Json.map("header", header)); }
-    private Map<String, Object> rev(String actor) { return Json.map("hash", FilesEx.hash(contractText), "actor", actor, "at", Instant.now().toString(), "text", contractText); }
-    private void persistContract() { vault.write("workspace.enc", Json.map("contract", contractText, "revisions", revisions)); }
+    private List<?> readBaseline(Map<String, Object> history) {
+        if (history != null && history.containsKey("header")) {
+            Object header = history.get("header");
+            return header == null ? null : Json.array(header);
+        }
+        Map<String, Object> legacy = vault.read("baseline.enc");
+        return legacy == null ? null : Json.array(legacy.get("header"));
+    }
+
+    private static Map<String, Object> rev(String text, String actor) {
+        return Json.map("hash", FilesEx.hash(text), "actor", actor, "at", Instant.now().toString(), "text", text);
+    }
+
+    private void persistContract(String text, List<Object> savedRevisions) {
+        vault.write("workspace.enc", Json.map("contract", text, "revisions", savedRevisions));
+    }
 }

@@ -1,0 +1,62 @@
+name: Backend
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  deployment-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      CELLAR_DOMAIN: localhost
+      CELLAR_ACCESS_KEY: cellar-ci-synthetic-key
+      CELLAR_MASTER_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build, run Java tests, and start the stack
+        run: docker compose -f deploy/docker-compose.yml up -d --build --wait --wait-timeout 90
+      - name: Check HTTPS, authentication, CSV validation and persistence
+        run: |
+          compose() { docker compose -f deploy/docker-compose.yml "$@"; }
+          root_ca="$RUNNER_TEMP/cellar-root.crt"
+          for attempt in {1..20}; do
+            if compose exec -T proxy cat /data/caddy/pki/authorities/local/root.crt > "$root_ca"; then
+              break
+            fi
+            sleep 1
+          done
+          request() { curl --silent --show-error --max-time 6 --cacert "$root_ca" "$@"; }
+          origin=https://localhost
+          ready() {
+            for attempt in {1..20}; do
+              if request --fail "$origin/api/ready" | jq -e '.status == "ready"'; then
+                return 0
+              fi
+              sleep 1
+            done
+            return 1
+          }
+          ready
+          test "$(request --output /dev/null --write-out '%{http_code}' "$origin/api/config")" = 401
+          request --fail --header "X-Access-Key: $CELLAR_ACCESS_KEY" \
+            --header "Origin: $origin" --header 'Content-Type: application/json' \
+            --data-binary @examples/api-check.json "$origin/api/check" |
+            jq -e '.blocking and (.results[0].integration == "inventory-report")'
+          compose restart cellar
+          ready
+          request --fail --header "X-Access-Key: $CELLAR_ACCESS_KEY" "$origin/api/history" |
+            jq -e '.history[0].blocking == true'
+          request --fail --header "X-Access-Key: $CELLAR_ACCESS_KEY" "$origin/api/activity/verify" |
+            jq -e '.ok and .entries > 0'
+      - name: Print container logs on failure
+        if: failure()
+        run: docker compose -f deploy/docker-compose.yml logs --no-color
+      - name: Stop the smoke-test stack
+        if: always()
+        run: docker compose -f deploy/docker-compose.yml down --volumes

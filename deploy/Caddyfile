@@ -1,8 +1,7 @@
-cellar.example.com {
-	# Caddy obtains TLS certificates automatically. Overwrite (never append) forwarded headers.
-	request_body { max_size 18MB }
-	reverse_proxy cellar:8080 {
-		header_up X-Forwarded-Proto https
-		header_up X-Forwarded-For {remote_host}
+{$CELLAR_DOMAIN} {
+	request_body {
+		max_size 18MiB
 	}
+	# Caddy supplies the forwarded scheme and IP from its connection metadata.
+	reverse_proxy cellar:8080
 }
