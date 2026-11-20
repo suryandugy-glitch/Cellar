@@ -2,11 +2,11 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:https';
 import { once } from 'node:events';
-import { config } from '../../../vercel.mjs';
 import { siteOrigin, workspaceOrigin } from '../../../deploy/vercel-origins.mjs';
 import { chromium } from '../../../build/e2e/node_modules/playwright/index.mjs';
 
 const root = new URL('../../../', import.meta.url);
+const config = JSON.parse(await readFile(new URL('vercel.json', root), 'utf8'));
 const frontend = new URL(siteOrigin);
 const backend = new URL(workspaceOrigin);
 assert.equal(frontend.hostname, '127.0.0.1');

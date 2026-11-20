@@ -166,12 +166,12 @@ Actions** as the source. The **Website** workflow publishes after pushes to
 ## Deploy the site and connect the workspace
 
 Import this repository into Vercel and keep the repository root as the project
-root. The settings in `vercel.mjs` build the overview, animated walkthrough,
+root. The settings in `vercel.json` build the overview, animated walkthrough,
 setup guide, and full sample reports with Node.js. The build needs no Java installation or npm dependencies.
 
 The public demo works with no environment variables. To run the full workspace
 from Vercel, deploy Java using the [deployment guide](docs/WEB_SECURITY.md),
-then set both origins:
+then set both origins.
 
 | Where | Variable | Example |
 |---|---|---|

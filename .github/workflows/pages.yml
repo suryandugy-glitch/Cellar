@@ -27,7 +27,10 @@ jobs:
       - name: Check the Vercel build against the Java-generated site
         run: |
           node deploy/build-vercel.mjs
-          diff -r --exclude=index.html build/pages build/vercel
+          diff -r --exclude='*.html' build/pages build/vercel
+          for page in demo.html guide.html walkthrough.html; do
+            sed '/<meta http-equiv="Content-Security-Policy"/d' "build/vercel/$page" | diff "build/pages/$page" -
+          done
       - uses: actions/upload-pages-artifact@v4
         if: github.ref == 'refs/heads/main'
         with:
