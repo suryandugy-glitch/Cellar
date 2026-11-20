@@ -32,6 +32,7 @@ public final class WebServer implements AutoCloseable {
     }
 
     private static final int SMALL = 64 * 1024, CONFIG = 1024 * 1024, CHECK = FilesEx.MAX_BYTES + 1024 * 1024, DIFF = 2 * FilesEx.MAX_BYTES + 1024 * 1024;
+    private static final Set<String> FRONTEND_HEADERS = Set.of("content-type", "x-access-key");
     private final WebConfig cfg; private final HttpServer server; private final ExecutorService executor;
     private final WorkspaceLock workspaceLock;
     private final AtomicBoolean closing = new AtomicBoolean();
@@ -245,9 +246,14 @@ public final class WebServer implements AutoCloseable {
             if (host == null || !allowedHosts.contains(host.toLowerCase(Locale.ROOT))) throw new HttpError(400, "Unrecognised host.");      // DNS-rebinding defence
             if (cfg.trustProxy() && !List.of("https").equals(x.getRequestHeaders().get("X-Forwarded-Proto")))
                 throw new HttpError(400, "HTTPS forwarding is required.");
+            boolean fromFrontend = allowFrontend(x, path);
             c.ip = clientIp(x);
             if (!limiter.allow("ip:" + c.ip, 200, 120)) throw new HttpError(429, "Too many requests. Slow down.");
 
+            if (cfg.frontendOrigin() != null && method.equals("OPTIONS") && path.startsWith("/api/")) {
+                preflight(x, path, fromFrontend);
+                return;
+            }
             if (method.equals("GET") && statics.containsKey(path)) { sendBytes(x, 200, statics.get(path), staticTypes.get(path), "no-cache"); return; }
             Route route = routes.get(method + " " + path);
             if (route == null) {
@@ -257,9 +263,11 @@ public final class WebServer implements AutoCloseable {
             boolean mutating = !method.equals("GET");
             if (mutating) {
                 String origin = x.getRequestHeaders().getFirst("Origin");
-                if (origin == null || !allowedOrigins.contains(origin)) throw new HttpError(403, "Cross-origin request rejected.");
+                if (!fromFrontend && (origin == null || !allowedOrigins.contains(origin))) throw new HttpError(403, "Cross-origin request rejected.");
                 String site = x.getRequestHeaders().getFirst("Sec-Fetch-Site");
-                if (site != null && !site.equals("same-origin")) throw new HttpError(403, "Cross-site request rejected.");
+                if (site != null && !site.equals("same-origin") &&
+                    !(fromFrontend && (site.equals("cross-site") || site.equals("same-site"))))
+                    throw new HttpError(403, "Cross-site request rejected.");
                 String ct = x.getRequestHeaders().getFirst("Content-Type");
                 if (ct == null || !ct.toLowerCase(Locale.ROOT).split(";", 2)[0].trim().equals("application/json")) throw new HttpError(415, "Use application/json.");
             }
@@ -297,6 +305,36 @@ public final class WebServer implements AutoCloseable {
             if (checkSlot) checkPermits.release();
             x.close();
         }
+    }
+
+    private boolean allowFrontend(HttpExchange exchange, String path) {
+        if (cfg.frontendOrigin() == null || !path.startsWith("/api/")) return false;
+        var response = exchange.getResponseHeaders();
+        response.add("Vary", "Origin");
+        String origin = cfg.frontendOrigin().toString();
+        if (!List.of(origin).equals(exchange.getRequestHeaders().get("Origin"))) return false;
+        response.set("Access-Control-Allow-Origin", origin);
+        return true;
+    }
+
+    private void preflight(HttpExchange exchange, String path, boolean fromFrontend) throws IOException {
+        var request = exchange.getRequestHeaders();
+        var response = exchange.getResponseHeaders();
+        response.add("Vary", "Access-Control-Request-Method, Access-Control-Request-Headers");
+        if (!fromFrontend) throw new HttpError(403, "Cross-origin request rejected.");
+        String method = request.getFirst("Access-Control-Request-Method");
+        if (!routes.containsKey(method + " " + path)) throw new HttpError(405, "Method not allowed.");
+        for (String list : request.getOrDefault("Access-Control-Request-Headers", List.of())) {
+            for (String header : list.split(",")) {
+                if (!FRONTEND_HEADERS.contains(header.trim().toLowerCase(Locale.ROOT)))
+                    throw new HttpError(403, "Cross-origin request header rejected.");
+            }
+        }
+        response.set("Cache-Control", "no-store");
+        response.set("Access-Control-Allow-Methods", method);
+        response.set("Access-Control-Allow-Headers", "Content-Type, X-Access-Key");
+        response.set("Access-Control-Max-Age", "300");
+        exchange.sendResponseHeaders(204, -1);
     }
 
     // ------------------------------------------------------------------ helpers

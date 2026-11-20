@@ -15,6 +15,7 @@ jobs:
     timeout-minutes: 12
     env:
       CELLAR_DOMAIN: localhost
+      CELLAR_FRONTEND_ORIGIN: https://127.0.0.1:8443
       CELLAR_ACCESS_KEY: cellar-ci-synthetic-key
       CELLAR_MASTER_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
     steps:
@@ -54,6 +55,16 @@ jobs:
             jq -e '.history[0].blocking == true'
           request --fail --header "X-Access-Key: $CELLAR_ACCESS_KEY" "$origin/api/activity/verify" |
             jq -e '.ok and .entries > 0'
+      - name: Connect the Vercel build to Java in Chromium
+        env:
+          CELLAR_SITE_URL: https://127.0.0.1:8443
+          CELLAR_WORKSPACE_URL: https://localhost
+        run: |
+          npm install --prefix build/e2e --no-save --no-package-lock playwright@1.62.1
+          openssl req -x509 -newkey rsa:2048 -nodes -days 1 -subj /CN=127.0.0.1 \
+            -addext subjectAltName=IP:127.0.0.1 -keyout build/e2e/frontend.key -out build/e2e/frontend.crt
+          node deploy/build-vercel.mjs
+          node src/test/web/workspace.e2e.mjs
       - name: Print container logs on failure
         if: failure()
         run: docker compose -f deploy/docker-compose.yml logs --no-color

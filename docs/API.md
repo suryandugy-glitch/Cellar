@@ -5,10 +5,13 @@ workspace without sign-in. Requests to workspace routes include
 `X-Access-Key` when the server has `CELLAR_ACCESS_KEY` configured. Store that
 key in the calling application's secret store.
 
-POST and PUT requests require `Content-Type: application/json` and an
-`Origin` header equal to the site's origin, including any non-default port.
-Requests that provide `Sec-Fetch-Site` must use `same-origin`. Cellar serves
-the frontend and API together. For CI, use the Java CLI with synthetic exports.
+POST and PUT requests require `Content-Type: application/json` and a matching
+`Origin` header, including any non-default port. The bundled Java frontend
+uses the API's own origin. A hosted frontend can use the single HTTPS origin
+configured as `CELLAR_FRONTEND_ORIGIN`. Only that external origin is accepted
+for cross-site or same-site browser API requests. CORS preflight checks the
+route, method and requested headers. Protected requests still require
+`X-Access-Key`. For CI, use the Java CLI with synthetic exports.
 
 | Method | Route | Access key | Input and response |
 |---|---|---|---|
