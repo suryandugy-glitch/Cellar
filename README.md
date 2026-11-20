@@ -138,17 +138,17 @@ Point the export step at your real exporter using synthetic data.
 
 ## Share it on a server
 
-Local use needs no settings. To share on a network, set a single shared key and put Cellar behind HTTPS:
+Local use needs no settings. For a shared workspace, set `CELLAR_DOMAIN`,
+`CELLAR_ACCESS_KEY` and `CELLAR_MASTER_KEY` in the deployment environment.
+Point the domain at your host, then start the Java service and Caddy together.
 
 ```sh
-CELLAR_BIND=0.0.0.0
-CELLAR_PUBLIC_URL=https://cellar.example.com
-CELLAR_ACCESS_KEY=a-long-shared-key      # 12+ characters; there are no user accounts
-CELLAR_TRUST_PROXY=true
-CELLAR_DATA=/var/lib/cellar
+docker compose -f deploy/docker-compose.yml up -d --build --wait
 ```
 
-Cellar refuses to listen beyond localhost without an access key. Back up the data folder together with the master key. Deployment files are in `deploy/`.
+Use one server per data directory and back up the encrypted data volume and
+its original master key separately. See the
+[deployment and restore guide](docs/WEB_SECURITY.md) for the settings and upgrade steps.
 
 ## Build and test
 

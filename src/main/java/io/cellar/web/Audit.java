@@ -36,18 +36,34 @@ public final class Audit {
     }
 
     public synchronized List<Object> recent(int limit) {
-        List<Object> all = readAll(); int from = Math.max(0, all.size() - limit);
-        List<Object> out = new ArrayList<>(all.subList(from, all.size())); Collections.reverse(out);
-        for (Object o : out) Json.object(o).remove("prev");
-        return out;
+        if (limit <= 0) return List.of();
+        Deque<String> lines = new ArrayDeque<>();
+        try (var reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+            for (String line; (line = reader.readLine()) != null;) {
+                if (line.isBlank()) continue;
+                if (lines.size() == limit) lines.removeFirst();
+                lines.addLast(line);
+            }
+        } catch (NoSuchFileException e) {
+            return List.of();
+        } catch (IOException e) {
+            throw new InputError("Cannot read the audit log.");
+        }
+        List<Object> recent = new ArrayList<>(lines.size());
+        for (var iterator = lines.descendingIterator(); iterator.hasNext();) {
+            Map<String, Object> entry = Json.object(Json.parse(iterator.next()));
+            entry.remove("prev");
+            recent.add(entry);
+        }
+        return recent;
     }
 
     public synchronized Verdict verify() {
-        if (!Files.exists(file)) return new Verdict(true, 0, "0".repeat(64), "");
         String prev = "0".repeat(64); int n = 0;
-        try {
-            for (Object o : readAll()) {
-                Map<String, Object> m = Json.object(o);
+        try (var reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+            for (String line; (line = reader.readLine()) != null;) {
+                if (line.isBlank()) continue;
+                Map<String, Object> m = Json.object(Json.parse(line));
                 n++;
                 if (((Number) m.get("seq")).longValue() != n) return new Verdict(false, n, prev, "sequence gap at entry " + n);
                 if (!Crypto.equal((String) m.get("prev"), prev)) return new Verdict(false, n, prev, "chain broken at entry " + n);
@@ -55,17 +71,12 @@ public final class Audit {
                 if (!Crypto.equal(expected, (String) m.get("mac"))) return new Verdict(false, n, prev, "entry " + n + " was modified");
                 prev = expected;
             }
-        } catch (RuntimeException e) { return new Verdict(false, n, prev, "unreadable entry after " + n); }
+        } catch (NoSuchFileException e) {
+            return new Verdict(true, 0, "0".repeat(64), "");
+        } catch (IOException | RuntimeException e) {
+            return new Verdict(false, n, prev, "unreadable entry after " + n);
+        }
         return new Verdict(true, n, prev, "");
-    }
-
-    private List<Object> readAll() {
-        if (!Files.exists(file)) return new ArrayList<>();
-        try {
-            List<Object> out = new ArrayList<>();
-            for (String line : Files.readAllLines(file, StandardCharsets.UTF_8)) if (!line.isBlank()) out.add(Json.parse(line));
-            return out;
-        } catch (IOException e) { throw new InputError("Cannot read the audit log."); }
     }
     private String mac(String prev, long n, String ts, String actor, String ip, String action, String detail) {
         return crypto.hmac("audit", String.join("\u001f", prev, Long.toString(n), ts, actor, ip, action, detail));

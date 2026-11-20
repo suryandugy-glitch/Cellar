@@ -7,7 +7,10 @@ import java.util.*;
 public final class Json {
     private Json() {}
     public static Object parse(String text) {
-        if(text.length()>FilesEx.MAX_BYTES)throw new InputError("JSON exceeds the input limit.");
+        return parse(text, FilesEx.MAX_BYTES);
+    }
+    public static Object parse(String text, int maxChars) {
+        if(text.length()>maxChars)throw new InputError("JSON exceeds the input limit.");
         Parser p = new Parser(text.startsWith("\ufeff") ? text.substring(1) : text);
         Object value = p.value(0); p.space();
         if (p.i != p.s.length()) throw p.error();
@@ -17,6 +20,11 @@ public final class Json {
     public static Map<String,Object> object(Object value) {
         if (!(value instanceof Map<?,?>)) throw new InputError("Expected a JSON object.");
         return (Map<String,Object>) value;
+    }
+    @SuppressWarnings("unchecked")
+    public static List<Object> array(Object value) {
+        if (!(value instanceof List<?>)) throw new InputError("Expected a JSON array.");
+        return (List<Object>) value;
     }
     public static String write(Object value) {
         if (value == null) return "null";

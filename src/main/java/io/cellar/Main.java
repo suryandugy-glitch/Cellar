@@ -53,7 +53,8 @@ public final class Main {
                     for(int attempt=0;server==null;attempt++){
                         try{server=new io.cellar.web.WebServer(wc);}
                         catch(java.net.BindException busy){
-                            if(port>=0||attempt>=10)throw new InputError("Port "+wc.port()+" is already in use. Close the other program or run: run.bat web --port 9090");
+                            if(port>=0||wc.shared()||System.getenv("CELLAR_PORT")!=null||attempt>=10||wc.port()==65535)
+                                throw new InputError("Port "+wc.port()+" is already in use. Close the other program or choose a different port.");
                             System.out.println("Port "+wc.port()+" is busy, trying "+(wc.port()+1)+"...");
                             wc=new io.cellar.web.WebConfig(wc.bindHost(),wc.port()+1,wc.dataDir(),wc.publicOrigin(),wc.trustProxy(),wc.tlsKeystore(),wc.tlsPassword(),wc.masterKeyEnv(),wc.accessKey());
                         }
