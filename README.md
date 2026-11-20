@@ -3,7 +3,7 @@
 <h3 align="center">Catch the CSV change that breaks a customer's import, before it ships.</h3>
 
 <p align="center">
-  <a href="https://suryandugy-glitch.github.io/Cellar/">Website</a> ·
+  <a href="https://suryandugy-glitch.github.io/Cellar/">Website and sample checks</a> ·
   <a href="https://github.com/suryandugy-glitch/Cellar">GitHub</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#what-you-get">Features</a> ·
@@ -37,6 +37,9 @@ Verdict: do not ship.                                   (exit code 1)
 **Who is it for?** Small agencies and product teams that send recurring exports, their team leads, and the support staff who get the angry email when an import breaks. You don't need to be a developer to read the results.
 
 ## Quick start
+
+The public website includes reports for two synthetic exports. To check your own
+CSV or edit the contracts, start the Java app.
 
 You need **Java 21+**. No other installs, no account, no sign-in.
 
@@ -154,6 +157,11 @@ java Build.java test     # compiles, runs the test suite, packages dist/cellar.j
 ```
 
 No Maven, Gradle or downloads needed.
+
+Build the static website with `sh deploy/build-pages.sh`. The files are written
+to `build/pages`. In the repository's **Settings → Pages**, select **GitHub
+Actions** as the source. The **Website** workflow publishes after pushes to
+`main` and can also be run manually.
 
 ## Troubleshooting
 
