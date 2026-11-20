@@ -45,6 +45,18 @@ final class WebTests {
             }
             invalid(() -> WebConfig.fromEnv(Map.of("CELLAR_TRUST_PROXY", "true"), -1, null));
         });
+        test("separate frontend requires its own HTTPS origin and shared deployment keys", () -> {
+            var env = new HashMap<>(Map.of("CELLAR_PUBLIC_URL", "https://api.example.com", "CELLAR_TRUST_PROXY", "true",
+                "CELLAR_FRONTEND_ORIGIN", "https://CELLAR.example.com:443/", "CELLAR_ACCESS_KEY", "a-long-shared-key", "CELLAR_MASTER_KEY", KEY));
+            eq("https://cellar.example.com", WebConfig.fromEnv(env, -1, null).frontendOrigin().toString());
+            env.remove("CELLAR_ACCESS_KEY");
+            invalid(() -> WebConfig.fromEnv(env, -1, null));
+            env.put("CELLAR_ACCESS_KEY", "a-long-shared-key");
+            for (String origin : List.of("http://cellar.example.com", "https://api.example.com", "https://cellar.example.com/demo")) {
+                env.put("CELLAR_FRONTEND_ORIGIN", origin);
+                invalid(() -> WebConfig.fromEnv(env, -1, null));
+            }
+        });
     }
     static void persistence(Path root) throws Exception {
         test("workspace lock prevents concurrent server writers and releases on close", () -> {

@@ -4,6 +4,7 @@ services:
     environment:
       CELLAR_DOMAIN: ${CELLAR_DOMAIN:?set the public hostname}
       CELLAR_PUBLIC_URL: https://${CELLAR_DOMAIN:?set the public hostname}
+      CELLAR_FRONTEND_ORIGIN: ${CELLAR_FRONTEND_ORIGIN:-}
       CELLAR_ACCESS_KEY: ${CELLAR_ACCESS_KEY:?set a shared access key from your secret manager}
       CELLAR_MASTER_KEY: ${CELLAR_MASTER_KEY:?set the persistent master key from your secret manager}
     healthcheck:

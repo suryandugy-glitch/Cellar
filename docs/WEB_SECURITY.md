@@ -40,6 +40,16 @@ client-supplied forwarded headers and to send `X-Forwarded-Proto: https`.
 For direct TLS, set `CELLAR_TLS_KEYSTORE` to a PKCS12 keystore and provide
 `CELLAR_TLS_PASSWORD`. Set `CELLAR_BIND` and `CELLAR_PORT` for the listener.
 
+## Connect a separate Vercel frontend
+
+Set `CELLAR_FRONTEND_ORIGIN` on the Java host to the exact HTTPS origin of
+the Vercel site. In Vercel, set `CELLAR_WORKSPACE_URL` to the HTTPS Java API
+origin. Both values are origins without a path. Java enables API CORS for
+that one frontend and requires the existing shared access key and master key.
+The workspace link on Vercel opens the live UI and the browser sends requests
+directly to Java. The access key is entered by the user and sent in
+`X-Access-Key` rather than built into the site.
+
 ## Runtime and data behavior
 
 - `/api/health` checks that HTTP is serving. `/api/ready` also checks that

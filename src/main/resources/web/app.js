@@ -3,6 +3,8 @@
 const repo = 'https://github.com/suryandugy-glitch/Cellar';
 const root = document.querySelector('#app');
 const preview = document.documentElement.hasAttribute('data-preview');
+const apiOrigin = document.documentElement.dataset.apiOrigin || '';
+const keyStorage = apiOrigin ? 'cellar_key:' + apiOrigin : 'cellar_key';
 const glyphs = {
   grid: 'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',
   check: 'm5 12 4 4L19 6',
@@ -118,14 +120,17 @@ async function api(path, method = 'GET', body) {
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   let response;
   try {
-    response = await fetch('/api/' + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+    response = await fetch(apiOrigin + '/api/' + path, {
+      method, headers, credentials: 'omit', redirect: 'error',
+      body: body === undefined ? undefined : JSON.stringify(body)
+    });
   } catch {
     throw new Error('Cellar could not be reached. Check that the Java server is running.');
   }
   const data = await response.json().catch(() => null);
   if (response.status === 401 && state.session?.keyRequired) {
     state.accessKey = '';
-    storageWrite('sessionStorage', 'cellar_key', null);
+    storageWrite('sessionStorage', keyStorage, null);
   }
   if (!response.ok || !data) throw new Error(data?.error || 'The server returned an unexpected response.');
   return data;
@@ -284,7 +289,7 @@ function shell(id, content) {
         state.accessKey = '';
         state.report = null;
         state.csv = state.before = state.after = '';
-        storageWrite('sessionStorage', 'cellar_key', null);
+        storageWrite('sessionStorage', keyStorage, null);
         connect();
       }, { style: 'text compact', glyph: 'lock' }) : null));
   const menu = button('Open navigation', () => toggleMenu(true), { style: 'square mobile-menu', glyph: 'menu' });
@@ -929,7 +934,7 @@ function gate() {
     state.accessKey = input.value;
     try { await api('config'); }
     catch (error) { state.accessKey = ''; throw error; }
-    storageWrite('sessionStorage', 'cellar_key', state.accessKey);
+    storageWrite('sessionStorage', keyStorage, state.accessKey);
     render(true);
   }, message);
   return node('main', { class: 'panel gate stack', id: 'main-content' }, brand(),
@@ -965,7 +970,10 @@ async function connect() {
   root.replaceChildren(node('p', { class: 'boot', role: 'status' }, 'Connecting to Cellar…'));
   try {
     state.session = await api('session');
-    state.accessKey = state.session.keyRequired ? storageRead('sessionStorage', 'cellar_key') || '' : '';
+    if (apiOrigin && state.session.keyRequired !== true) {
+      throw new Error('The connected Java workspace must require an access key.');
+    }
+    state.accessKey = state.session.keyRequired ? storageRead('sessionStorage', keyStorage) || '' : '';
     if (state.accessKey) {
       try { await api('config'); }
       catch (error) { if (state.accessKey) throw error; }
@@ -975,7 +983,9 @@ async function connect() {
     state.session = null;
     root.replaceChildren(node('main', { class: 'panel gate stack', id: 'main-content' },
       brand(), node('h1', {}, 'Connection unavailable'), node('p', { class: 'muted', role: 'alert' }, error.message),
-      node('p', { class: 'muted' }, 'Start Cellar and open the address printed by the Java server.'),
+      node('p', { class: 'muted' }, apiOrigin
+        ? 'Check that the Java API is online and allows this site’s HTTPS origin.'
+        : 'Start Cellar and open the address printed by the Java server.'),
       node('div', {}, button('Retry connection', connect, { style: 'primary', glyph: 'refresh' }))));
   }
 }

@@ -163,18 +163,30 @@ to `build/pages`. In the repository's **Settings → Pages**, select **GitHub
 Actions** as the source. The **Website** workflow publishes after pushes to
 `main` and can also be run manually.
 
-## Deploy the public site on Vercel
+## Deploy the site and connect the workspace
 
 Import this repository into Vercel and keep the repository root as the project
-root. The settings in `vercel.json` build the overview, animated walkthrough,
+root. The settings in `vercel.mjs` build the overview, animated walkthrough,
 setup guide, and full sample reports with Node.js. The build needs no Java installation or npm dependencies.
 
-Set the optional `CELLAR_SITE_URL` to your public HTTPS origin to override
-Vercel's production hostname in the page metadata. Leave
-`CELLAR_WORKSPACE_URL` empty for a standalone demo, or set it to the HTTPS
-origin of your separately hosted Java app to show an **Open workspace** link.
-The Java app handles custom CSVs, access keys, and workspace data. Its
-configuration is in the [deployment guide](docs/WEB_SECURITY.md).
+The public demo works with no environment variables. To run the full workspace
+from Vercel, deploy Java using the [deployment guide](docs/WEB_SECURITY.md),
+then set both origins:
+
+| Where | Variable | Example |
+|---|---|---|
+| Java host | `CELLAR_FRONTEND_ORIGIN` | `https://cellar.example.com` |
+| Vercel | `CELLAR_WORKSPACE_URL` | `https://cellar-api.example.com` |
+
+Restart Java after changing its allowlist and redeploy Vercel after setting
+the API URL. Open **Open workspace** on the Vercel site and enter the shared
+access key. The browser sends uploads directly to the Java API, which stores
+the contracts and run history. Keep the Java keys on the backend host.
+
+Use the exact HTTPS origin your team visits. Vercel's per-deployment preview
+URLs are distinct origins. Set `CELLAR_WORKSPACE_URL` in the deployment
+environment that uses the allowed origin. Optionally set `CELLAR_SITE_URL`
+to override Vercel's production hostname in page metadata.
 
 Run `node deploy/build-vercel.mjs` locally to build the same output in
 `build/vercel`. When sample data or check output changes, refresh the bundled
