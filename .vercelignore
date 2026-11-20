@@ -1,0 +1,6 @@
+/build
+/data
+/dist
+/.cellar
+.env*
+master.key

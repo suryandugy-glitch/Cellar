@@ -163,6 +163,28 @@ to `build/pages`. In the repository's **Settings → Pages**, select **GitHub
 Actions** as the source. The **Website** workflow publishes after pushes to
 `main` and can also be run manually.
 
+## Deploy the public site on Vercel
+
+Import this repository into Vercel and keep the repository root as the project
+root. The settings in `vercel.json` build the landing page and sample checks
+with Node.js. The build needs no Java installation or npm dependencies.
+
+Set the optional `CELLAR_SITE_URL` to your public HTTPS origin to override
+Vercel's production hostname in the page metadata. Leave
+`CELLAR_WORKSPACE_URL` empty for a standalone demo, or set it to the HTTPS
+origin of your separately hosted Java app to show an **Open workspace** link.
+The Java app handles custom CSVs, access keys, and workspace data. Its
+configuration is in the [deployment guide](docs/WEB_SECURITY.md).
+
+Run `node deploy/build-vercel.mjs` locally to build the same output in
+`build/vercel`. When sample data or check output changes, refresh the bundled
+reports from the Java checker:
+
+```sh
+sh deploy/build-pages.sh
+cp build/pages/samples/* deploy/pages/samples/
+```
+
 ## Troubleshooting
 
 | Problem | Fix |

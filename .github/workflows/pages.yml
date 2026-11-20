@@ -24,6 +24,10 @@ jobs:
           distribution: temurin
           java-version: '21'
       - run: sh deploy/build-pages.sh
+      - name: Check the Vercel build against the Java-generated site
+        run: |
+          node deploy/build-vercel.mjs
+          diff -r --exclude=index.html build/pages build/vercel
       - uses: actions/upload-pages-artifact@v4
         if: github.ref == 'refs/heads/main'
         with:
