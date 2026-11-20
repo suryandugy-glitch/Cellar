@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7f3">
+  <title>Cellar | Catch breaking CSV changes before release</title>
+  <meta name="description" content="Check CSV exports against the contracts your customers depend on. See what broke, who is affected, and whether the release can ship.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Cellar | CSV compatibility checks before release">
+  <meta property="og:description" content="Find breaking changes in CSV exports before they reach a customer's import.">
+  <link rel="canonical" href="https://suryandugy-glitch.github.io/Cellar/">
+  <link rel="icon" href="./logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./landing.css">
+  <script src="./landing.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="./" aria-label="Cellar home"><img src="./logo.svg" width="36" height="36" alt="">Cellar</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="#workflow">How it works</a>
+        <a href="#quick-start">Quick start</a>
+        <a href="./demo.html#docs">Docs</a>
+      </nav>
+      <a class="button button-small button-outline" href="https://github.com/suryandugy-glitch/Cellar">GitHub</a>
+    </div>
+  </header>
+
+  <main id="content">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span></span> CSV compatibility</p>
+          <h1 id="hero-title">Catch breaking CSV changes before release.</h1>
+          <p class="lede">Check exports against the contracts your customers depend on. See which integrations are affected, what changed, and whether it’s safe to ship.</p>
+          <div class="actions">
+            <a class="button button-primary" href="./demo.html#demo-breaking">Try the demo</a>
+            <a class="button button-outline" href="#quick-start">Run Cellar locally</a>
+          </div>
+        </div>
+
+        <div class="demo" aria-labelledby="sample-title">
+          <div class="demo-top">
+            <div class="demo-file">
+              <span class="file-mark" aria-hidden="true"></span>
+              <div><h2 id="sample-title">Sales export</h2><p>Synthetic CSV sample</p></div>
+            </div>
+            <nav class="sample-control" aria-label="Choose a sample">
+              <a href="./demo.html#demo-breaking" data-sample="breaking" aria-current="true">Breaking</a>
+              <a href="./demo.html#demo-passing" data-sample="passing">Passing</a>
+            </nav>
+          </div>
+          <div class="demo-body">
+            <div class="demo-label"><span>CSV header</span><code>sales.csv</code></div>
+            <div class="code-row"><code id="sample-header"><span class="changed">id</span>,sku,total_cents,currency</code></div>
+
+            <div class="verdict" id="sample-verdict" data-outcome="blocked" role="status">
+              <span class="state-icon" id="sample-symbol" aria-hidden="true">!</span>
+              <div><strong id="sample-outcome">Release blocked</strong><p id="sample-detail">A required column is missing.</p></div>
+            </div>
+
+            <div class="demo-label"><span>Integration results</span></div>
+            <ul class="sample-results" id="sample-results">
+              <li><code>inventory-report</code><span class="outcome" data-result="fail">Failed</span></li>
+              <li><code>finance-summary</code><span class="outcome" data-result="pass">Passed</span></li>
+            </ul>
+            <div class="demo-footer">
+              <a href="./demo.html#demo-breaking" id="full-report">View the full sample report</a>
+              <span id="sample-feedback" class="sample-feedback" role="status"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="proof">
+      <ul class="container proof-grid" aria-label="Cellar at a glance">
+        <li><strong>Open source</strong><span>MIT licensed</span></li>
+        <li><strong>Java 21+</strong><span>No runtime dependencies</span></li>
+        <li><strong>Runs on your infrastructure</strong><span>Local app and CI</span></li>
+      </ul>
+    </div>
+
+    <section class="section container" id="workflow" aria-labelledby="workflow-title">
+      <div class="section-heading">
+        <h2 id="workflow-title">From CSV export to release decision</h2>
+        <p>Use the same compatibility rules in your browser and your build pipeline.</p>
+      </div>
+      <div class="workflow-grid">
+        <article class="workflow-card">
+          <div class="card-icon contract-icon" aria-hidden="true"><span></span></div>
+          <h3>Define the contract</h3>
+          <p>Describe the columns, data types, and value rules each integration expects. Assign an owner to each contract.</p>
+          <a href="https://github.com/suryandugy-glitch/Cellar/blob/main/docs/CONTRACTS.md">Contract reference</a>
+        </article>
+        <article class="workflow-card">
+          <div class="card-icon compare-icon" aria-hidden="true"><span></span></div>
+          <h3>See what changed</h3>
+          <p>Compare export headers and see which integrations would lose a required column or receive columns in a different order.</p>
+          <a href="./demo.html#demo-breaking">See a breaking change</a>
+        </article>
+        <article class="workflow-card">
+          <div class="card-icon gate-icon" aria-hidden="true"><span></span></div>
+          <h3>Gate the release</h3>
+          <p>Fail CI when an export breaks a blocking contract. Use advisory mode to surface findings while you introduce new rules.</p>
+          <a href="https://github.com/suryandugy-glitch/Cellar#use-it-in-ci">CI setup</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="setup section" id="quick-start" aria-labelledby="setup-title">
+      <div class="container setup-grid">
+        <div class="section-heading">
+          <h2 id="setup-title">Check your own export</h2>
+          <p>Install Java 21 or newer, then run Cellar. Open the address it prints and choose <strong>Check an export</strong>.</p>
+          <div class="actions resources">
+            <a href="https://github.com/suryandugy-glitch/Cellar#share-it-on-a-server">Server deployment</a>
+            <a href="https://github.com/suryandugy-glitch/Cellar/blob/main/docs/API.md">API reference</a>
+          </div>
+        </div>
+        <div class="setup-terminal">
+          <div class="terminal-bar">
+            <span>Quick start</span>
+            <button id="copy-commands" type="button" hidden>Copy commands</button>
+          </div>
+          <pre><code id="setup-commands">git clone https://github.com/suryandugy-glitch/Cellar.git
+cd Cellar
+java Build.java package
+sh run.sh</code></pre>
+          <p class="terminal-note"><span>On Windows, replace the last line with <code>.\run.bat</code>.</span><span id="copy-feedback" role="status"></span></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <a class="brand" href="./" aria-label="Cellar home"><img src="./logo.svg" width="30" height="30" alt="">Cellar</a>
+      <nav aria-label="Project links">
+        <a href="https://github.com/suryandugy-glitch/Cellar">Source code</a>
+        <a href="https://github.com/suryandugy-glitch/Cellar/issues">Report an issue</a>
+        <a href="https://github.com/suryandugy-glitch/Cellar/blob/main/LICENSE">MIT license</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

@@ -9,7 +9,8 @@ site=build/pages
 samples="$site/samples"
 mkdir -p "$samples"
 cp "$web/app.css" "$web/app.js" "$web/logo.svg" "$site/"
-sed 's/<html /<html data-preview /' "$web/index.html" > "$site/index.html"
+cp deploy/pages/index.html deploy/pages/landing.css deploy/pages/landing.js "$site/"
+sed 's/<html /<html data-preview /' "$web/index.html" > "$site/demo.html"
 
 java -jar dist/cellar.jar export-demo --out "$samples/passing.csv"
 java -jar dist/cellar.jar export-demo --out "$samples/breaking.csv" --demo-break
