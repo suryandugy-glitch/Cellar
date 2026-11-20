@@ -45,64 +45,69 @@
       <div class="wrap walkthrough-layout">
         <div class="walkthrough-copy">
           <p class="eyebrow">Interactive walkthrough</p>
-          <h1 id="walkthrough-title">One rename. Two different outcomes.</h1>
+          <h1 id="walkthrough-title">Follow a breaking CSV change.</h1>
           <p class="lede">A sales export changes <code>order_id</code> to <code>id</code>. Inventory still expects the old header. Finance uses different columns.</p>
-          <p class="walkthrough-hint">Run the breaking sample, then apply the fix to keep both headers and check the export again.</p>
+          <ol class="walkthrough-instructions">
+            <li>Run the breaking sample.</li>
+            <li>Open Inventory’s result to inspect the missing column.</li>
+            <li>Apply the fix and rerun with both headers.</li>
+          </ol>
           <a class="text-link" href="./demo.html#demo-breaking">Open the full sample reports</a>
         </div>
-      <section class="demo" id="demo" tabindex="-1" aria-labelledby="demo-title">
-        <div class="demo-top">
-          <div class="demo-name" id="demo-title"><svg class="icon" aria-hidden="true"><use href="#table"/></svg> Sample check</div>
-          <div class="scenarios" role="group" aria-label="Sample export">
-            <button type="button" data-sample="breaking" disabled aria-pressed="true">Breaking</button>
-            <button type="button" data-sample="passing" disabled aria-pressed="false">Passing</button>
-          </div>
-        </div>
-        <div class="demo-body">
-          <div class="input-head">
-            <span class="filename"><svg class="icon" aria-hidden="true"><use href="#file"/></svg> sales.csv</span>
-            <span class="sample-label" id="sample-label">2 rows · synthetic data</span>
-          </div>
-          <div class="csv-box" id="csv" role="table" aria-label="Sample CSV"></div>
-          <ol class="stage-list" aria-label="Check stages">
-            <li class="stage" data-state="waiting"><svg class="icon" aria-hidden="true"><use href="#wait"/></svg><span>Read CSV</span><span class="sr-only stage-state">Waiting</span></li>
-            <li class="stage" data-state="waiting"><svg class="icon" aria-hidden="true"><use href="#wait"/></svg><span>Check contracts</span><span class="sr-only stage-state">Waiting</span></li>
-            <li class="stage" data-state="waiting"><svg class="icon" aria-hidden="true"><use href="#wait"/></svg><span>Triage</span><span class="sr-only stage-state">Waiting</span></li>
-            <li class="stage" data-state="waiting"><svg class="icon" aria-hidden="true"><use href="#wait"/></svg><span>Release gate</span><span class="sr-only stage-state">Waiting</span></li>
-          </ol>
-          <div class="result-list">
-            <details class="result" data-state="waiting">
-              <summary><span class="result-name">inventory-report</span><span class="result-state"><svg class="icon" aria-hidden="true"><use href="#wait"/></svg><span>Waiting</span></span><svg class="icon" aria-hidden="true"><use href="#chevron"/></svg></summary>
-              <p></p>
-            </details>
-            <details class="result" data-state="waiting">
-              <summary><span class="result-name">finance-summary</span><span class="result-state"><svg class="icon" aria-hidden="true"><use href="#wait"/></svg><span>Waiting</span></span><svg class="icon" aria-hidden="true"><use href="#chevron"/></svg></summary>
-              <p></p>
-            </details>
-          </div>
-          <div class="verdict" id="verdict" data-state="ready">
-            <svg class="icon" aria-hidden="true"><use href="#shield"/></svg>
-            <div class="verdict-copy">
-              <div class="verdict-head"><strong id="verdict-title">Loading samples</strong><span class="exit" id="exit-code"></span></div>
-              <p id="verdict-note">Loading the synthetic export and contract reports.</p>
+        <section class="demo" id="demo" tabindex="-1" aria-labelledby="demo-title">
+          <div class="demo-top">
+            <div class="demo-name" id="demo-title"><svg class="icon" aria-hidden="true"><use href="#table"/></svg> Export check</div>
+            <div class="scenarios" role="group" aria-label="Sample export">
+              <button type="button" data-sample="breaking" disabled aria-pressed="true">Breaking</button>
+              <button type="button" data-sample="passing" disabled aria-pressed="false">Passing</button>
             </div>
           </div>
-          <noscript><p>This sample check requires JavaScript. <a href="./demo.html#demo-breaking">View the full sample reports</a>.</p></noscript>
-          <p id="announcer" class="sr-only" role="status" aria-atomic="true"></p>
-        </div>
-        <div class="demo-controls">
-          <button class="button run" type="button" id="run" disabled><svg class="icon" aria-hidden="true"><use href="#play"/></svg><span>Run check</span></button>
-          <button class="button demo-secondary" type="button" id="fix" hidden><svg class="icon" aria-hidden="true"><use href="#branch"/></svg> Apply fix &amp; rerun</button>
-          <button class="button demo-secondary" type="button" id="reset" hidden><svg class="icon" aria-hidden="true"><use href="#reset-icon"/></svg> Reset</button>
-          <span class="demo-meta">Runs in this browser</span>
-        </div>
-      </section>
+          <div class="demo-body">
+            <div class="input-head">
+              <span class="filename"><svg class="icon" aria-hidden="true"><use href="#file"/></svg> sales.csv</span>
+              <span class="sample-label" id="sample-label">2 rows · synthetic data</span>
+            </div>
+            <div class="csv-box" id="csv" role="table" aria-label="Sample CSV"></div>
+            <ol class="stage-list" aria-label="Check stages">
+              <li class="stage" data-state="waiting"><svg class="icon" aria-hidden="true"><use href="#wait"/></svg><span>Read CSV</span><span class="sr-only stage-state">Waiting</span></li>
+              <li class="stage" data-state="waiting"><svg class="icon" aria-hidden="true"><use href="#wait"/></svg><span>Check contracts</span><span class="sr-only stage-state">Waiting</span></li>
+              <li class="stage" data-state="waiting"><svg class="icon" aria-hidden="true"><use href="#wait"/></svg><span>Triage</span><span class="sr-only stage-state">Waiting</span></li>
+              <li class="stage" data-state="waiting"><svg class="icon" aria-hidden="true"><use href="#wait"/></svg><span>Release gate</span><span class="sr-only stage-state">Waiting</span></li>
+            </ol>
+            <h2 class="integration-label">Contract results</h2>
+            <div class="result-list">
+              <details class="result" data-state="waiting">
+                <summary><span class="result-name">inventory-report</span><span class="result-state"><svg class="icon" aria-hidden="true"><use href="#wait"/></svg><span>Waiting</span></span><svg class="icon" aria-hidden="true"><use href="#chevron"/></svg></summary>
+                <p></p>
+              </details>
+              <details class="result" data-state="waiting">
+                <summary><span class="result-name">finance-summary</span><span class="result-state"><svg class="icon" aria-hidden="true"><use href="#wait"/></svg><span>Waiting</span></span><svg class="icon" aria-hidden="true"><use href="#chevron"/></svg></summary>
+                <p></p>
+              </details>
+            </div>
+            <div class="verdict" id="verdict" data-state="ready">
+              <svg class="icon" aria-hidden="true"><use href="#shield"/></svg>
+              <div class="verdict-copy">
+                <div class="verdict-head"><strong id="verdict-title">Loading samples</strong><span class="exit" id="exit-code"></span></div>
+                <p id="verdict-note">Loading the synthetic export and contract reports.</p>
+              </div>
+            </div>
+            <noscript><p>This sample check requires JavaScript. <a href="./demo.html#demo-breaking">View the full sample reports</a>.</p></noscript>
+            <p id="announcer" class="sr-only" role="status" aria-atomic="true"></p>
+          </div>
+          <div class="demo-controls">
+            <button class="button run" type="button" id="run" disabled><svg class="icon" aria-hidden="true"><use href="#play"/></svg><span>Run check</span></button>
+            <button class="button demo-secondary" type="button" id="fix" hidden><svg class="icon" aria-hidden="true"><use href="#branch"/></svg> Apply fix &amp; rerun</button>
+            <button class="button demo-secondary" type="button" id="reset" hidden><svg class="icon" aria-hidden="true"><use href="#reset-icon"/></svg> Reset</button>
+            <span class="demo-meta">Runs in this browser</span>
+          </div>
+        </section>
       </div>
     </section>
     <section class="wrap details-section" aria-labelledby="outcome-title">
       <div class="section-head"><h2 id="outcome-title">What the release gate returns</h2></div>
       <div class="steps">
-        <article class="step"><h3><code>0</code> · Pass</h3><p>Every blocking contract passed. The export can continue through CI.</p></article>
+        <article class="step"><h3><code>0</code> · Pass</h3><p>The release gate allows the export to continue through CI.</p></article>
         <article class="step"><h3><code>1</code> · Blocked</h3><p>A required contract failed. Review the affected workflow and fix the export.</p></article>
         <article class="step"><h3><code>2</code> · Invalid input</h3><p>The CLI could not run a valid check. Review the input or configuration.</p></article>
       </div>

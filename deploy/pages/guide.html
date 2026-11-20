@@ -16,17 +16,9 @@
 <body>
 <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
   <symbol id="github" viewBox="0 0 24 24"><path d="M9 19c-4.5 1.4-4.5-2.4-6.3-2.9m12.5 5v-3.6c.1-1-.3-1.8-.8-2.1 2.7-.3 5.6-1.3 5.6-6A4.8 4.8 0 0 0 18.7 6a4.5 4.5 0 0 0-.1-3.1s-1-.3-3.5 1.3a13.2 13.2 0 0 0-6.3 0C6.4 2.6 5.4 3 5.4 3A4.5 4.5 0 0 0 5.3 6 4.8 4.8 0 0 0 4 9.4c0 4.7 2.8 5.7 5.5 6-.4.4-.7 1-.7 2.1v3.6"/></symbol>
-  <symbol id="play" viewBox="0 0 24 24"><path d="m8 5 12 7-12 7z"/></symbol>
   <symbol id="table" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11m6-11v11M3 14h18"/></symbol>
-  <symbol id="file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6m-6 4h6"/></symbol>
-  <symbol id="check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
-  <symbol id="wait" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
-  <symbol id="loader" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9"/></symbol>
-  <symbol id="chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
-  <symbol id="close" viewBox="0 0 24 24"><path d="m6 6 12 12m0-12L6 18"/></symbol>
   <symbol id="shield" viewBox="0 0 24 24"><path d="M12 22s7-3.5 7-11V5l-7-3-7 3v6c0 7.5 7 11 7 11z"/><path d="m9 12 2 2 4-4"/></symbol>
   <symbol id="branch" viewBox="0 0 24 24"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="6" r="2"/><path d="M6 7v10m12-9c0 4-3 6-6 6H6"/></symbol>
-  <symbol id="reset-icon" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1.5 7M4 4v6h6"/></symbol>
 </svg>
   <a href="#main" class="skip">Skip to content</a>
   <header class="site-header">
@@ -48,28 +40,32 @@
         <p class="lede">Start the Java workspace, define your contracts, and run the same checks before every release.</p>
       </div>
     </section>
-  <section class="start" id="quick-start" aria-labelledby="start-title">
-    <div class="wrap start-grid">
-      <div class="start-copy">
-        <h2 id="start-title">Check your own CSV.</h2>
-        <p>Start the Java workspace, then open <strong>Check</strong> to try a sample or select your own export. Open <strong>Contracts</strong> to set the rules each import depends on. Cellar requires Java 21 or newer.</p>
-        <div class="docs">
-          <a href="https://github.com/suryandugy-glitch/Cellar/blob/main/docs/API.md">API</a>
+    <section class="start" id="quick-start" aria-labelledby="start-title">
+      <div class="wrap start-grid">
+        <div class="start-copy">
+          <h2 id="start-title">Run Cellar locally.</h2>
+          <p>Install Java 21 or newer, then run the commands for your platform.</p>
+          <ol class="guide-instructions">
+            <li>Open the address printed in the terminal.</li>
+            <li>Use <strong>Contracts</strong> to define what each import expects.</li>
+            <li>Open <strong>Check</strong> and select an export to validate.</li>
+          </ol>
         </div>
-      </div>
-      <div class="terminal">
-        <div class="terminal-head" role="group" aria-label="Quick start commands">
-          <button type="button" data-shell="unix" aria-pressed="true">macOS / Linux</button>
-          <button type="button" data-shell="windows" aria-pressed="false">Windows</button>
-          <button type="button" class="copy" id="copy" hidden>Copy</button>
-        </div>
-        <pre><code id="commands">git clone https://github.com/suryandugy-glitch/Cellar.git
+        <div class="terminal">
+          <div class="terminal-head" role="group" aria-label="Quick start commands">
+            <button type="button" data-shell="unix" aria-pressed="true">macOS / Linux</button>
+            <button type="button" data-shell="windows" aria-pressed="false">Windows</button>
+            <button type="button" class="copy" id="copy" hidden>Copy</button>
+          </div>
+          <pre><code id="commands">git clone https://github.com/suryandugy-glitch/Cellar.git
 cd Cellar
 sh run.sh</code></pre>
-        <span class="sr-only" id="copy-status" role="status"></span>
+          <p class="terminal-note">Local access defaults to <code>127.0.0.1:8080</code>.</p>
+          <span class="sr-only" id="copy-status" role="status"></span>
+          <noscript><p class="terminal-note">On Windows, run <code>.\run.bat</code> as the last command.</p></noscript>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
     <section class="wrap details-section" aria-labelledby="resources-title">
       <div class="section-head"><h2 id="resources-title">Integrate with your workflow</h2></div>
       <div class="steps">
@@ -83,7 +79,7 @@ sh run.sh</code></pre>
     <div class="wrap">
       <a href="./" class="brand"><img src="./logo.svg" width="28" height="28" alt="">Cellar</a>
       <nav class="footer-links" aria-label="Project links">
-        <a href="./demo.html#demo-breaking">Full sample reports</a>
+        <a href="https://github.com/suryandugy-glitch/Cellar/blob/main/docs/API.md">API reference</a>
         <a href="https://github.com/suryandugy-glitch/Cellar/blob/main/CONTRIBUTING.md">Contribute</a>
         <a href="https://github.com/suryandugy-glitch/Cellar/blob/main/LICENSE">MIT License</a>
       </nav>
