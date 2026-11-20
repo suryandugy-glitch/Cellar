@@ -166,8 +166,8 @@ Actions** as the source. The **Website** workflow publishes after pushes to
 ## Deploy the public site on Vercel
 
 Import this repository into Vercel and keep the repository root as the project
-root. The settings in `vercel.json` build the landing page and sample checks
-with Node.js. The build needs no Java installation or npm dependencies.
+root. The settings in `vercel.json` build the overview, animated walkthrough,
+setup guide, and full sample reports with Node.js. The build needs no Java installation or npm dependencies.
 
 Set the optional `CELLAR_SITE_URL` to your public HTTPS origin to override
 Vercel's production hostname in the page metadata. Leave

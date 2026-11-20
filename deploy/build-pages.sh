@@ -9,7 +9,7 @@ site=build/pages
 samples="$site/samples"
 mkdir -p "$samples"
 cp "$web/app.css" "$web/app.js" "$web/logo.svg" "$site/"
-cp deploy/pages/index.html deploy/pages/landing.css deploy/pages/landing.js "$site/"
+cp deploy/pages/*.html deploy/pages/*.css deploy/pages/*.js deploy/pages/*.svg "$site/"
 sed 's/<html /<html data-preview /' "$web/index.html" > "$site/demo.html"
 
 java -jar dist/cellar.jar export-demo --out "$samples/passing.csv"
@@ -24,3 +24,10 @@ if [ "$status" -ne 1 ]; then
   echo "Expected the breaking sample to block release (exit 1), got exit $status." >&2
   exit 1
 fi
+
+# This bundled synthetic export uses plain, comma-separated fields.
+# Keep the original order_id and add the replacement id for the migration demo.
+awk 'BEGIN { FS = "," } { alias = NR == 1 ? "id" : $1; sub(/,/, "," alias ","); print }' \
+  "$samples/passing.csv" > "$samples/fixed.csv"
+java -jar dist/cellar.jar check --config cellar.json \
+  --csv "$samples/fixed.csv" --format json > "$samples/fixed.json"

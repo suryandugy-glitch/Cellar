@@ -46,9 +46,9 @@ await writeFile(new URL('index.html', output), landing);
 await writeFile(new URL('demo.html', output), demo.replace('<html ', '<html data-preview '));
 
 const assets = [
-  ...['landing.css', 'landing.js'].map(name => ({ source: site + '/' + name, name })),
+  ...['walkthrough.html', 'guide.html', 'landing.css', 'walkthrough.js', 'guide.js', 'trace-grid.svg'].map(name => ({ source: site + '/' + name, name })),
   ...['app.css', 'app.js', 'logo.svg'].map(name => ({ source: web + '/' + name, name })),
-  ...['passing.csv', 'passing.json', 'breaking.csv', 'breaking.json']
+  ...['passing.csv', 'passing.json', 'breaking.csv', 'breaking.json', 'fixed.csv', 'fixed.json']
     .map(file => ({ source: site + '/samples/' + file, name: 'samples/' + file }))
 ];
 await Promise.all(assets.map(({ source, name }) => copyFile(new URL(source, root), new URL(name, output))));
