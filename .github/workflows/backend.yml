@@ -10,6 +10,17 @@ permissions:
   contents: read
 
 jobs:
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - name: Run Gitleaks secret scanner
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   deployment-smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 12
@@ -20,6 +31,12 @@ jobs:
       CELLAR_MASTER_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
     steps:
       - uses: actions/checkout@v5
+      - name: Guard against committed sensitive files
+        run: |
+          if git ls-files | grep -E '^data/|master\.key$|\.enc$|audit\.log$'; then
+            echo "::error::Tracked sensitive files detected in repository"
+            exit 1
+          fi
       - name: Build, run Java tests, and start the stack
         run: docker compose -f deploy/docker-compose.yml up -d --build --wait --wait-timeout 90
       - name: Check HTTPS, authentication, CSV validation and persistence

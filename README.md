@@ -49,6 +49,8 @@ cd Cellar
 sh run.sh            # Windows: run.bat
 ```
 
+Running `run.sh` from the repo root creates `./data`; it is ignored and must never be committed.
+
 Open the address it prints (usually `http://127.0.0.1:8080`; if that port is busy it picks the next free one).
 
 1. Go to **Check** and press **Breaking demo**, then **Run check**.

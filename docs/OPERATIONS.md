@@ -15,7 +15,7 @@ required secrets, and the shared deployment checklist.
 ## Start and operate
 
 From the repository folder, run `run.bat` on Windows or `sh run.sh` on macOS or
-Linux, then open the local address printed by the launcher. The dashboard checks
+Linux, then open the local address printed by the launcher. Running `run.sh` from the repo root creates `./data`; it is ignored and must never be committed. The dashboard checks
 the server readiness endpoint while it is open. To choose a port explicitly,
 run `java -jar dist/cellar.jar web --port 8766`.
 
