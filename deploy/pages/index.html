@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f6f8f3">
+  <meta name="theme-color" content="#080b12">
   <title>Cellar | Catch breaking CSV changes before release</title>
   <meta name="description" content="Check CSV exports against the contracts your customers depend on. See what broke, who is affected, and whether the release can ship.">
   <meta property="og:type" content="website">
@@ -29,11 +29,14 @@
     <div class="wrap header-inner">
       <a href="./" class="brand"><img src="./logo.svg" width="34" height="34" alt="">Cellar</a>
       <nav class="site-nav" aria-label="Main navigation">
-        <a href="./" aria-current="page">Overview</a>
-        <a href="./walkthrough.html">Walkthrough</a>
-        <a href="./guide.html">Guide</a>
+        <a href="./" aria-current="page">Website</a>
+        <a href="./walkthrough.html">Sample checks</a>
+        <a href="#features">Features</a>
+        <a href="#quick-start">Quick start</a>
+        <a href="./guide.html">CI / Deploy</a>
+        <a href="https://github.com/suryandugy-glitch/Cellar/blob/main/docs/API.md">API</a>
       </nav>
-      <a class="button button-outline repo-button" href="https://github.com/suryandugy-glitch/Cellar"><svg class="icon" aria-hidden="true"><use href="#github"/></svg><span>GitHub</span></a>
+      <div class="header-actions"><a class="button button-outline repo-button" href="https://github.com/suryandugy-glitch/Cellar"><svg class="icon" aria-hidden="true"><use href="#github"/></svg><span>GitHub</span></a><a class="button button-primary" href="./guide.html#quick-start">Open workspace <span aria-hidden="true">↗</span></a></div>
     </div>
   </header>
   <main id="main">
@@ -41,11 +44,11 @@
       <div class="wrap hero-inner">
         <div class="hero-copy">
           <p class="eyebrow">CSV compatibility checks</p>
-          <h1 id="hero-title">Catch breaking CSV changes <span>before release.</span></h1>
-          <p class="lede">A renamed column can break a customer’s import. Cellar checks your export against each customer’s contract and tells your team what to fix before the release goes out.</p>
+          <h1 id="hero-title">Catch the CSV change that breaks a customer’s import, <span>before it ships.</span></h1>
+          <p class="lede">Validate your data contracts, detect breaking changes, and protect every customer integration before release.</p>
           <div class="hero-actions">
-            <a href="./walkthrough.html" class="button button-primary"><svg class="icon" aria-hidden="true"><use href="#play"/></svg> Run a sample check</a>
-            <a class="button button-outline" href="#quick-start">Run Cellar locally</a>
+            <a href="./walkthrough.html" class="button button-primary"><svg class="icon" aria-hidden="true"><use href="#play"/></svg> Explore sample checks</a>
+            <a class="button button-outline" href="./guide.html#quick-start">Open workspace</a>
           </div>
           <p class="hero-meta"><span>Open source</span><span>Java 21+</span><span>Runs locally or in CI</span></p>
         </div>
@@ -63,6 +66,7 @@
               <div><code>inventory-report</code><span class="changed"><svg class="icon" aria-hidden="true"><use href="#close"/></svg> Missing <code>order_id</code></span></div>
               <div><code>finance-summary</code><span class="restored"><svg class="icon" aria-hidden="true"><use href="#check"/></svg> Passed</span></div>
             </div>
+            <div class="preview-triage"><span>TRIAGE</span><p><code>order_id</code> may have been renamed to <code>id</code>. Keep both until the report is updated.</p></div>
             <div class="preview-verdict"><svg class="icon" aria-hidden="true"><use href="#shield"/></svg><strong>Release blocked</strong><code>EXIT 1</code></div>
           </div>
         </aside>
@@ -70,14 +74,32 @@
     </section>
     <section class="wrap details-section" id="workflow" aria-labelledby="workflow-title">
       <div class="section-head">
-        <h2 id="workflow-title">How the check works</h2>
-        <p>One export can feed several customer workflows. Check them together before you ship.</p>
+        <h2 id="workflow-title">Every export. Every contract. Every customer protected.</h2>
+        <p>One export enters a precise release gate. Follow every stage from raw file to clear decision.</p>
       </div>
       <div class="steps">
-        <article class="step"><svg class="icon" aria-hidden="true"><use href="#file"/></svg><h3>Define a contract</h3><p>Declare the columns, types, and values each import expects. Give every contract an owner.</p></article>
-        <article class="step"><svg class="icon" aria-hidden="true"><use href="#branch"/></svg><h3>Check the export</h3><p>Read the CSV against each contract. See which workflows passed and what the failing workflow needs.</p></article>
-        <article class="step"><svg class="icon" aria-hidden="true"><use href="#shield"/></svg><h3>Gate the release</h3><p>Block CI when a required integration breaks. Fix the export and rerun the same check.</p></article>
+        <article class="step"><span class="step-no">01 / EXPORT</span><svg class="icon" aria-hidden="true"><use href="#file"/></svg><h3>Bring in the export</h3><p>Your CSV enters the check. Cell values stay private and are never kept in reports.</p></article>
+        <article class="step"><span class="step-no">02 / VALIDATE</span><svg class="icon" aria-hidden="true"><use href="#branch"/></svg><h3>Compare the contract</h3><p>Check required columns, types, ranges, allowed values, uniqueness and row counts.</p></article>
+        <article class="step"><span class="step-no">03 / DETECT</span><svg class="icon" aria-hidden="true"><use href="#table"/></svg><h3>Find what changed</h3><p>See missing columns, invalid values and drift, with the affected customer workflow.</p></article>
+        <article class="step"><span class="step-no">04 / TRIAGE</span><svg class="icon" aria-hidden="true"><use href="#branch"/></svg><h3>Understand the risk</h3><p>Built-in offline agents explain findings and suggest a safe migration path.</p></article>
+        <article class="step"><span class="step-no">05 / RELEASE GATE</span><svg class="icon" aria-hidden="true"><use href="#shield"/></svg><h3>Ship with confidence</h3><p>Get a clear pass or block decision in the workspace, CLI and CI.</p></article>
       </div>
+    </section>
+    <section class="wrap feature-section" id="features" aria-labelledby="features-title">
+      <div class="section-head"><h2 id="features-title">A safety net for every CSV release.</h2><p>Practical checks, clear ownership and release decisions that fit the tools you already use.</p></div>
+      <div class="feature-grid">
+        <article class="feature-card feature-wide"><span class="feature-kicker">01 · CONTRACT VALIDATION</span><h3>Rules that match the real agreement.</h3><p>Required columns, types, ranges, allowed values, unique keys and row limits.</p><div class="rule-pills"><code>order_id · required</code><code>amount · decimal ≥ 0</code><code>currency · enum</code></div></article>
+        <article class="feature-card"><span class="feature-kicker">02 · INTELLIGENT TRIAGE</span><h3>See the likely rename.</h3><p>Spot suspicious header changes and get a migration suggestion.</p><div class="rename-flow"><code>order_id</code><i>→</i><code>id</code></div></article>
+        <article class="feature-card"><span class="feature-kicker">03 · RELEASE GATE</span><h3>One honest verdict.</h3><p>Pass or block decisions stay tied to actual validation results.</p><div class="gate-chip"><span></span> RELEASE BLOCKED</div></article>
+        <article class="feature-card"><span class="feature-kicker">04 · WORKFLOW</span><h3>Built for the release path.</h3><p>CLI and CI checks, live inbox monitoring, downloadable reports and activity history.</p><div class="mini-pipeline"><b>CSV</b><i></i><b>RULES</b><i></i><b>CI</b></div></article>
+        <article class="feature-card"><span class="feature-kicker">05 · CONTRACT LIFECYCLE</span><h3>Changes you can trace.</h3><p>Revision history, stale edit protection, restore, import and export.</p><div class="revision-bars"><i></i><i></i><i></i><i></i></div></article>
+        <article class="feature-card"><span class="feature-kicker">06 · DRIFT WATCH</span><h3>Know what moved.</h3><p>Compare exports with the last passing shape and surface header drift.</p><div class="rename-flow"><code>BASELINE</code><i>↔</i><code>CANDIDATE</code></div></article>
+        <article class="feature-card"><span class="feature-kicker">07 · REPORTER</span><h3>Findings ready to share.</h3><p>Download clear Markdown or JSON reports and keep release context together.</p><div class="gate-chip"><span></span> PR-READY FINDINGS</div></article>
+        <article class="feature-card"><span class="feature-kicker">08 · CONTRACT SCOUT</span><h3>Start from a sample.</h3><p>Draft a contract from your CSV headers, then review the rules before saving.</p><div class="rule-pills"><code>sample.csv</code><code>→ draft contract</code></div></article>
+        <article class="feature-card"><span class="feature-kicker">09 · LIVE INBOX + AI</span><h3>Automation with clear boundaries.</h3><p>Watch the local inbox. Optional AI assistance uses metadata and never receives CSV rows.</p><div class="privacy-mark"><svg class="icon" aria-hidden="true"><use href="#shield"/></svg> Offline rules · optional AI</div></article>
+        <article class="feature-card feature-wide privacy-card"><span class="feature-kicker">10 · PRIVACY FIRST</span><h3>Your rows never leave the check.</h3><p>Reports keep column names, counts and row numbers. CSV cell values are never stored.</p><span class="privacy-mark"><svg class="icon" aria-hidden="true"><use href="#shield"/></svg> Local-first · no account · no sign-in</span></article>
+      </div>
+      <p class="agent-note"><strong>Two kinds of assistance.</strong> The built-in validation agents work offline. Optional AI explanations stay off until you configure your own key; CSV rows are never sent.</p>
     </section>
     <section class="start" id="quick-start" aria-labelledby="quick-start-title">
       <div class="wrap home-quick-start">
@@ -93,7 +115,9 @@
     <div class="wrap">
       <a href="./" class="brand"><img src="./logo.svg" width="28" height="28" alt="">Cellar</a>
       <nav class="footer-links" aria-label="Project links">
-        <a href="./demo.html#demo-breaking">Full sample reports</a>
+        <a href="./walkthrough.html">Full sample reports</a>
+        <a href="./guide.html">CI and deployment guide</a>
+        <a href="https://github.com/suryandugy-glitch/Cellar/blob/main/docs/API.md">API reference</a>
         <a href="https://github.com/suryandugy-glitch/Cellar/blob/main/CONTRIBUTING.md">Contribute</a>
         <a href="https://github.com/suryandugy-glitch/Cellar/blob/main/LICENSE">MIT License</a>
       </nav>

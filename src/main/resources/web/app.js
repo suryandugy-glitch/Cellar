@@ -111,7 +111,7 @@ function storageWrite(storage, key, value) {
 function setTheme(theme) {
   document.documentElement.dataset.theme = theme;
   storageWrite('localStorage', 'cellar_theme', theme);
-  document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#121322' : '#f7f8fc';
+  document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#080b12' : '#f5f6fb';
 }
 
 async function api(path, method = 'GET', body) {
@@ -328,12 +328,15 @@ function themeButton() {
 
 function illustration() {
   const columns = ['id', 'sku', 'currency'];
-  return node('div', { class: 'schema', 'aria-hidden': 'true' },
+  return node('div', { class: 'schema', 'aria-label': 'Animated preview of a CSV validation pipeline' },
+    node('div', { class: 'pipeline-caption' }, 'THE CELLAR CHECK PIPELINE'),
     node('div', { class: 'schema-file' },
       node('div', { class: 'schema-title' }, icon('file'), 'sales-export.csv'),
       node('div', { class: 'schema-grid' }, columns.map(value => node('span', {}, value)),
         Array.from({ length: 9 }, () => node('i')))),
-    node('div', { class: 'schema-alert' }, icon('alert'), 'Missing order_id'));
+    node('div', { class: 'schema-flow' }, ['Extract columns', 'Check contract', 'Run agents'].map((label, index) => node('div', { class: 'flow-node' }, node('span', { class: 'flow-pulse' }, String(index + 1).padStart(2, '0')), label))),
+    node('div', { class: 'schema-alert' }, icon('alert'), 'Missing order_id'),
+    node('div', { class: 'schema-pass' }, icon('check'), 'finance-summary · PASS'));
 }
 
 function overview() {
@@ -382,9 +385,10 @@ function overview() {
   void loadRecent();
   void loadCoverage();
   return node('div', { class: 'page' },
-    pageHeading('Compatibility overview', 'Monitor your CSV exports and the integrations that depend on them.'),
+    pageHeading('Good morning. Here’s your data health.', 'Live workspace health from your Cellar validation history.'),
     node('section', { class: 'hero' }, node('div', {},
-      node('h2', {}, 'Catch breaking CSV changes'),
+      node('span', { class: 'eyebrow' }, 'RELEASE CONFIDENCE · BUILT INTO YOUR WORKFLOW'),
+      node('h2', {}, 'Catch the CSV change that breaks a customer’s import, before it ships.'),
       node('p', {}, 'Check an export against your contracts before it reaches a customer’s import.'),
       node('div', { class: 'actions' },
         link('New check', '#check', { style: 'btn primary', glyph: 'plus' }),
@@ -576,14 +580,14 @@ function checkPage() {
   const controls = [run, passing, breaking, scout];
   function setBusy(busy) { controls.forEach(control => { control.disabled = busy; }); }
   setBusy(state.checkBusy);
-  if (state.checkBusy) results.replaceChildren(working('Checking the export…'));
+  if (state.checkBusy) results.replaceChildren(validationProgress());
   async function runCheck() {
     if (state.checkBusy) return;
     const session = state.session;
     state.checkBusy = true;
     setBusy(true);
     state.report = null;
-    results.replaceChildren(working('Checking the export…'));
+    results.replaceChildren(validationProgress());
     setNotice(message, '');
     try {
       const report = await api('check', 'POST', { csv: csv.area.value, advisory: advisory.checked });
@@ -593,6 +597,7 @@ function checkPage() {
       if (results.isConnected) results.querySelector('.verdict').focus();
     } catch (error) { results.replaceChildren(); errorMessage(message, error); }
     finally {
+      results.querySelector('.validation-progress')?.classList.add('complete');
       state.checkBusy = false;
       setBusy(false);
       if (!results.isConnected && session === state.session && sectionId() === 'check') render();
@@ -627,6 +632,19 @@ function checkPage() {
   return node('div', { class: 'page' },
     pageHeading('Check an export', 'Get a release verdict for a CSV against your active contract.', link('View contracts', '#contracts', { glyph: 'layers' })),
     panel('Export to check', form), draft, results);
+}
+
+function validationProgress() {
+  const stages = ['Reading CSV structure', 'Extracting column names', 'Loading contract rules', 'Validating requirements', 'Running triage analysis', 'Generating final verdict'];
+  const list = node('ol', { class: 'validation-stages', 'aria-live': 'polite' }, stages.map((label, index) => node('li', { class: index === 0 ? 'active' : '' }, node('span', { class: 'stage-mark' }, index === 0 ? '···' : String(index + 1).padStart(2, '0')), label)));
+  const progress = node('section', { class: 'validation-progress panel pad', role: 'status' }, node('div', { class: 'progress-heading' }, node('span', { class: 'eyebrow' }, 'LIVE VALIDATION'), node('strong', {}, 'Checking against your active contract')), node('div', { class: 'progress-track' }, node('i')), list);
+  let current = 0;
+  const timer = setInterval(() => {
+    if (!progress.isConnected || progress.classList.contains('complete')) { clearInterval(timer); return; }
+    list.children[current]?.classList.remove('active'); list.children[current]?.classList.add('done');
+    current = Math.min(current + 1, stages.length - 1); list.children[current]?.classList.add('active');
+  }, 480);
+  return progress;
 }
 
 function contractsPage() {
@@ -1005,6 +1023,6 @@ document.addEventListener('keydown', event => {
     palette();
   }
 });
-setTheme(storageRead('localStorage', 'cellar_theme') === 'dark' ? 'dark' : 'light');
+setTheme(storageRead('localStorage', 'cellar_theme') || 'dark');
 if (preview) render();
 else void connect();

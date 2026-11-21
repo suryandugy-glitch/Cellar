@@ -18,8 +18,8 @@ landing = landing.replace(/  <link rel="canonical" href="[^"]*">\r?\n/, siteOrig
     '  <meta property="og:url" content="' + siteOrigin + '/">\n'
   : '');
 if (workspaceOrigin) {
-  landing = landing.replace('href="#quick-start">Run Cellar locally</a>',
-    'href="./workspace.html">Open workspace</a>');
+  landing = landing.replace('href="./guide.html#quick-start">Open workspace',
+    'href="./workspace.html">Open workspace');
 }
 
 const demo = await readFile(new URL(web + '/index.html', root), 'utf8');
