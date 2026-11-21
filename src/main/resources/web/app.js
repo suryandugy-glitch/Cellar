@@ -1023,6 +1023,19 @@ document.addEventListener('keydown', event => {
     palette();
   }
 });
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && window.matchMedia('(pointer: fine)').matches) {
+  let pointerFrame = 0;
+  let pointer = null;
+  document.addEventListener('pointermove', event => {
+    pointer = { x: event.clientX, y: event.clientY };
+    if (pointerFrame) return;
+    pointerFrame = requestAnimationFrame(() => {
+      document.documentElement.style.setProperty('--pointer-x', pointer.x + 'px');
+      document.documentElement.style.setProperty('--pointer-y', pointer.y + 'px');
+      pointerFrame = 0;
+    });
+  }, { passive: true });
+}
 setTheme(storageRead('localStorage', 'cellar_theme') || 'dark');
 if (preview) render();
 else void connect();

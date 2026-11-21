@@ -12,6 +12,7 @@
   <link rel="canonical" href="https://suryandugy-glitch.github.io/Cellar/">
   <link rel="icon" href="./logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./landing.css">
+  <script src="./landing.js" defer></script>
 </head>
 <body>
 <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -56,6 +57,18 @@
           <div class="preview-top">
             <div class="preview-file"><svg class="icon" aria-hidden="true"><use href="#table"/></svg><div><h2 id="preview-title">sales.csv</h2><span>Compatibility report</span></div></div>
             <span class="preview-sample">Synthetic export</span>
+          </div>
+          <div class="pipeline-graphic" aria-hidden="true">
+            <svg viewBox="0 0 600 112" preserveAspectRatio="none">
+              <defs><linearGradient id="flow-gradient"><stop stop-color="#a78bfa"/><stop offset=".55" stop-color="#22d3ee"/><stop offset="1" stop-color="#34d399"/></linearGradient></defs>
+              <path class="pipeline-track" d="M55 43H545"/>
+              <path class="pipeline-stream" d="M55 43H545"/>
+              <circle class="data-particle particle-a" r="4" cy="43"><animateMotion dur="3.4s" repeatCount="indefinite" path="M55 43H545"/></circle>
+              <circle class="data-particle particle-b" r="3" cy="43"><animateMotion dur="3.4s" begin="-1.15s" repeatCount="indefinite" path="M55 43H545"/></circle>
+              <circle class="data-particle particle-c" r="2.5" cy="43"><animateMotion dur="3.4s" begin="-2.3s" repeatCount="indefinite" path="M55 43H545"/></circle>
+            </svg>
+            <div class="pipeline-stages"><span><i>01</i> CSV</span><span><i>02</i> CONTRACT</span><span><i>03</i> AGENTS</span><span><i>04</i> RELEASE</span></div>
+            <span class="pipeline-live"><i></i> CHECK STREAM</span>
           </div>
           <div class="preview-content">
             <div class="preview-diff" aria-label="Export header comparison">

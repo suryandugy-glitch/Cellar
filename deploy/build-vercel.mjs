@@ -38,7 +38,7 @@ for (const page of ['walkthrough.html', 'guide.html']) {
 }
 
 const assets = [
-  ...['landing.css', 'walkthrough.js', 'guide.js', 'trace-grid.svg'].map(name => ({ source: site + '/' + name, name })),
+  ...['landing.css', 'landing.js', 'walkthrough.js', 'guide.js', 'trace-grid.svg'].map(name => ({ source: site + '/' + name, name })),
   ...['app.css', 'app.js', 'logo.svg'].map(name => ({ source: web + '/' + name, name })),
   ...['passing.csv', 'passing.json', 'breaking.csv', 'breaking.json', 'fixed.csv', 'fixed.json']
     .map(file => ({ source: site + '/samples/' + file, name: 'samples/' + file }))
