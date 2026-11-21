@@ -561,3 +561,28 @@ dialog::backdrop { background:#05090bcc; backdrop-filter:blur(2px); }
 @media (max-width:1100px) { .architecture-flow { grid-template-columns:repeat(3,minmax(0,1fr)); }.architecture-node:nth-child(3)::after { display:none; } }
 @media (max-width:810px) { .sidebar { background:#10161a; }.feature-grid-workspace { grid-template-columns:repeat(2,minmax(0,1fr)); }.architecture-flow { grid-template-columns:repeat(2,minmax(0,1fr)); }.architecture-node:nth-child(2n)::after { display:none; } }
 @media (max-width:610px) { .hero { grid-template-columns:minmax(0,1fr); }.schema { display:block; min-height:13rem; }.overview-flow { grid-template-columns:repeat(2,minmax(0,1fr)); }.architecture-flow,.feature-grid-workspace,.cli-grid { grid-template-columns:1fr; }.architecture-node::after { display:none!important; }.architecture-detail { align-items:flex-start; flex-direction:column; }.back-to-top { right:.85rem; bottom:.85rem; } }
+
+/* Pilot onboarding: implementation guidance with locally saved progress. */
+.pilot-summary { display:flex; align-items:center; justify-content:space-between; gap:1.2rem; padding:1rem 1.2rem; border-color:#35423e; background:#141d1d; }
+.pilot-summary-copy { display:grid; gap:.28rem; }.pilot-summary .eyebrow { margin:0; color:#8eb59d; }.pilot-summary h2 { font-size:1rem; }.pilot-summary p { max-width:62ch; }
+.pilot-intro { display:grid; gap:.45rem; border-color:#35423e; background:#141d1d; }.pilot-intro h2 { font-size:1.25rem; }.pilot-intro p { max-width:70ch; }
+.pilot-setup-body { display:grid; gap:1rem; padding:1rem; }
+.pilot-progress { display:grid; gap:.7rem; padding:1rem; border:1px solid #2b3938; border-radius:.6rem; background:#141d20; }
+.pilot-progress-copy { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; flex-wrap:wrap; }.pilot-progress-copy strong { font-size:.9rem; }
+.pilot-progress-track { height:.5rem; overflow:hidden; border-radius:1rem; background:#293538; }.pilot-progress-track span { display:block; height:100%; border-radius:inherit; background:#67ae88; transition:width .2s ease; }
+.pilot-steps { display:grid; gap:.65rem; padding:0; margin:0; list-style:none; counter-reset:pilot; }
+.pilot-step { display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:.9rem; padding:.9rem; border:1px solid #2b3938; border-radius:.6rem; background:#11191d; transition:border-color .16s ease,background .16s ease; }
+.pilot-step:hover { border-color:#50645a; }.pilot-step.complete { background:#14211b; border-color:#3d5c49; }
+.pilot-step-check { display:flex; align-items:center; gap:.55rem; }.pilot-step-check input { accent-color:#55bd94; width:1.1rem; height:1.1rem; }
+.pilot-step-copy { display:grid; gap:.2rem; }.pilot-step-copy h2 { font-size:.92rem; }.pilot-step-copy p { line-height:1.45; }
+.pilot-step.complete .pilot-step-copy h2 { color:#abd4b9; }
+.pilot-footer { display:flex; justify-content:space-between; align-items:center; gap:.8rem; flex-wrap:wrap; padding-top:.85rem; border-top:1px solid #273236; }.pilot-footer p { max-width:64ch; }
+[data-theme="light"] .pilot-summary,[data-theme="light"] .pilot-intro { background:#f8faf8; border-color:#dce4df; }
+[data-theme="light"] .pilot-summary .eyebrow { color:#476c58; }
+[data-theme="light"] .pilot-progress { background:#f7faf8; border-color:#dce4df; }
+[data-theme="light"] .pilot-progress-track { background:#e2e9e4; }.pilot-progress-track span { background:#408264; }
+[data-theme="light"] .pilot-step { background:#fff; border-color:#dce4df; }
+[data-theme="light"] .pilot-step:hover { border-color:#9ab7a3; }.pilot-step.complete { background:#f0f6f1; border-color:#bfd4c6; }
+[data-theme="light"] .pilot-step.complete .pilot-step-copy h2 { color:#216344; }
+[data-theme="light"] .pilot-footer { border-color:#e4e9e6; }
+@media (max-width:700px) { .pilot-summary { align-items:flex-start; flex-direction:column; }.pilot-step { grid-template-columns:auto minmax(0,1fr); }.pilot-step > .btn { grid-column:2; justify-self:start; }.pilot-progress-copy { align-items:flex-start; flex-direction:column; gap:.2rem; } }

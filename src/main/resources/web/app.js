@@ -40,6 +40,7 @@ const sections = preview ? [
   ['check', 'Check an export', 'check'],
   ['contracts', 'Contracts', 'layers'],
   ['compare', 'Compare exports', 'compare'],
+  ['setup', 'Pilot setup', 'check'],
   ['architecture', 'Architecture', 'branch'],
   ['features', 'Features', 'shield'],
   ['cli', 'CLI commands', 'play'],
@@ -288,7 +289,7 @@ function shell(id, content) {
   const pick = ids => sections.filter(section => ids.includes(section[0])).map(navItem);
   const sidebar = node('aside', { class: 'sidebar', id: 'workspace-navigation' }, closeMenu, brand(),
     group(preview ? 'Preview' : 'Workspace', pick(preview ? ['check'] : ['overview', 'check', 'contracts', 'compare'])),
-    preview ? null : group('Explore', pick(['architecture', 'features', 'cli', 'why'])),
+    preview ? null : group('Explore', pick(['setup', 'architecture', 'features', 'cli', 'why'])),
     preview ? null : group('Monitor', pick(['history', 'inbox', 'activity'])),
     group('Resources', [docs && navItem(docs), link('GitHub', repo, { style: 'nav-link', glyph: 'github', external: true })].filter(Boolean)),
     preview ? null : node('div', { class: 'sidebar-bottom' },
@@ -395,7 +396,13 @@ function overview() {
   void loadRecent();
   void loadCoverage();
   return node('div', { class: 'page' },
-    pageHeading('Good morning. Here’s your data health.', 'Live workspace health from your Cellar validation history.'),
+    pageHeading('Release health', 'Live workspace health from your Cellar validation history.'),
+    node('section', { class: 'pilot-summary panel' },
+      node('div', { class: 'pilot-summary-copy' },
+        node('span', { class: 'eyebrow' }, 'PILOT READINESS'),
+        node('h2', {}, pilotProgress().size ? 'Keep your pilot moving' : 'Get your first pilot ready'),
+        node('p', { class: 'muted small' }, pilotProgress().size + ' of ' + pilotSteps.length + ' setup steps complete. Use advisory checks before enabling a blocking gate.')),
+      link('Open setup checklist', '#setup', { style: 'btn primary' })),
     node('section', { class: 'hero' }, node('div', {},
       node('span', { class: 'eyebrow' }, 'RELEASE CONFIDENCE · BUILT INTO YOUR WORKFLOW'),
       node('h2', {}, 'Catch the CSV change that breaks a customer’s import, before it ships.'),
@@ -420,6 +427,74 @@ function overview() {
         [['Contract validation', 'Required columns, values, types and row limits'], ['Release gate', 'Real pass or block verdicts and exit codes'], ['Traceability', 'History, revisions and an integrity-checked activity log']].map(([title, detail]) =>
           node('div', { class: 'capability-row' }, node('strong', {}, title), node('span', { class: 'muted small' }, detail)))),
         link('View all features', '#features', { style: 'btn text compact' }))));
+}
+
+const pilotSteps = [
+  { id: 'scope', title: 'Choose one export and pilot owner', description: 'Start with a recurring customer export and name the person who can confirm what its consumer needs.', href: '#docs', action: 'Review the pilot guide' },
+  { id: 'contracts', title: 'Map the downstream requirements', description: 'Add each affected workflow, its owner, required columns, and any agreed value rules.', href: '#contracts', action: 'Open contracts' },
+  { id: 'fixture', title: 'Check a representative export', description: 'Run the real exporter on synthetic or redacted data, then confirm a known-good file passes.', href: '#check', action: 'Run a check' },
+  { id: 'review', title: 'Review findings in advisory mode', description: 'Discuss warnings with the pilot owner and tune rules before a finding can block a release.', href: '#check', action: 'Review check workflow' },
+  { id: 'ci', title: 'Add the check to CI', description: 'Run Cellar after export generation and keep repository permissions read-only.', href: '#cli', action: 'See CLI and CI commands' },
+  { id: 'gate', title: 'Enable the gate after agreement', description: 'Require the check only after the owner accepts the contract, findings, and rollback plan.', href: '#docs', action: 'Review rollout guidance' }
+];
+const pilotStorageKey = 'cellar_pilot_setup:' + window.location.origin + ':' + apiOrigin;
+
+function pilotProgress() {
+  try {
+    const saved = JSON.parse(storageRead('localStorage', pilotStorageKey) || '[]');
+    return new Set(Array.isArray(saved) ? saved.filter(id => pilotSteps.some(step => step.id === id)) : []);
+  } catch { return new Set(); }
+}
+
+function pilotChecklist() {
+  const checked = pilotProgress();
+  const progress = node('div', { class: 'pilot-progress', role: 'group', 'aria-label': 'Pilot setup progress' });
+  const list = node('ol', { class: 'pilot-steps' });
+  function drawProgress() {
+    const complete = checked.size;
+    progress.replaceChildren(
+      node('div', { class: 'pilot-progress-copy' }, node('strong', {}, complete + ' of ' + pilotSteps.length + ' steps complete'),
+        node('span', { class: 'muted small' }, complete === pilotSteps.length ? 'Ready for your agreed release gate' : 'Work through the pilot in order; repeat steps as requirements change.')),
+      node('div', { class: 'pilot-progress-track', role: 'progressbar', 'aria-label': 'Pilot setup progress', 'aria-valuemin': '0', 'aria-valuemax': String(pilotSteps.length), 'aria-valuenow': String(complete) },
+        node('span', { style: 'width:' + Math.round(complete / pilotSteps.length * 100) + '%' })));
+  }
+  function drawSteps() {
+    list.replaceChildren(...pilotSteps.map((step, index) => {
+      const checkbox = node('input', { type: 'checkbox', checked: checked.has(step.id), 'aria-label': 'Mark ' + step.title + ' complete' });
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) checked.add(step.id); else checked.delete(step.id);
+        storageWrite('localStorage', pilotStorageKey, JSON.stringify([...checked]));
+        checkbox.closest('.pilot-step')?.classList.toggle('complete', checkbox.checked);
+        drawProgress();
+      });
+      return node('li', { class: 'pilot-step' + (checked.has(step.id) ? ' complete' : '') },
+        node('label', { class: 'pilot-step-check' }, checkbox, node('span', { class: 'step-index' }, String(index + 1).padStart(2, '0'))),
+        node('div', { class: 'pilot-step-copy' }, node('h2', {}, step.title), node('p', { class: 'muted small' }, step.description)),
+        link(step.action, step.href, { style: 'btn compact' }));
+    }));
+  }
+  const download = button('Download pilot plan', () => {
+    const lines = ['# Cellar pilot setup', '', 'Progress is saved in this browser. This file contains no CSV data.', ''];
+    pilotSteps.forEach((step, index) => lines.push((checked.has(step.id) ? '- [x] ' : '- [ ] ') + (index + 1) + '. ' + step.title + ' — ' + step.description));
+    lines.push('', 'Enable a blocking gate only after the pilot owner agrees on the contract, findings, and rollback plan.', '');
+    saveFile('cellar-pilot-setup.md', lines.join('\n'), 'text/markdown;charset=utf-8');
+  }, { glyph: 'download' });
+  drawProgress();
+  drawSteps();
+  return node('div', { class: 'pilot-setup-body' }, progress, list,
+    node('div', { class: 'pilot-footer' }, node('p', { class: 'muted small' }, 'Checklist status stays in this browser. It does not record customer data or represent an approval.'), download));
+}
+
+function setupPage() {
+  return node('div', { class: 'page' },
+    pageHeading('Pilot setup', 'A practical path from first contract to a release gate the customer understands.'),
+    node('section', { class: 'pilot-intro panel pad' }, node('span', { class: 'eyebrow' }, 'A CUSTOMER-READY ROLLOUT'),
+      node('h2', {}, 'Prove the workflow with one export first.'),
+      node('p', { class: 'muted' }, 'Use synthetic or redacted fixtures. Review each contract with its owner, start in advisory mode, and make checks blocking only after the team agrees on the rules.')),
+    panel('Pilot readiness', pilotChecklist()),
+    panel('Need the full rollout notes?', node('div', { class: 'pad actions' },
+      link('Open startup playbook', repo + '/blob/main/docs/STARTUP_PLAYBOOK.md', { external: true }),
+      link('Read CI setup', repo + '#use-it-in-ci', { external: true }))));
 }
 
 function sampleCheck() {
@@ -1013,6 +1088,7 @@ function architecturePage() {
 
 function featuresPage() {
   const features = [
+    ['Pilot onboarding', 'Follow a measured rollout from choosing one export through reviewing findings and agreeing before enabling a blocking gate.', '#setup'],
     ['Contract validation', 'Required and allowed headers, exact order, types, ranges, enums, non-empty and unique values, and row-count limits.', '#contracts'],
     ['Triage and explanations', 'Offline built-in agents identify suspicious header renames and explain safe compatibility steps.', '#check'],
     ['Release gate', 'Every check returns a real pass or block decision. CLI exit codes are 0 allowed, 1 blocked, and 2 invalid input.', '#check'],
@@ -1117,7 +1193,7 @@ function gate() {
 const views = { overview, check: preview ? sampleCheck : checkPage,
   contracts: contractsPage, compare: comparePage, history: historyPage,
   inbox: inboxPage, activity: activityPage, docs: documentation,
-  architecture: architecturePage, features: featuresPage, cli: cliPage, why: whyPage };
+  architecture: architecturePage, features: featuresPage, cli: cliPage, why: whyPage, setup: setupPage };
 
 function render(focus = false) {
   if (!preview && (!state.session || (state.session.keyRequired && !state.accessKey))) {
