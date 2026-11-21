@@ -28,7 +28,7 @@ jobs:
         run: |
           node deploy/build-vercel.mjs
           diff -r --exclude='*.html' build/pages build/vercel
-          for page in demo.html guide.html walkthrough.html; do
+          for page in demo.html guide.html walkthrough.html workplace.html; do
             sed '/<meta http-equiv="Content-Security-Policy"/d' "build/vercel/$page" | diff "build/pages/$page" -
           done
       - uses: actions/upload-pages-artifact@v4
