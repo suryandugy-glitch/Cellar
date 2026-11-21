@@ -109,9 +109,10 @@ function storageWrite(storage, key, value) {
 }
 
 function setTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  storageWrite('localStorage', 'cellar_theme', theme);
-  document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#080b12' : '#f5f6fb';
+  const selected = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = selected;
+  storageWrite('localStorage', 'cellar_theme', selected);
+  document.querySelector('meta[name="theme-color"]').content = selected === 'dark' ? '#080b12' : '#f5f6fb';
 }
 
 async function api(path, method = 'GET', body) {
