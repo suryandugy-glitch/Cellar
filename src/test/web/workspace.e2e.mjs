@@ -19,6 +19,7 @@ const assets = new Map([
   ['/workspace.html', ['workspace.html', 'text/html']],
   ['/app.js', ['app.js', 'text/javascript']],
   ['/app.css', ['app.css', 'text/css']],
+  ['/landing.js', ['landing.js', 'text/javascript']],
   ['/landing.css', ['landing.css', 'text/css']],
   ['/logo.svg', ['logo.svg', 'image/svg+xml']],
   ['/trace-grid.svg', ['trace-grid.svg', 'image/svg+xml']]
