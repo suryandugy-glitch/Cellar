@@ -118,7 +118,7 @@ function setTheme(theme) {
   const selected = theme === 'light' ? 'light' : 'dark';
   document.documentElement.dataset.theme = selected;
   storageWrite('localStorage', 'cellar_theme', selected);
-  document.querySelector('meta[name="theme-color"]').content = selected === 'dark' ? '#080b12' : '#f5f6fb';
+  document.querySelector('meta[name="theme-color"]').content = selected === 'dark' ? '#111713' : '#f4f6f3';
 }
 
 async function api(path, method = 'GET', body) {
@@ -444,12 +444,21 @@ function overview() {
   void loadCoverage();
   return node('div', { class: 'page' },
     pageHeading('Release health', 'Live workspace health from your Cellar validation history.'),
-    node('section', { class: 'pilot-summary panel' },
-      node('div', { class: 'pilot-summary-copy' },
-        node('span', { class: 'eyebrow' }, 'PILOT READINESS'),
-        node('h2', {}, pilotProgress().size ? 'Keep your pilot moving' : 'Get your first pilot ready'),
-        node('p', { class: 'muted small' }, pilotProgress().size + ' of ' + pilotSteps.length + ' setup steps complete. Use advisory checks before enabling a blocking gate.')),
-      link('Open setup checklist', '#setup', { style: 'btn primary' })),
+    (() => {
+      const progress = pilotProgress();
+      const completed = progress.size;
+      const nextStep = pilotSteps.find(step => !progress.has(step.id));
+      return node('section', { class: 'pilot-summary panel', 'aria-labelledby': 'pilot-summary-title' },
+        node('div', { class: 'pilot-summary-copy' },
+          node('span', { class: 'eyebrow' }, 'PILOT READINESS'),
+          node('h2', { id: 'pilot-summary-title' }, completed === pilotSteps.length ? 'Pilot checklist complete' : completed ? 'Keep your pilot moving' : 'Set up your first pilot'),
+          node('p', { class: 'muted small' }, 'Use advisory checks before enabling a blocking gate.'),
+          node('div', { class: 'pilot-summary-progress', role: 'group', 'aria-label': 'Pilot setup progress' },
+            node('div', { class: 'pilot-summary-progress-track', role: 'progressbar', 'aria-label': 'Pilot setup', 'aria-valuemin': '0', 'aria-valuemax': String(pilotSteps.length), 'aria-valuenow': String(completed) },
+              node('span', { style: 'width:' + Math.round(completed / pilotSteps.length * 100) + '%' })),
+            node('span', { class: 'pilot-summary-count' }, completed + ' of ' + pilotSteps.length + ' steps'))),
+        link(nextStep ? 'Continue setup' : 'Review setup', nextStep?.href || '#setup', { style: 'btn primary', glyph: 'chevron' }));
+    })(),
     node('section', { class: 'hero' }, node('div', {},
       node('span', { class: 'eyebrow' }, 'RELEASE CONFIDENCE · BUILT INTO YOUR WORKFLOW'),
       node('h2', {}, 'Catch the CSV change that breaks a customer’s import, before it ships.'),
