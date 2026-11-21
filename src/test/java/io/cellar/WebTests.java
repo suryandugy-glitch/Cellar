@@ -166,8 +166,16 @@ final class WebTests {
     }
     static void aiTests(Path root) throws Exception {
         var seen = new java.util.concurrent.atomic.AtomicReference<String>("");
+        var oversized = new java.util.concurrent.atomic.AtomicBoolean();
+        var upstreamStatus = new java.util.concurrent.atomic.AtomicInteger(200);
         var stub = com.sun.net.httpserver.HttpServer.create(new java.net.InetSocketAddress("127.0.0.1", 0), 0);
-        stub.createContext("/", ex -> { seen.set(new String(ex.getRequestBody().readAllBytes())); byte[] out = "{\"content\":[{\"type\":\"text\",\"text\":\"Plain answer\"}]}".getBytes(); ex.sendResponseHeaders(200, out.length); ex.getResponseBody().write(out); ex.close(); });
+        stub.createContext("/", ex -> {
+            seen.set(new String(ex.getRequestBody().readAllBytes()));
+            String body = oversized.get()
+                ? "{\"content\":[{\"type\":\"text\",\"text\":\"" + "x".repeat(1_048_600) + "\"}]}"
+                : "{\"content\":[{\"type\":\"text\",\"text\":\"Plain answer\"}]}";
+            byte[] out = body.getBytes(); ex.sendResponseHeaders(upstreamStatus.get(), out.length); ex.getResponseBody().write(out); ex.close();
+        });
         stub.start();
         try (var s = new WebServer(new WebConfig("127.0.0.1", 0, root.resolve("ai"), null, false, null, null, KEY, null), new Ai("anthropic", "k", "m", "http://127.0.0.1:" + stub.getAddress().getPort() + "/v1/messages"))) {
             s.start(); String base = "http://127.0.0.1:" + s.port();
@@ -175,6 +183,13 @@ final class WebTests {
                 String report = send("POST", base + "/api/check", "{\"csv\":\"id,sku,total_cents,currency\\nSECRET-ZZZ,B,1,INR\\n\"}", null, base).body();
                 Resp r = send("POST", base + "/api/ai", "{\"task\":\"explain\",\"report\":" + report + "}", null, base);
                 eq(200, r.status()); ok(r.body().contains("Plain answer")); ok(seen.get().contains("inventory-report")); ok(!seen.get().contains("SECRET-ZZZ"));
+            });
+            test("AI upstream errors and oversized responses use bounded gateway errors", () -> {
+                upstreamStatus.set(429);
+                eq(503, send("POST", base + "/api/ai", "{\"task\":\"explain\"}", null, base).status());
+                upstreamStatus.set(200); oversized.set(true);
+                eq(502, send("POST", base + "/api/ai", "{\"task\":\"explain\"}", null, base).status());
+                oversized.set(false);
             });
             test("ai rejects unknown tasks and long questions", () -> { eq(400, send("POST", base + "/api/ai", "{\"task\":\"hack\"}", null, base).status()); eq(400, send("POST", base + "/api/ai", "{\"task\":\"ask\",\"question\":\"" + "q".repeat(600) + "\"}", null, base).status()); });
         } finally { stub.stop(0); }

@@ -1,47 +1,37 @@
-# Python to Java migration
+# Current Cellar setup
 
-This release is a replacement implementation, not a Python wrapper. Python package files, Python tests/exporter, HTML/JavaScript browser UI and old setup scripts are not included in the Java archive. Original MIT notices and logo assets remain.
+This guide reflects the current Java web workspace. Earlier desktop and
+`serve`/`ui` command instructions are obsolete.
 
-## Command mapping
+## Run the workspace
 
-| Previous command / feature | Java replacement |
-|---|---|
-| `python run.py` | `java -jar dist/cellar.jar ui` or double-click run.bat |
-| `pip install .` | No install step; use included JAR |
-| `cellar check --csv file.csv` | `java -jar dist/cellar.jar check --csv file.csv` |
-| `cellar check --format json` | Same flags after Java command; add required --csv |
-| `cellar check --summary` | Same flag; appends to GITHUB_STEP_SUMMARY |
-| `cellar ui` browser | `ui` native Java Swing dashboard |
-| Local Python HTTP endpoints | `serve` Java authenticated `/api/*`; API changed |
-| `python examples/sales_exporter.py --out file.csv` | `export-demo --out file.csv` |
-| Python unittest | `java Build.java test` |
-| Browser history | New local `.cellar/history.json`; old browser history is not imported |
+Install Java 21 or newer, then run `run.bat` on Windows or `sh run.sh` on
+macOS/Linux. Open the local address printed by the launcher. For a chosen port,
+use `java -jar dist/cellar.jar web --port 8766`.
 
-## Compatibility retained
+## Use the CLI
 
-Legacy JSON integration IDs/required-column lists work without conversion. Exact case/space matching remains. Extra and reordered columns pass unless explicitly restricted. Required list duplicates are deduplicated. BOM accepted. Text/JSON result content omits CSV cell values. Blocking check failures exit 1, invalid inputs exit 2.
+```sh
+java -jar dist/cellar.jar validate
+java -jar dist/cellar.jar export-demo --out build/sales.csv
+java -jar dist/cellar.jar check --csv build/sales.csv --summary --format markdown
+java -jar dist/cellar.jar diff --baseline build/previous.csv --csv build/current.csv
+```
 
-## Deliberate differences
+The CLI and workspace share the Java validation engine. Checks return exit 0
+when allowed, exit 1 when a release is blocked, and exit 2 for invalid input.
+Use synthetic exports while setting up a pilot, then confirm your exporter and
+consumer requirements with their owners.
 
-- UI is now native Java. Browser URL/theme storage and old `ui --port/--no-browser` flags do not apply. Use `serve --port` for local automation.
-- HTTP is authenticated and rejects browser-origin requests. Config saving requires an observed revision.
-- Check JSON now includes richer scope, gate, hash and issue metadata; update integrations consuming the previous shape.
-- Header-only mode still skips data-row parsing, but UTF-8 decoding covers the full bounded file.
-- CSV grammar is strict: malformed quoting is rejected. Header controls (including newline) are rejected even inside quotes.
-- Unknown config fields are rejected. Fix misspellings instead of silently ignoring them.
-- Warning severity/advisory can return 0 while `passed=false`; use `blocking` for the gate.
-- New example `cellar.json` includes row rules; use `examples/legacy-contract.json` for old behavior.
-- History stores summaries, not full previous reports or source CSVs. Theme selection is session-local, not persisted.
+## Existing web deployments
 
-## Rollout checklist
+Cellar's web server stores its workspace contract, revisions, run history, and
+baseline in the configured data directory. Preserve its original master key
+with backups. Local mode binds to loopback and does not require sign-in. A
+shared deployment can require a single access key, which grants the same
+workspace permissions to everyone who has it. It does not have individual
+accounts, role-based access, or tenant isolation.
 
-1. Keep a backup of your current config and the original project release.
-2. Extract the Java release into a new directory.
-3. Copy your contract to a chosen path; run `validate --config PATH`.
-4. Compare passing/failing synthetic fixtures with your previous expected outcomes.
-5. Replace Python installation/check commands in CI with the Java build/JAR commands.
-6. Use advisory mode for an agreed observation period, review findings and revise real requirements.
-7. Make blocking checks required only with pilot-owner acceptance.
-8. Keep contracts in Git and assign owner reviews to edits/removals.
-
-For a planned rename, publish old and new columns temporarily, migrate consumers, obtain owner confirmation, then change contracts and remove the old column. Cellar reports impact; it does not automatically migrate data or approve breaking changes.
+For shared deployment security and backup guidance, follow
+[`WEB_SECURITY.md`](WEB_SECURITY.md). For the latest regression scope, see
+[`TEST_REPORT.md`](TEST_REPORT.md).

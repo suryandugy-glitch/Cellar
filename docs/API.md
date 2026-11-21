@@ -37,9 +37,10 @@ A valid check returns HTTP 200 whether the export passes or blocks a release.
 Use `blocking` for the release decision. Invalid requests return 400, missing
 or invalid credentials 401, origin rejections 403, unknown routes 404, wrong
 methods 405, stale revisions 409, oversized requests 413, unsupported content
-types 415, throttled requests 429, and temporary overload 503. For 429 or 503,
-use `Retry-After` before retrying. Save the `X-Request-ID` response header when
-reporting an internal error.
+types 415, throttled requests 429, upstream AI failures 502, temporary overload
+503, and AI provider timeouts 504. The AI response body is capped at 1 MiB.
+For 429 or 503/504, use `Retry-After` when present before retrying. Save the
+`X-Request-ID` response header when reporting an internal error.
 
 POST bodies have per-route limits. The check and scout envelopes allow up to
 9 MiB and compare up to 17 MiB. The CSV engine separately limits each CSV to

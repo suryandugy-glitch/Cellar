@@ -139,7 +139,7 @@ public final class WebServer implements AutoCloseable {
         heavyRoute("/api/scout", CHECK, c -> Agents.scout(str(c.body, "csv"), workspace.contract().delimiter()));
         route("GET", "/api/history", true, SMALL, c -> Json.map("history", workspace.history()));
         route("GET", "/api/stats", true, SMALL, c -> stats());
-        route("GET", "/api/live", true, SMALL, c -> Json.map("inbox", inbox == null ? "" : inbox.toString(), "entries", new ArrayList<>(live)));
+        route("GET", "/api/live", true, SMALL, c -> Json.map("inbox", inbox == null ? "" : inbox.toString(), "entries", liveSnapshot()));
         route("GET", "/api/activity", true, SMALL, c -> Json.map("entries", audit.recent(200)));
         route("GET", "/api/activity/verify", true, SMALL, c -> { var v = audit.verify(); return Json.map("ok", v.ok(), "entries", v.entries(), "head", v.head(), "problem", v.problem()); });
     }
@@ -173,6 +173,7 @@ public final class WebServer implements AutoCloseable {
     private final List<Object> live = Collections.synchronizedList(new ArrayList<>());
     private final Map<String, FileStamp> seen = new HashMap<>();
     private Path inbox; private final long started = System.currentTimeMillis();
+    private List<Object> liveSnapshot() { synchronized (live) { return new ArrayList<>(live); } }
     private void startInbox() {
         String env = System.getenv("CELLAR_INBOX"); inbox = (env != null && !env.isBlank() ? Path.of(env) : cfg.dataDir().resolve("inbox")).toAbsolutePath();
         try { Files.createDirectories(inbox); } catch (IOException e) { System.err.println("WARNING  Inbox folder unavailable: " + inbox); return; }
@@ -209,7 +210,10 @@ public final class WebServer implements AutoCloseable {
                 catch (RuntimeException e) { entry.put("error", "Could not check this file."); }
                 finally { checkPermits.release(); }
                 seen.put(name, stamp);
-                live.add(0, entry); while (live.size() > 30) live.remove(live.size() - 1);
+                synchronized (live) {
+                    live.add(0, entry);
+                    while (live.size() > 30) live.remove(live.size() - 1);
+                }
             }
             seen.keySet().removeIf(name -> !Files.isRegularFile(inbox.resolve(name), LinkOption.NOFOLLOW_LINKS));
         } catch (Exception e) { /* folder briefly unavailable: try again next tick */ }
@@ -295,6 +299,9 @@ public final class WebServer implements AutoCloseable {
             if (e.status == 503) x.getResponseHeaders().set("Retry-After", "2");
             sendJson(x, e.status, Json.map("error", e.getMessage()));
         } catch (Workspace.Conflict e) { sendJson(x, 409, Json.map("error", e.getMessage()));
+        } catch (Ai.ServiceError e) {
+            if (e.status == 503 || e.status == 504) x.getResponseHeaders().set("Retry-After", "15");
+            sendJson(x, e.status, Json.map("error", e.getMessage()));
         } catch (InputError e) { sendJson(x, 400, Json.map("error", e.getMessage()));
         } catch (IOException e) {
             throw e; // The client disconnected or the transport failed during the exchange.

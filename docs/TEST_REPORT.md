@@ -1,18 +1,19 @@
-# Test report — 3.0.0-web.1
+# Cellar regression report
 
-Run with `java Build.java test` on OpenJDK 21. Result: **73 test groups passed, 0 failed** (full list in `test-results.txt`). The suite is dependency-free and starts a real HTTP server on an ephemeral port.
+The latest local run used JDK 21: **75 test groups passed, 0 failed** with
+`java Build.java test`. The suite is dependency-free and starts a real HTTP
+server on a loopback port.
 
-| Area | Groups | What is attacked or verified |
-|---|---|---|
-| Validation engine and CLI (unchanged from 2.0) | 49 | Header and row rules, parsers and bounds, exit codes, report redaction |
-| Cryptography | 3 | AES-GCM round trip, tamper and wrong-key/wrong-file rejection, PBKDF2 hashing and password policy |
-| Accounts, sessions, rate limiting | 3 | Lockout, uniform failure, restart persistence, last-owner protection; hashed, expiring, revocable sessions with per-user cap; bounded limiter |
-| Audit chain | 1 | Edit, deletion and forgery under another key detected; server refuses to start on a broken chain |
-| Storage | 1 | Ciphertext only on disk; tampered file fails closed |
-| Configuration | 1 | Refuses plaintext network exposure and malformed settings |
-| Live server attacks | 15 | Forged cookie, missing/wrong CSRF, cross-origin and no-Origin posts, wrong content type, bad Host, role escalation, disabled-user session kill, password-change revocation, oversize bodies, path probing, first-run replay, login throttling, secret/cell-value/stack-trace leakage, no plaintext in data files, audit tamper detection |
+| Area | Coverage |
+|---|---|
+| CSV and contracts | Header and row rules, parsing edge cases, schema validation, deterministic results, value redaction, and bounds |
+| CLI | Release exit codes, output formats, invalid arguments, input-file protection, and demo generation |
+| Workspace storage | Encrypted persistence, revisions, stale-save conflicts, history retention, baseline migration, and process locking |
+| HTTP API | Access-key enforcement, host and origin checks, request sizes, route behavior, contract restore, activity, and inbox processing |
+| Optional AI | Cell-value exclusion, task validation, disabled mode, upstream failures, and bounded provider responses |
 
-Also performed manually in headless Chromium against the packaged JAR: sign-in, check, contracts, team, audit-verify and sign-out ran with **zero CSP violations or console errors**, and an `<img onerror>` payload in CSV headers rendered as inert text.
-
-## Not covered
-TLS listener (`CELLAR_TLS_KEYSTORE`) and the `deploy/` Docker/Caddy templates were not executed. There was no load test, fuzzing campaign, dependency scan (there are no dependencies) or independent penetration test. Treat results as regression evidence, not a security certification.
+These are regression checks, not a load test, fuzzing campaign, independent
+penetration test, or security certification. TLS listener and Docker/Caddy
+deployment templates were not exercised by this run. Review
+[`WEB_SECURITY.md`](WEB_SECURITY.md) for the deployment boundary and
+operational precautions.

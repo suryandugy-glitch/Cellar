@@ -285,6 +285,10 @@ function shell(id, content) {
     return node('a', { class: 'nav-link', href: '#' + name, 'aria-current': name === id ? 'page' : null }, icon(glyph), node('span', {}, title));
   }
   const closeMenu = button('Close navigation', () => toggleMenu(false), { style: 'square mobile-menu mobile-close', glyph: 'close' });
+  const healthDot = node('span', { class: 'dot', 'aria-hidden': 'true' });
+  const healthTitle = node('strong', {}, 'Server ready');
+  const healthDetail = node('small', {}, state.session.version ? 'v' + state.session.version : 'Cellar Java');
+  const connection = node('div', { class: 'connection', role: 'status', 'aria-live': 'polite' }, healthDot, healthTitle, healthDetail);
   const docs = sections.find(section => section[0] === 'docs');
   const pick = ids => sections.filter(section => ids.includes(section[0])).map(navItem);
   const sidebar = node('aside', { class: 'sidebar', id: 'workspace-navigation' }, closeMenu, brand(),
@@ -293,8 +297,7 @@ function shell(id, content) {
     preview ? null : group('Monitor', pick(['history', 'inbox', 'activity'])),
     group('Resources', [docs && navItem(docs), link('GitHub', repo, { style: 'nav-link', glyph: 'github', external: true })].filter(Boolean)),
     preview ? null : node('div', { class: 'sidebar-bottom' },
-      node('div', { class: 'connection' }, node('span', { class: 'dot', 'aria-hidden': 'true' }),
-        node('strong', {}, 'Server connected'), node('small', {}, state.session.version ? 'v' + state.session.version : 'Cellar Java')),
+      connection,
       state.session.keyRequired ? button('Lock workspace', () => {
         state.accessKey = '';
         state.report = null;
@@ -320,6 +323,22 @@ function shell(id, content) {
   sidebar.addEventListener('click', event => {
     if (sidebar.classList.contains('open') && event.target.closest('a')) toggleMenu(false);
   });
+  let healthKnown = true;
+  async function refreshHealth() {
+    try {
+      await api('ready');
+      if (!healthKnown) { healthTitle.textContent = 'Server ready'; healthDetail.textContent = state.session.version ? 'v' + state.session.version : 'Cellar Java'; }
+      healthDot.classList.remove('down'); healthKnown = true;
+    } catch {
+      if (healthKnown) { healthTitle.textContent = 'Server unavailable'; healthDetail.textContent = 'Check the Java process'; }
+      healthDot.classList.add('down'); healthKnown = false;
+    }
+  }
+  void refreshHealth();
+  const healthTimer = setInterval(() => {
+    if (!connection.isConnected) { clearInterval(healthTimer); return; }
+    if (document.visibilityState === 'visible') void refreshHealth();
+  }, 30000);
   return node('div', { class: 'layout' }, sidebar, node('div', {}, top,
     node('main', { class: 'content', id: 'main-content', tabindex: '-1' }, content)));
 }
@@ -354,6 +373,8 @@ function overview() {
   const metrics = node('div', { class: 'metrics', 'aria-label': 'Workspace metrics' });
   const recent = node('div', {}, working('Loading recent checks…'));
   const coverage = node('div', {}, working('Loading contracts…'));
+  const trend = node('div', { class: 'release-trend-empty' }, working('Loading recent release outcomes…'));
+  const latestCheck = node('div', { class: 'latest-check-empty' }, working('Loading the latest check…'));
   function metric(label, value, detail, glyph, color = '') {
     return node('section', { class: 'metric' },
       node('div', { class: 'metric-label' }, node('span', { class: 'symbol ' + color }, icon(glyph)), label),
@@ -362,9 +383,9 @@ function overview() {
   function loadMetrics(stats) {
     const runs = stats?.runs;
     metrics.replaceChildren(
-      metric('Checks run', count(runs), 'Recorded runs', 'activity'),
-      metric('Pass rate', runs ? Math.round(100 * stats.passed / runs) + '%' : '—', runs ? count(stats.passed) + ' passed' : 'Awaiting first check', 'check', 'good'),
-      metric('Blocked releases', count(stats?.blocked), 'Runs with blocking findings', 'stop', 'bad'),
+      metric('Saved checks', count(runs), 'Latest 100 runs retained', 'activity'),
+      metric('Pass rate', runs ? Math.round(100 * stats.passed / runs) + '%' : '—', runs ? 'Across saved checks' : 'Awaiting first check', 'check', 'good'),
+      metric('Blocked releases', count(stats?.blocked), 'Among saved checks', 'stop', 'bad'),
       metric('Integrations', count(stats?.integrations), 'In the active contract', 'layers', 'blue'));
   }
   const statError = node('div');
@@ -378,6 +399,32 @@ function overview() {
       recent.replaceChildren(history.length
         ? table(['Outcome', 'Run time', 'Rows'], history.slice(0, 5).map(run => [outcome(run), dateTime(run.timestamp), count(run.rowsChecked)]))
         : empty('history', 'No checks recorded yet', 'Upload a CSV or run the demo to see a release verdict here.', link('Check an export', '#check', { style: 'btn text compact' })));
+      const latest = history[0];
+      if (!latest) {
+        trend.replaceChildren(empty('history', 'Trend starts with your first check', 'Run checks against the same contract to see recent release outcomes.'));
+        latestCheck.replaceChildren(empty('check', 'No release decision yet', 'Run a check to see its outcome and affected integrations.', link('Start a check', '#check', { style: 'btn text compact' })));
+        return;
+      }
+      const recentRuns = history.slice(0, 8).reverse();
+      const outcomeLabel = run => run.blocking ? 'Blocked' : run.passed ? 'Passed' : run.advisory ? 'Advisory' : 'Warnings';
+      trend.replaceChildren(
+        node('p', { class: 'muted small' }, 'Latest ' + recentRuns.length + ' checks, oldest to newest.'),
+        node('div', { class: 'release-trend', role: 'list', 'aria-label': 'Recent release outcomes' }, recentRuns.map((run, index) =>
+          node('div', { class: 'release-trend-item', role: 'listitem', title: outcomeLabel(run) + ' · ' + dateTime(run.timestamp) },
+            node('span', { class: 'trend-dot ' + (run.blocking ? 'blocked' : run.passed ? 'passed' : 'advisory'), 'aria-hidden': 'true' }),
+            node('span', { class: 'trend-sequence', 'aria-hidden': 'true' }, String(index + 1).padStart(2, '0')),
+            node('span', { class: 'sr-only' }, outcomeLabel(run) + ' · ' + dateTime(run.timestamp))))),
+        node('div', { class: 'trend-legend' }, badge('Passed', 'good'), badge('Blocked', 'bad'), badge('Warnings / advisory', 'warn')));
+      const affected = (latest.results || []).filter(result => !result.passed);
+      latestCheck.replaceChildren(
+        node('div', { class: 'latest-check-head' }, badge(outcomeLabel(latest), latest.blocking ? 'bad' : latest.passed ? 'good' : 'warn'),
+          node('time', { class: 'muted small', datetime: latest.timestamp }, dateTime(latest.timestamp))),
+        node('p', { class: 'latest-check-summary' }, affected.length
+          ? affected.length + ' integration' + (affected.length === 1 ? '' : 's') + ' need review.'
+          : 'No integration findings in this run.'),
+        affected.length ? node('ul', { class: 'latest-affected' }, affected.slice(0, 5).map(result =>
+          node('li', {}, node('strong', { class: 'wrap' }, result.integration), node('span', { class: 'muted small' }, count(result.issueCount) + ' finding' + (result.issueCount === 1 ? '' : 's'))))) : null,
+        link('Review run history', '#history', { style: 'btn text compact' }));
     } catch (error) { renderError(recent, error, loadRecent); }
   }
   async function loadCoverage() {
@@ -415,6 +462,9 @@ function overview() {
     node('div', { class: 'two wide' },
       panel('Recent checks', recent, link('View history', '#history', { style: 'btn text compact' })),
       panel('Contract coverage', coverage, link('View contracts', '#contracts', { style: 'btn text compact' }))),
+    node('div', { class: 'two wide' },
+      panel('Recent release outcomes', trend, link('Full history', '#history', { style: 'btn text compact' })),
+      panel('Latest check', latestCheck, link('Run another check', '#check', { style: 'btn text compact' }))),
     quickCommandMessage,
     node('div', { class: 'two wide' },
       panel('How a check moves through Cellar', node('div', { class: 'overview-flow' },

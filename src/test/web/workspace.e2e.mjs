@@ -81,8 +81,14 @@ try {
   await page.getByText('Access key required.', { exact: true }).waitFor();
   await page.getByLabel('Access key').fill(key);
   await page.getByRole('button', { name: 'Unlock workspace' }).click();
-  await page.getByText('Server connected', { exact: true }).waitFor();
-  await page.getByRole('navigation', { name: 'Workspace' }).getByRole('link', { name: 'Check an export', exact: true }).click();
+  await page.getByText('Server ready', { exact: true }).waitFor();
+  const workspaceNav = page.getByRole('navigation', { name: 'Workspace' });
+  await page.getByRole('heading', { name: 'Release health' }).waitFor();
+  await page.getByRole('navigation', { name: 'Explore' }).getByRole('link', { name: 'Pilot setup' }).click();
+  await page.getByRole('heading', { name: 'Pilot setup' }).waitFor();
+  await page.getByRole('checkbox', { name: 'Mark Choose one export and pilot owner complete' }).check();
+  await page.getByText('1 of 6 steps complete', { exact: true }).waitFor();
+  await workspaceNav.getByRole('link', { name: 'Check an export', exact: true }).click();
 
   const result = page.getByRole('region', { name: 'Check results' });
   const upload = page.getByLabel('Upload Export CSV');
@@ -97,7 +103,17 @@ try {
     await result.getByRole('heading', { name: verdict, exact: true }).waitFor();
   }
 
-  await page.getByRole('link', { name: 'Run history' }).click();
+  await workspaceNav.getByRole('link', { name: 'Overview' }).click();
+  await page.getByRole('heading', { name: 'Latest check' }).waitFor();
+  const trend = page.getByRole('list', { name: 'Recent release outcomes' });
+  await trend.waitFor();
+  assert.equal(await trend.locator('.trend-dot.passed').count(), 1);
+  assert.equal(await trend.locator('.trend-dot.blocked').count(), 1);
+  await page.getByText('No integration findings in this run.', { exact: true }).waitFor();
+  await page.getByRole('navigation', { name: 'Explore' }).getByRole('link', { name: 'Pilot setup' }).click();
+  await page.getByText('1 of 6 steps complete', { exact: true }).waitFor();
+
+  await page.getByRole('navigation', { name: 'Monitor' }).getByRole('link', { name: 'Run history' }).click();
   const rows = page.getByRole('table').getByRole('row');
   await rows.nth(1).getByRole('cell', { name: 'Passed', exact: true }).waitFor();
   await rows.nth(2).getByRole('cell', { name: 'Blocked', exact: true }).waitFor();
@@ -105,7 +121,7 @@ try {
   await rows.nth(1).getByRole('cell', { name: 'Passed', exact: true }).waitFor();
   await page.getByRole('button', { name: 'Lock workspace' }).click();
   await page.getByRole('heading', { name: 'Unlock Cellar' }).waitFor();
-  console.log('Browser workspace checks passed: preflight, authentication, uploads, verdicts, history and lock.');
+  console.log('Browser workspace checks passed: preflight, authentication, pilot setup, dashboard outcomes, uploads, verdicts, history and lock.');
 } finally {
   await browser?.close();
   await new Promise(resolve => server.close(resolve));
