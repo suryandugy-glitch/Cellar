@@ -29,7 +29,8 @@ const glyphs = {
   close: 'm6 6 12 12M18 6 6 18',
   download: 'M12 3v12m-4-4 4 4 4-4 M4 17v4h16v-4',
   refresh: 'M20 8a8.5 8.5 0 1 0 1 7 M20 3v5h-5',
-  lock: 'M6 10h12v11H6z M8 10V7a4 4 0 0 1 8 0v3 M12 14v3'
+  lock: 'M6 10h12v11H6z M8 10V7a4 4 0 0 1 8 0v3 M12 14v3',
+  arrowUp: 'M12 19V5m-7 7 7-7 7 7'
 };
 const sections = preview ? [
   ['check', 'Sample checks', 'check'],
@@ -39,12 +40,16 @@ const sections = preview ? [
   ['check', 'Check an export', 'check'],
   ['contracts', 'Contracts', 'layers'],
   ['compare', 'Compare exports', 'compare'],
+  ['architecture', 'Architecture', 'branch'],
+  ['features', 'Features', 'shield'],
+  ['cli', 'CLI commands', 'play'],
+  ['why', 'Why Cellar', 'activity'],
   ['history', 'Run history', 'history'],
   ['inbox', 'Live inbox', 'inbox'],
   ['activity', 'Activity log', 'activity'],
   ['docs', 'Documentation', 'book']
 ];
-const aliases = { home: 'overview', diff: 'compare', live: 'inbox', features: 'docs', roadmap: 'docs',
+const aliases = { home: 'overview', diff: 'compare', live: 'inbox', features: preview ? 'docs' : 'features', roadmap: 'docs',
   'demo-breaking': 'check', 'demo-passing': 'check' };
 const state = {
   session: null, accessKey: '', csv: '', before: '', after: '', advisory: false,
@@ -272,17 +277,20 @@ function palette() {
 function shell(id, content) {
   const label = sections.find(section => section[0] === id)[1];
   function group(title, entries) {
+    if (!entries.length) return null;
     return node('nav', { class: 'nav-group', 'aria-label': title }, node('span', { class: 'nav-label' }, title), entries);
   }
   function navItem([name, title, glyph]) {
-    return node('a', { class: 'nav-link', href: '#' + name, 'aria-current': name === id ? 'page' : null }, icon(glyph), title);
+    return node('a', { class: 'nav-link', href: '#' + name, 'aria-current': name === id ? 'page' : null }, icon(glyph), node('span', {}, title));
   }
   const closeMenu = button('Close navigation', () => toggleMenu(false), { style: 'square mobile-menu mobile-close', glyph: 'close' });
   const docs = sections.find(section => section[0] === 'docs');
+  const pick = ids => sections.filter(section => ids.includes(section[0])).map(navItem);
   const sidebar = node('aside', { class: 'sidebar', id: 'workspace-navigation' }, closeMenu, brand(),
-    group(preview ? 'Preview' : 'Workspace', sections.slice(0, preview ? 1 : 5).map(navItem)),
-    preview ? null : group('Monitor', sections.slice(5, 7).map(navItem)),
-    group('Resources', [navItem(docs), link('GitHub', repo, { style: 'nav-link', glyph: 'github', external: true })]),
+    group(preview ? 'Preview' : 'Workspace', pick(preview ? ['check'] : ['overview', 'check', 'contracts', 'compare'])),
+    preview ? null : group('Explore', pick(['architecture', 'features', 'cli', 'why'])),
+    preview ? null : group('Monitor', pick(['history', 'inbox', 'activity'])),
+    group('Resources', [docs && navItem(docs), link('GitHub', repo, { style: 'nav-link', glyph: 'github', external: true })].filter(Boolean)),
     preview ? null : node('div', { class: 'sidebar-bottom' },
       node('div', { class: 'connection' }, node('span', { class: 'dot', 'aria-hidden': 'true' }),
         node('strong', {}, 'Server connected'), node('small', {}, state.session.version ? 'v' + state.session.version : 'Cellar Java')),
@@ -341,6 +349,7 @@ function illustration() {
 }
 
 function overview() {
+  const quickCommandMessage = node('div', { class: 'notice' });
   const metrics = node('div', { class: 'metrics', 'aria-label': 'Workspace metrics' });
   const recent = node('div', {}, working('Loading recent checks…'));
   const coverage = node('div', {}, working('Loading contracts…'));
@@ -393,11 +402,24 @@ function overview() {
       node('p', {}, 'Check an export against your contracts before it reaches a customer’s import.'),
       node('div', { class: 'actions' },
         link('New check', '#check', { style: 'btn primary', glyph: 'plus' }),
-        button('Try breaking demo', launchDemo, { glyph: 'play' }))), illustration()),
+        button('Try breaking demo', launchDemo, { glyph: 'play' }),
+        button('Copy CLI check', () => void copy('java -jar dist/cellar.jar check --csv build/sales.csv --summary --format markdown', quickCommandMessage), { glyph: 'file' }))), illustration()),
     statError, metrics,
     node('div', { class: 'two wide' },
       panel('Recent checks', recent, link('View history', '#history', { style: 'btn text compact' })),
-      panel('Contract coverage', coverage, link('View contracts', '#contracts', { style: 'btn text compact' }))));
+      panel('Contract coverage', coverage, link('View contracts', '#contracts', { style: 'btn text compact' }))),
+    quickCommandMessage,
+    node('div', { class: 'two wide' },
+      panel('How a check moves through Cellar', node('div', { class: 'overview-flow' },
+        ['CSV export', 'Contract rules', 'Validation agents', 'Release gate'].map((label, index) =>
+          node('a', { class: 'overview-flow-step', href: ['#check', '#contracts', '#features', '#history'][index] },
+            node('span', { class: 'step-index' }, String(index + 1).padStart(2, '0')), node('strong', {}, label),
+            node('small', {}, ['Read the file', 'Load the declared schema', 'Explain findings', 'Allow or block'][index])))),
+        link('Explore architecture', '#architecture', { style: 'btn text compact' })),
+      panel('What Cellar covers', node('div', { class: 'overview-capabilities' },
+        [['Contract validation', 'Required columns, values, types and row limits'], ['Release gate', 'Real pass or block verdicts and exit codes'], ['Traceability', 'History, revisions and an integrity-checked activity log']].map(([title, detail]) =>
+          node('div', { class: 'capability-row' }, node('strong', {}, title), node('span', { class: 'muted small' }, detail)))),
+        link('View all features', '#features', { style: 'btn text compact' }))));
 }
 
 function sampleCheck() {
@@ -945,6 +967,135 @@ function documentation() {
       link('Roadmap', repo + '#roadmap', { external: true }))));
 }
 
+function architecturePage() {
+  const components = [
+    { id: 'csv', number: '01', name: 'CSV reader', file: 'Csv.java', detail: 'Parses the uploaded export and extracts its header and records. Reports retain structural findings without storing cell values.' },
+    { id: 'contract', number: '02', name: 'Contract', file: 'Contract.java', detail: 'Loads the versioned integration schema: required columns, header policy, row limits, and per-column rules.' },
+    { id: 'checker', number: '03', name: 'Validation engine', file: 'Checker.java', detail: 'Evaluates each integration against the CSV and produces the findings used by the workspace, reports, CLI, and API.' },
+    { id: 'agents', number: '04', name: 'Agents', file: 'Agents.java', detail: 'Runs built-in offline triage, drift, and contract-scout helpers. Optional AI assistance is separate and stays off until configured.' },
+    { id: 'report', number: '05', name: 'Release report', file: 'Reports.java', detail: 'Formats the actual validation outcome and findings for people and CI. Exit code 1 blocks; 0 allows; 2 means invalid input.' },
+    { id: 'store', number: '06', name: 'Workspace history', file: 'Store.java', detail: 'Persists contracts, revisions, reports, and audit entries while keeping raw CSV cell values out of stored reports.' }
+  ];
+  const detail = node('div', { class: 'architecture-detail', 'aria-live': 'polite' });
+  const stageNodes = components.map((component, index) => node('button', {
+    class: 'architecture-node' + (index === 0 ? ' selected' : ''), type: 'button',
+    'aria-pressed': index === 0 ? 'true' : 'false', onclick: () => select(component)
+  }, node('span', { class: 'step-index' }, component.number), node('strong', {}, component.name),
+  node('code', {}, component.file)));
+  function select(component) {
+    stageNodes.forEach(item => {
+      const selected = item.querySelector('strong').textContent === component.name;
+      item.classList.toggle('selected', selected);
+      item.setAttribute('aria-pressed', String(selected));
+    });
+    detail.replaceChildren(node('div', { class: 'architecture-detail-copy' },
+      node('span', { class: 'eyebrow' }, 'CELLAR COMPONENT'),
+      node('h2', {}, component.name), node('p', { class: 'muted' }, component.detail)),
+      link('View ' + component.file, 'https://github.com/suryandugy-glitch/Cellar/blob/main/src/main/java/io/cellar/' + component.file, { external: true, style: 'btn compact' }));
+  }
+  select(components[0]);
+  return node('div', { class: 'page' },
+    pageHeading('Architecture', 'A CSV moves through the same validation engine in the workspace, API, CLI, and CI.'),
+    node('section', { class: 'architecture-panel panel pad' },
+      node('div', { class: 'architecture-intro' }, node('span', { class: 'eyebrow' }, 'FROM EXPORT TO DECISION'),
+        node('h2', {}, 'One contract check. A traceable release decision.'),
+        node('p', { class: 'muted' }, 'Select a component to see its role and the implementation behind it.')),
+      node('div', { class: 'architecture-flow', role: 'group', 'aria-label': 'Cellar validation pipeline' }, stageNodes),
+      detail),
+    node('div', { class: 'two' },
+      panel('One engine across entry points', node('div', { class: 'pad stack' },
+        node('p', {}, 'The Java workspace and HTTP API call the same checker used by the command line. CI can run that CLI against a synthetic export from the real exporter.'),
+        node('div', { class: 'actions' }, link('Check an export', '#check', { style: 'btn primary' }), link('CLI commands', '#cli', { style: 'btn' })))),
+      panel('Data boundary', node('div', { class: 'pad stack' },
+        node('p', {}, 'Cell values are processed for the check but not retained in reports. Reports contain structural details such as column names, counts, and record numbers.'),
+        link('Security notes', repo + '/blob/main/docs/WEB_SECURITY.md', { style: 'btn text compact', external: true })))));
+}
+
+function featuresPage() {
+  const features = [
+    ['Contract validation', 'Required and allowed headers, exact order, types, ranges, enums, non-empty and unique values, and row-count limits.', '#contracts'],
+    ['Triage and explanations', 'Offline built-in agents identify suspicious header renames and explain safe compatibility steps.', '#check'],
+    ['Release gate', 'Every check returns a real pass or block decision. CLI exit codes are 0 allowed, 1 blocked, and 2 invalid input.', '#check'],
+    ['Reports and history', 'Review findings, download reports, filter recent runs, and compare changes against a passing baseline.', '#history'],
+    ['Drift watch', 'Compare the candidate export with its previous shape and flag added, missing, or changed headers.', '#compare'],
+    ['Contract Scout', 'Draft a contract from CSV headers, then review it before saving to the active contract.', '#check'],
+    ['Live inbox', 'Automatically validate CSV files added to the configured local inbox directory.', '#inbox'],
+    ['CLI and CI', 'Run the same contract validation locally and in a workflow without requiring a hosted account.', '#cli'],
+    ['Contract revisions', 'Reject stale edits, review saved revisions, and restore a previous contract version.', '#contracts'],
+    ['Privacy boundary', 'Reports retain structural findings; raw CSV cell values are not stored in validation history.', '#docs'],
+    ['Optional AI', 'AI explanations can summarize findings or suggest fixes when configured. Built-in rules work offline and remain separate.', '#docs'],
+    ['Activity integrity', 'Review configuration changes and verify the chained activity log from the workspace.', '#activity']
+  ];
+  return node('div', { class: 'page' },
+    pageHeading('Features', 'A product map of Cellar’s implemented checks, release controls, and operating tools.'),
+    node('div', { class: 'feature-grid-workspace' }, features.map(([title, description, href], index) =>
+      node('article', { class: 'feature-card-workspace' }, node('span', { class: 'step-index' }, String(index + 1).padStart(2, '0')),
+        node('h2', {}, title), node('p', { class: 'muted' }, description), link('Open ' + title, href, { style: 'btn text compact' })))),
+    node('div', { class: 'notice feature-boundary' }, 'Offline rules are Cellar’s default. Optional AI uses your configured provider and receives no CSV cell values.'));
+}
+
+function cliPage() {
+  const message = node('div', { class: 'notice' });
+  const commands = [
+    ['Start workspace', 'java -jar dist/cellar.jar web', 'Runs the local workspace.'],
+    ['Check an export', 'java -jar dist/cellar.jar check --csv build/sales.csv --summary --format markdown', 'Checks headers and row rules, writes a summary, and returns the release-gate exit code.'],
+    ['Compare exports', 'java -jar dist/cellar.jar diff --baseline build/previous.csv --csv build/current.csv', 'Reports structural changes between a known baseline and candidate export.'],
+    ['Validate contract', 'java -jar dist/cellar.jar validate', 'Checks the active contract before using it.'],
+    ['Create sample contract', 'java -jar dist/cellar.jar init', 'Creates cellar.json only when one does not already exist.'],
+    ['Generate synthetic CSV', 'java -jar dist/cellar.jar export-demo --out build/sales.csv', 'Writes a synthetic example. Add --demo-break to remove the inventory order_id column.'],
+    ['Read local history', 'java -jar dist/cellar.jar history', 'Prints the latest locally saved check summaries.'],
+    ['Verify activity chain', 'java -jar dist/cellar.jar audit-verify', 'Checks the tamper-evident activity log when the master key is configured.']
+  ];
+  return node('div', { class: 'page' },
+    pageHeading('CLI commands', 'Run the same Java validation engine from a terminal or CI job.', link('CI example', repo + '#use-it-in-ci', { external: true })),
+    node('section', { class: 'cli-intro panel pad' }, node('span', { class: 'eyebrow' }, 'JAVA 21+ · NO EXTRA RUNTIME DEPENDENCIES'),
+      node('h2', {}, 'Make the release gate repeatable.'),
+      node('p', { class: 'muted' }, 'Commands below match the CLI accepted by this repository. Copy one and replace example file paths with your generated export.'),
+      node('p', { class: 'notice', role: 'note' }, 'Exit codes: 0 allowed · 1 blocked · 2 invalid input.')),
+    message,
+    node('div', { class: 'cli-grid' }, commands.map(([title, command, detail]) =>
+      node('article', { class: 'cli-card panel' }, node('div', { class: 'panel-head' }, node('h2', {}, title),
+        button('Copy command', () => void copy(command, message), { style: 'compact' })),
+      node('div', { class: 'pad stack' }, node('p', { class: 'muted small' }, detail), node('pre', {}, command))))),
+    panel('Full command help', node('div', { class: 'pad stack' },
+      node('pre', {}, 'java -jar dist/cellar.jar --help'),
+      node('p', { class: 'muted small' }, 'Use --config and --data on commands that support them; --help lists each option.'))));
+}
+
+function whyPage() {
+  const rows = [
+    ['Find the affected consumer', 'Read exporter code and compare files manually.', 'Cellar names each integration whose declared contract fails.'],
+    ['Explain the change', 'Trace a header or value through customer-specific requirements.', 'Findings name the rule, column, and record where available.'],
+    ['Decide whether to ship', 'Agree on a decision in code review or a custom script.', 'Use the check verdict locally or its exit code in CI.'],
+    ['Repeat the check', 'Recreate the command and keep reports separately.', 'Save run history and compare against a passing baseline.']
+  ];
+  return node('div', { class: 'page' },
+    pageHeading('Why Cellar', 'Keep the consumer contract beside the export check so release decisions are easy to explain.'),
+    node('section', { class: 'why-intro panel pad' }, node('span', { class: 'eyebrow' }, 'A QUALITATIVE WORKFLOW COMPARISON'),
+      node('h2', {}, 'Make CSV compatibility part of the release path.'),
+      node('p', { class: 'muted' }, 'This describes the workflow Cellar supports. It is not a benchmark or a claim that every check catches every downstream issue.')),
+    panel('Manual diagnosis and a contract-based check', table(['Task', 'Ad-hoc manual workflow', 'With Cellar'], rows)),
+    node('div', { class: 'actions' }, link('Try a breaking demo', '#check', { style: 'btn primary' }), link('See the architecture', '#architecture', { style: 'btn' })));
+}
+
+function backToTopControl() {
+  const control = button('Back to top', () => window.scrollTo({
+    top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+  }), { style: 'square back-to-top', glyph: 'arrowUp' });
+  control.hidden = true;
+  control.setAttribute('aria-label', 'Back to top');
+  document.body.append(control);
+  control.hidden = window.scrollY < 360;
+  let frame = 0;
+  window.addEventListener('scroll', () => {
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      control.hidden = window.scrollY < 360;
+      frame = 0;
+    });
+  }, { passive: true });
+}
+
 function gate() {
   const message = node('div', { class: 'notice' });
   const input = node('input', { type: 'password', id: 'access-key', required: true, autocomplete: 'off' });
@@ -965,7 +1116,8 @@ function gate() {
 
 const views = { overview, check: preview ? sampleCheck : checkPage,
   contracts: contractsPage, compare: comparePage, history: historyPage,
-  inbox: inboxPage, activity: activityPage, docs: documentation };
+  inbox: inboxPage, activity: activityPage, docs: documentation,
+  architecture: architecturePage, features: featuresPage, cli: cliPage, why: whyPage };
 
 function render(focus = false) {
   if (!preview && (!state.session || (state.session.keyRequired && !state.accessKey))) {
@@ -1038,5 +1190,6 @@ if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && window.mat
   }, { passive: true });
 }
 setTheme(storageRead('localStorage', 'cellar_theme') || 'dark');
+backToTopControl();
 if (preview) render();
 else void connect();
