@@ -50,6 +50,12 @@ sh run.sh            # Windows: run.bat
 ```
 
 Running `run.sh` from the repo root creates `./data`; it is ignored and must never be committed.
+The launcher automatically compiles and packages `dist/cellar.jar` from source if not present. If you download a prebuilt `cellar.jar` from GitHub Releases instead, always verify its checksum against `SHA256SUMS.txt` before running:
+```sh
+sha256sum -c dist/SHA256SUMS.txt
+# or on Windows PowerShell:
+# Get-FileHash dist\cellar.jar -Algorithm SHA256
+```
 
 Open the address it prints (usually `http://127.0.0.1:8080`; if that port is busy it picks the next free one).
 
