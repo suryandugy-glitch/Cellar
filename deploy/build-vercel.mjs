@@ -20,6 +20,9 @@ landing = landing.replace(/  <link rel="canonical" href="[^"]*">\r?\n/, siteOrig
 if (workspaceOrigin) {
   landing = landing.replace('href="./guide.html#quick-start">Open workspace',
     'href="./workspace.html">Open workspace');
+} else {
+  landing = landing.replace('href="./guide.html#quick-start">Open workspace',
+    'href="./guide.html#quick-start">Workspace setup');
 }
 
 const demo = await readFile(new URL(web + '/index.html', root), 'utf8');
@@ -35,6 +38,13 @@ if (workspaceOrigin) {
 for (const page of ['walkthrough.html', 'guide.html', 'workplace.html']) {
   const html = await readFile(new URL(site + '/' + page, root), 'utf8');
   await writeFile(new URL(page, output), restrictConnections(html));
+  if (page === 'guide.html' && !workspaceOrigin) {
+    const setup = html.replace(/<title>[^<]+<\/title>/, '<title>Cellar | Workspace setup</title>')
+      .replace('Use Cellar with your exports.', 'Workspace setup')
+      .replace('Start the Java workspace, define your contracts, and run the same checks before every release.',
+        'This deployment has no connected Java workspace. Run Cellar locally or follow the shared workspace deployment guide below.');
+    await writeFile(new URL('workspace.html', output), restrictConnections(setup));
+  }
 }
 
 const assets = [
