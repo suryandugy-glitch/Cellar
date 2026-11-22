@@ -27,7 +27,7 @@ jobs:
     env:
       CELLAR_DOMAIN: localhost
       CELLAR_FRONTEND_ORIGIN: https://127.0.0.1:8443
-      CELLAR_ACCESS_KEY: cellar-ci-synthetic-key
+      CELLAR_ACCESS_KEY: cellar-ci-synthetic-access-key-24
       CELLAR_MASTER_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
     steps:
       - uses: actions/checkout@v5

@@ -63,7 +63,7 @@ public record WebConfig(String bindHost, int port, Path dataDir, URI publicOrigi
         if (frontendOrigin != null && (!frontendOrigin.getScheme().equals("https") || frontendOrigin.equals(publicOrigin)))
             throw new InputError("CELLAR_FRONTEND_ORIGIN must be a separate HTTPS origin.");
         if (shared()) {
-            if (accessKey == null || accessKey.isBlank() || accessKey.length() < 12) throw new InputError("Shared deployments need CELLAR_ACCESS_KEY (12+ characters).");
+            if (accessKey == null || accessKey.isBlank() || accessKey.length() < 24) throw new InputError("Shared deployments need CELLAR_ACCESS_KEY (24+ characters).");
             if (publicOrigin == null || !publicOrigin.getScheme().equals("https")) throw new InputError("Shared deployments need an HTTPS CELLAR_PUBLIC_URL.");
             if (!tls() && !trustProxy) throw new InputError("Configure direct TLS or put Cellar behind a TLS proxy with CELLAR_TRUST_PROXY=true.");
             if (masterKeyEnv == null || masterKeyEnv.isBlank()) throw new InputError("Shared deployments need CELLAR_MASTER_KEY from a secret manager.");

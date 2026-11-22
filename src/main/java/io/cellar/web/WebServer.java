@@ -38,6 +38,12 @@ public final class WebServer implements AutoCloseable {
     private final AtomicBoolean closing = new AtomicBoolean();
     private final Workspace workspace; private final Audit audit; private final Ai ai; private final Semaphore aiPermits = new Semaphore(2);
     private final RateLimiter limiter = new RateLimiter(50_000);
+    private final RateLimiter authLogLimiter = new RateLimiter(10_000);
+    private final Object authFloodLock = new Object();
+    private long authFloodWindowStart = System.currentTimeMillis();
+    private int authFailedCount = 0;
+    private boolean authFloodLogged = false;
+    private static final int AUTH_FLOOD_THRESHOLD = 50;
     private final Semaphore checkPermits = new Semaphore(2);
     private final Map<String, Route> routes = new HashMap<>(); private final Map<String, byte[]> statics = new HashMap<>(); private final Map<String, String> staticTypes = new HashMap<>();
     private final Set<String> allowedHosts = new HashSet<>(), allowedOrigins = new HashSet<>();
@@ -277,6 +283,7 @@ public final class WebServer implements AutoCloseable {
             }
             if (route.needsKey() && cfg.accessKey() != null) {
                 if (!Crypto.equal(cfg.accessKey(), Objects.toString(x.getRequestHeaders().getFirst("X-Access-Key"), ""))) {
+                    recordFailedAuth(c.ip);
                     limit("key:" + c.ip, 20, 30);
                     throw new HttpError(401, "Access key required.");
                 }
@@ -346,6 +353,29 @@ public final class WebServer implements AutoCloseable {
 
     // ------------------------------------------------------------------ helpers
     private void limit(String key, int burst, double perMinute) { if (!limiter.allow(key, burst, perMinute)) throw new HttpError(429, "Too many attempts. Wait a minute."); }
+
+    private void recordFailedAuth(String ip) {
+        long now = System.currentTimeMillis();
+        boolean triggerFlood = false;
+        synchronized (authFloodLock) {
+            if (now - authFloodWindowStart >= 60_000) {
+                authFloodWindowStart = now;
+                authFailedCount = 0;
+                authFloodLogged = false;
+            }
+            authFailedCount++;
+            if (authFailedCount >= AUTH_FLOOD_THRESHOLD && !authFloodLogged) {
+                authFloodLogged = true;
+                triggerFlood = true;
+            }
+        }
+        if (triggerFlood) {
+            try { audit.log("system", ip, "AUTH_FLOOD", "Excessive failed authentication attempts: " + authFailedCount + " in 1 minute"); } catch (Exception ignored) {}
+        }
+        if (authLogLimiter.allow("ip:" + ip, 1, 1.0) && authLogLimiter.allow("global", 10, 10.0)) {
+            try { audit.log("anonymous", ip, "AUTH_FAILED", "Invalid or missing access key"); } catch (Exception ignored) {}
+        }
+    }
     private static String str(Map<String, Object> body, String key) { if (!(body.get(key) instanceof String s)) throw new InputError(key + " must be a string."); return s; }
 
     private String clientIp(HttpExchange x) {

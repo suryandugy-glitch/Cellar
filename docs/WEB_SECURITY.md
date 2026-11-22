@@ -14,7 +14,7 @@ Provide these values through your deployment environment or secret manager.
 | Variable | Value |
 |---|---|
 | `CELLAR_DOMAIN` | Public hostname, for example `cellar.example.com` |
-| `CELLAR_ACCESS_KEY` | Random shared access key. Generate with `openssl rand -hex 32`. |
+| `CELLAR_ACCESS_KEY` | Random shared access key (24+ characters). Generate with `openssl rand -base64 24`. |
 | `CELLAR_MASTER_KEY` | Persistent encryption and audit key. Generate once with `openssl rand -base64 32`. |
 
 ```sh

@@ -32,12 +32,15 @@ final class WebTests {
         });
         test("shared deployments require an HTTPS origin, proxy or TLS, and both keys", () -> {
             var env = new HashMap<>(Map.of("CELLAR_BIND", "0.0.0.0", "CELLAR_PUBLIC_URL", "https://C.example.com:443/",
-                "CELLAR_ACCESS_KEY", "a-long-shared-key", "CELLAR_MASTER_KEY", KEY, "CELLAR_TRUST_PROXY", "true"));
+                "CELLAR_ACCESS_KEY", "a-very-long-shared-access-key-24", "CELLAR_MASTER_KEY", KEY, "CELLAR_TRUST_PROXY", "true"));
             for (String name : List.of("CELLAR_ACCESS_KEY", "CELLAR_MASTER_KEY", "CELLAR_PUBLIC_URL", "CELLAR_TRUST_PROXY")) {
                 String value = env.remove(name);
                 invalid(() -> WebConfig.fromEnv(env, -1, null));
                 env.put(name, value);
             }
+            env.put("CELLAR_ACCESS_KEY", "short-key-12char");
+            invalid(() -> WebConfig.fromEnv(env, -1, null));
+            env.put("CELLAR_ACCESS_KEY", "a-very-long-shared-access-key-24");
             eq("https://c.example.com", WebConfig.fromEnv(env, -1, null).publicOrigin().toString());
             for (String url : List.of("http://c.example.com", "https://c.example.com/prefix", "https://c.example.com/?q=1")) {
                 env.put("CELLAR_PUBLIC_URL", url);
@@ -47,11 +50,11 @@ final class WebTests {
         });
         test("separate frontend requires its own HTTPS origin and shared deployment keys", () -> {
             var env = new HashMap<>(Map.of("CELLAR_PUBLIC_URL", "https://api.example.com", "CELLAR_TRUST_PROXY", "true",
-                "CELLAR_FRONTEND_ORIGIN", "https://CELLAR.example.com:443/", "CELLAR_ACCESS_KEY", "a-long-shared-key", "CELLAR_MASTER_KEY", KEY));
+                "CELLAR_FRONTEND_ORIGIN", "https://CELLAR.example.com:443/", "CELLAR_ACCESS_KEY", "a-very-long-shared-access-key-24", "CELLAR_MASTER_KEY", KEY));
             eq("https://cellar.example.com", WebConfig.fromEnv(env, -1, null).frontendOrigin().toString());
             env.remove("CELLAR_ACCESS_KEY");
             invalid(() -> WebConfig.fromEnv(env, -1, null));
-            env.put("CELLAR_ACCESS_KEY", "a-long-shared-key");
+            env.put("CELLAR_ACCESS_KEY", "a-very-long-shared-access-key-24");
             for (String origin : List.of("http://cellar.example.com", "https://api.example.com", "https://cellar.example.com/demo")) {
                 env.put("CELLAR_FRONTEND_ORIGIN", origin);
                 invalid(() -> WebConfig.fromEnv(env, -1, null));
@@ -151,16 +154,27 @@ final class WebTests {
             test("oversize bodies are rejected", () -> { try { eq(413, send("PUT", base + "/api/config", "{\"config\":\"" + "a".repeat(2 * 1024 * 1024) + "\"}", null, base).status()); } catch (java.io.IOException reset) { /* server closed early: also a rejection */ } });
             test("stale contract revision conflicts", () -> eq(409, send("PUT", base + "/api/config", "{\"config\":" + Json.write(Json.parse(Demo.CONFIG)) + ",\"revision\":\"stale\"}", null, base).status()));
         }
-        try (var s = new WebServer(new WebConfig("127.0.0.1", 0, root.resolve("keyed"), null, false, null, null, KEY, "a-long-shared-key"))) {
+        try (var s = new WebServer(new WebConfig("127.0.0.1", 0, root.resolve("keyed"), null, false, null, null, KEY, "a-very-long-shared-access-key-24"))) {
             s.start(); String base = "http://127.0.0.1:" + s.port();
             test("access key gates the api when configured", () -> {
                 eq(401, send("GET", base + "/api/config", null, null, base).status()); eq(401, send("GET", base + "/api/config", null, "wrong", base).status());
-                eq(200, send("GET", base + "/api/config", null, "a-long-shared-key", base).status()); eq(200, send("GET", base + "/api/health", null, null, base).status());
+                eq(200, send("GET", base + "/api/config", null, "a-very-long-shared-access-key-24", base).status()); eq(200, send("GET", base + "/api/health", null, null, base).status());
             });
             test("failed access keys are throttled without blocking authenticated requests", () -> {
                 for (int i = 0; i < 20; i++) send("GET", base + "/api/config", null, "wrong", base);
                 eq(429, send("GET", base + "/api/config", null, "wrong", base).status());
-                eq(200, send("GET", base + "/api/config", null, "a-long-shared-key", base).status());
+                eq(200, send("GET", base + "/api/config", null, "a-very-long-shared-access-key-24", base).status());
+            });
+            test("failed authentication logs AUTH_FAILED and AUTH_FLOOD without locking valid users", () -> {
+                for (int i = 0; i < 35; i++) send("GET", base + "/api/config", null, "wrong", base);
+                eq(200, send("GET", base + "/api/config", null, "a-very-long-shared-access-key-24", base).status());
+                Resp act = send("GET", base + "/api/activity", null, "a-very-long-shared-access-key-24", base);
+                eq(200, act.status());
+                ok(act.body().contains("AUTH_FAILED"));
+                ok(act.body().contains("AUTH_FLOOD"));
+                Resp ver = send("GET", base + "/api/activity/verify", null, "a-very-long-shared-access-key-24", base);
+                eq(200, ver.status());
+                ok(ver.body().contains("\"ok\":true"));
             });
         }
     }
