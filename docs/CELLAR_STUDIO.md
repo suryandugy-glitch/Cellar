@@ -4,13 +4,13 @@
 
 ## Studio today
 
-[Cellar Studio](https://suryandugy-glitch.github.io/Cellar/studio.html) is the first public product directory, with search, maturity filters, and links to existing projects. It is a static presentation layer. Shared sign-in, central reporting, and team workspaces remain future proposals.
+[Cellar Studio](https://suryandugy-glitch.github.io/Cellar-Studio/) is the first public product directory, with search, maturity filters, and links to existing projects. It is a static presentation layer. Shared sign-in, central reporting, and team workspaces remain future proposals.
 
 The [core governance and company structure](CORE_GOVERNANCE.md) names Suryandu Ganguly and Gunjan Roy as the current core decision-makers and explains the public/private access boundary.
 
 ## Repository hierarchy
 
-The planned **primary** GitHub repository is `suryandugy-glitch/Cellar-Studio`. This existing `suryandugy-glitch/Cellar` repository remains the **child Cellar Guard product**. The parent repo is not yet created. Follow the [repository hierarchy and migration plan](REPOSITORY_HIERARCHY.md) before moving Studio-specific files.
+The **primary** GitHub repository is now [`suryandugy-glitch/Cellar-Studio`](https://github.com/suryandugy-glitch/Cellar-Studio). It currently also contains Cellar Guard's Java implementation; extracting Guard to a separate product repository is future migration work. See the [repository hierarchy plan](REPOSITORY_HIERARCHY.md).
 
 ## Product hierarchy
 
@@ -31,7 +31,7 @@ The shared product principle: every tool must answer **what broke, who is affect
 
 | Product | Developer bottleneck | Current code | Maturity |
 |---|---|---|---|
-| **Cellar Guard** | CSV exports silently break downstream imports | [Cellar](https://github.com/suryandugy-glitch/Cellar) | Working pilot; Java checker and web interface |
+| **Cellar Guard** | CSV exports silently break downstream imports | [Cellar](https://github.com/suryandugy-glitch/Cellar-Studio) | Working pilot; Java checker and web interface |
 | **Cellar BuildClinic** | Build logs are long and fixes are hard to identify | [buildclinic](https://github.com/suryandugy-glitch/buildclinic) | Browser-only diagnostic tool |
 | **Cellar ClauseCraft** | Teams need help spotting risky text patterns in contracts | [ClauseCraft](https://github.com/suryandugy-glitch/ClauseCraft) | Separate existing prototype; not legal advice |
 | **Cellar PlanCliff** | Query performance regresses as data distributions change | [Systems Bottleneck Lab](https://github.com/suryandugy-glitch/systems-bottleneck-lab) | Research prototype |

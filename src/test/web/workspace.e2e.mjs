@@ -16,6 +16,7 @@ assert.ok(key);
 
 const assets = new Map([
   ['/', ['index.html', 'text/html']],
+  ['/guard.html', ['guard.html', 'text/html']],
   ['/workspace.html', ['workspace.html', 'text/html']],
   ['/app.js', ['app.js', 'text/javascript']],
   ['/app.css', ['app.css', 'text/css']],
@@ -73,7 +74,8 @@ try {
   });
   assert.equal(unsupported.status(), 403);
 
-  await page.goto(siteOrigin);
+  // Studio owns the site root; Cellar Guard's product page hosts the workspace entry.
+  await page.goto(siteOrigin + '/guard.html');
   await page.getByRole('link', { name: 'Open workspace' }).click();
   await page.getByRole('heading', { name: 'Unlock Cellar' }).waitFor();
   await page.getByLabel('Access key').fill('incorrect-test-key');

@@ -8,7 +8,7 @@
 
 | Repository | Role | Code and content | Status |
 | --- | --- | --- | --- |
-| `suryandugy-glitch/Cellar-Studio` | **Main company/platform repository** | Studio homepage, company structure, shared design system, product registry, cross-product interfaces, integration orchestrator and umbrella documentation | **Not created yet** |
+| `suryandugy-glitch/Cellar-Studio` | **Main company/platform repository** | Studio homepage, company structure, shared design system, product registry, cross-product interfaces, integration orchestrator and umbrella documentation | **Created via rename of the former `Cellar` repo; Studio home now at website root** |
 | [`suryandugy-glitch/Cellar`](https://github.com/suryandugy-glitch/Cellar) | **Child product: Cellar Guard** | Java 21 CSV contract checker, CLI, local backend, product API, tests and product-specific site | Existing working repository |
 | [`buildclinic`](https://github.com/suryandugy-glitch/buildclinic) | Child product candidate | Build diagnostics | Existing separate repository |
 | [`ClauseCraft`](https://github.com/suryandugy-glitch/ClauseCraft) | Child product candidate | Document review prototype | Existing separate repository |
@@ -38,7 +38,7 @@ Cellar/                    # EXISTING child repository, keep history and URLs
 
 ## Safe migration sequence
 
-1. Create a new repository named **`Cellar-Studio`** owned by `suryandugy-glitch`. The current `Cellar` repository remains untouched as the product.
+1. Create a new repository named **`Cellar-Studio`** owned by `suryandugy-glitch`. The old `Cellar` repository was renamed to `Cellar-Studio`; Guard's Java code remains inside Studio temporarily. A separate product repository has not yet been created.
 2. Configure the intended visibility and collaborator permissions. If internal planning must be private, put it in a separate private core repository, not a public Studio site.
 3. Copy the Studio-specific website assets (currently `deploy/pages/studio.html`, `studio.css`, `studio.js`) to `Cellar-Studio/apps/studio-web/`. Preserve source license/attribution.
 4. Move the umbrella-only documents (`docs/CELLAR_STUDIO.md`, governance/standards) into the new Studio documentation area **after** reviewing whether anything is confidential. Keep concise public links or redirects in `Cellar`.
@@ -56,4 +56,4 @@ Core company decisions: **Suryandu Ganguly** (`@suryandugy-glitch`) and **Gunjan
 
 ## Current migration state
 
-This document records the **agreed target architecture**. The GitHub connection available for this change supports repository file edits and pull requests but not repository creation/renaming or collaborator administration. The new parent repository and its permissions must be created and verified before marking the migration complete.
+This is the **target separated-repository architecture**, not the present filesystem. The `Cellar-Studio` repository now exists as the renamed original. Guard is still implemented within it. Creating a separate `Cellar` child repository, migrating the Guard source safely, and verifying permissions remain future work.

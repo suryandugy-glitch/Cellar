@@ -13,7 +13,7 @@ This document defines **decision ownership**, not access control. The Cellar Git
 
 ## Repository ownership
 
-**Cellar Studio is the parent company repository (planned new `Cellar-Studio` repo); Cellar Guard is the existing child product repository (`Cellar`).** See the [repository hierarchy plan](REPOSITORY_HIERARCHY.md). Listing a product under Studio does not transfer its repository permissions.
+**Cellar Studio is the main company repository (`Cellar-Studio`); Cellar Guard is currently a product codebase within it, intended for a separate child repository later.** See the [repository hierarchy plan](REPOSITORY_HIERARCHY.md). Listing a product under Studio does not transfer its repository permissions.
 
 ## Company structure
 

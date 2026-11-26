@@ -1,35 +1,42 @@
-<p align="center"><img src="assets/logo.svg" alt="Cellar Studio" width="360"></p>
+<p align="center"><img src="assets/logo.svg" alt="Cellar Studio" width="420"></p>
 
-<h3 align="center">Catch the CSV change that breaks a customer's import, before it ships.</h3>
+<h1 align="center">Cellar Studio</h1>
+
+<p align="center"><strong>Engineering tools for the problems that break software before release.</strong></p>
 
 <p align="center">
-  <a href="https://suryandugy-glitch.github.io/Cellar/">Website and sample checks</a> ·
-  <a href="https://github.com/suryandugy-glitch/Cellar">GitHub</a> ·
-  <a href="#quick-start">Quick start</a> ·
-  <a href="#what-you-get">Features</a> ·
-  <a href="#use-it-in-ci">CI</a> ·
-  <a href="#share-it-on-a-server">Deploy</a> ·
-  <a href="docs/API.md">API</a>
+  <a href="https://suryandugy-glitch.github.io/Cellar-Studio/">Company website</a> ·
+  <a href="https://suryandugy-glitch.github.io/Cellar-Studio/guard.html">Cellar Guard</a> ·
+  <a href="docs/CELLAR_STUDIO.md">Products and roadmap</a> ·
+  <a href="docs/CORE_GOVERNANCE.md">Core governance</a> ·
+  <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
 <p align="center">
-  <img alt="Java 21" src="https://img.shields.io/badge/Java-21+-orange">
-  <img alt="Dependencies" src="https://img.shields.io/badge/dependencies-none-brightgreen">
-  <img alt="Sign-in" src="https://img.shields.io/badge/sign--in-not%20needed-blue">
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-lightgrey">
+  <img alt="Open source" src="https://img.shields.io/badge/open%20source-products-145746">
+  <img alt="Platform stage" src="https://img.shields.io/badge/platform-directory%20preview-145746">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-145746">
 </p>
 
 ---
 
-> **Repository hierarchy:** **Cellar Studio** is the intended main company/platform repository, while this **Cellar** repository is its child product (Cellar Guard). The parent `Cellar-Studio` repository has not been created yet; see the [repository migration plan](docs/REPOSITORY_HIERARCHY.md).
+## The company
 
-> **Cellar Studio platform:** Cellar Guard is the CSV compatibility product within a proposed family of developer tools. See the [Cellar Studio product map and roadmap](docs/CELLAR_STUDIO.md) and [repository standards](docs/ECOSYSTEM_REPO_STANDARDS.md). Existing product names, maintainers, and deployments are unchanged.
+**Cellar Studio** is the main company repository and public product hub. We build developer tools that detect fragile boundaries in data exports, builds, databases and storage systems.
 
-**Cellar Studio preview:** [Explore the Cellar Studio product directory](https://suryandugy-glitch.github.io/Cellar/studio.html). This is a navigable directory, not yet a shared account or cloud dashboard.
+- **Products:** Cellar Guard (the Java CSV checker), BuildClinic, ClauseCraft and other focused tools.
+- **Studio Labs:** PlanCliff and CrashCheck research work.
+- **Studio workspace (planned):** shared projects, findings, permissions and integrations. The current website is a directory, not an authenticated cross-product backend.
+
+**What works now:** the Studio product directory and the existing Cellar Guard Java 21 CLI/web application. Other tools retain their own repositories and development status. Read the [product map](docs/CELLAR_STUDIO.md) and [repository hierarchy](docs/REPOSITORY_HIERARCHY.md) before assuming everything is one runtime.
+
+## Cellar Guard — the first product
+
+Cellar Guard catches CSV changes that would break customer imports before shipping. It contains an offline Java checker, local web workspace, contract-based checks, CI integration and optional AI assistance. The full product guide continues below.
 
 ## Start here
 
-**New to Cellar?** Choose the guide that matches what you want to do:
+**New to Cellar Studio?** Choose the guide that matches what you want to do:
 
 | Goal | Where to go |
 | --- | --- |
@@ -41,9 +48,9 @@
 | Explore the Cellar Studio company | [Cellar Studio roadmap](docs/CELLAR_STUDIO.md) |
 | See company structure and core governance | [Core governance](docs/CORE_GOVERNANCE.md) |
 
-**Current product:** Cellar checks CSV exports against contracts using a Java 21 backend, CLI and local web workspace. **Platform direction:** Cellar Studio will organize other developer tools, but those products are not all implemented in this repository. The public demonstration website is not the full Java backend.
+**Current status:** Cellar Studio is the company website and product hub; Cellar Guard's Java backend and CLI are implemented in this repository until the product is extracted into its own repo. Other products run independently. The public demonstration website is not the full Java backend.
 
-## What is Cellar?
+## What is Cellar Guard?
 
 Cellar is **spell-check for the files other software reads.** Your app produces a CSV. Your customers' tools expect certain columns. If someone renames or removes one, nothing looks wrong on your side, but a customer's import fails days later.
 
@@ -66,8 +73,8 @@ CSV or edit the contracts, start the Java app.
 You need **Java 21+**. No other installs, no account, no sign-in.
 
 ```sh
-git clone https://github.com/suryandugy-glitch/Cellar.git
-cd Cellar
+git clone https://github.com/suryandugy-glitch/Cellar-Studio.git
+cd Cellar-Studio
 sh run.sh            # Windows: run.bat
 ```
 
@@ -246,4 +253,4 @@ Scoped API tokens for CI · per-repository workspaces · Slack and email alerts 
 
 ## Contributing
 
-Issues and ideas are welcome at [github.com/suryandugy-glitch/Cellar](https://github.com/suryandugy-glitch/Cellar). See [CONTRIBUTING.md](CONTRIBUTING.md). Licensed under the [MIT License](LICENSE).
+Issues and ideas are welcome at [github.com/suryandugy-glitch/Cellar](https://github.com/suryandugy-glitch/Cellar-Studio). See [CONTRIBUTING.md](CONTRIBUTING.md). Licensed under the [MIT License](LICENSE).
