@@ -6,6 +6,8 @@
 
 [Cellar Studio](https://suryandugy-glitch.github.io/Cellar/studio.html) is the first public product directory, with search, maturity filters, and links to existing projects. It is a static presentation layer. Shared sign-in, central reporting, and team workspaces remain future proposals.
 
+The [core governance and company structure](CORE_GOVERNANCE.md) names Suryandu Ganguly and Gunjan Roy as the current core decision-makers and explains the public/private access boundary.
+
 ## Product hierarchy
 
 - **Cellar Studio** — primary identity, navigation, documentation, and future optional shared workspace.
