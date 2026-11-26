@@ -12,15 +12,15 @@ The **Cellar Studio** platform is intended to apply that same evidence-first app
 
 ### I just want to see what Cellar does
 
-Open the [public demonstration](https://suryandugy-glitch.github.io/Cellar/). It uses synthetic sample reports; it is **not** the full Java backend.
+Open the [Cellar Guard sample demonstration](https://suryandugy-glitch.github.io/Cellar-Studio/guard.html). It uses synthetic sample reports; it is **not** the full Java backend.
 
 ### I want to run the actual application
 
 You need a **JDK 21 or later**.
 
 ```sh
-git clone https://github.com/suryandugy-glitch/Cellar.git
-cd Cellar
+git clone https://github.com/suryandugy-glitch/Cellar-Studio.git
+cd Cellar-Studio
 java Build.java test
 sh run.sh
 ```
@@ -31,7 +31,7 @@ In the local workspace, choose **Check → Breaking demo → Run check**. The ex
 
 ### I want to code without installing Java
 
-Use [GitHub Codespaces](https://github.com/codespaces/new?repo=suryandugy-glitch%2FCellar), select `main`, and create a Codespace. Its devcontainer installs Java 21 and Node 22 and runs the tests during setup. When it finishes, run `sh run.sh` and open the forwarded port in the **Ports** tab.
+Use [GitHub Codespaces](https://github.com/codespaces/new?repo=suryandugy-glitch%2FCellar-Studio), select `main`, and create a Codespace. Its devcontainer installs Java 21 and Node 22 and runs the tests during setup. When it finishes, run `sh run.sh` and open the forwarded port in the **Ports** tab.
 
 Codespaces may consume paid account quota. It does not automatically deploy to production.
 
