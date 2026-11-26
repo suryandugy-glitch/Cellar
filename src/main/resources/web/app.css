@@ -775,3 +775,15 @@ h1 { font-weight:700;letter-spacing:-.075em; }
   .hero .btn.primary,.btn.primary { box-shadow:2px 2px 0 #8fbe80; }
   [data-theme="dark"] .hero .btn.primary,[data-theme="dark"] .btn.primary { box-shadow:2px 2px 0 #456f39; }
 }
+
+/* Minimalist palette to match the public Studio and Guard systems. */
+:root { --bg:#f3f3ec;--panel:#fffef8;--ink:#233025;--muted:#59695b;--line:#bbc9b8;--soft:#e7eee3;--accent:#345f3e;--accent-hover:#25482f;--accent-soft:#e1eddb; }
+[data-theme="dark"] { --bg:#0b100c;--panel:#161f18;--ink:#f1f0e8;--muted:#afb9ad;--line:#526453;--soft:#223024;--accent:#b9d3a2;--accent-hover:#d1e6bf;--accent-soft:#253a27;--green:#b9d3a2;--green-soft:#253a27; }
+[data-theme="dark"] .hero .btn.primary,[data-theme="dark"] .btn.primary { background:#b9d3a2;border-color:#b9d3a2;color:#13200f;box-shadow:3px 3px 0 #526950; }
+[data-theme="dark"] .hero .btn.primary:hover:not(:disabled),[data-theme="dark"] .btn.primary:hover:not(:disabled) { background:#d1e6bf;border-color:#d1e6bf;color:#13200f;box-shadow:5px 5px 0 #526950; }
+.sidebar,.topbar { border-color:var(--line); }
+.hero { background:var(--panel); }
+.page-head h1 { letter-spacing:-.075em; }
+.panel,.metric,.hero { border-color:var(--line); }
+.btn:focus-visible,.nav-link:focus-visible { outline:2px solid var(--accent);outline-offset:4px; }
+@media(prefers-reduced-motion:reduce) { .page > * { animation:none!important; } }
