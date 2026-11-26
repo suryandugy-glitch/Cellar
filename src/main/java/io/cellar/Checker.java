@@ -74,8 +74,30 @@ public final class Checker {
             if(!lost.isEmpty()||!unexpected.isEmpty()||order)impacted.add(Json.map("integration",i.id(),"owner",i.owner(),"removedRequired",lost,"unexpectedAdded",unexpected,"orderMismatch",order));
         }
         boolean reordered=!old.stream().filter(current::contains).toList().equals(current.stream().filter(old::contains).toList());
+        // Suggest header-only migrations. Each target is claimed at most once, and low-confidence
+        // guesses are omitted; a name match alone is never proof that data semantics agree.
+        List<Object> renameCandidates=new ArrayList<>();
+        Set<String> claimed=new HashSet<>();
+        if(removed.size()<=100 && added.size()<=100)for(String source:removed) {
+            String best=null;double score=0;
+            for(String target:added) {
+                if(claimed.contains(target))continue;
+                double similarity=Agents.similarity(source,target);
+                if(similarity>score){score=similarity;best=target;}
+            }
+            if(best!=null && score>=0.65) {
+                claimed.add(best);
+                List<String> consumers=contract.integrations().stream()
+                    .filter(i->i.required().contains(source)).map(Contract.Integration::id).toList();
+                renameCandidates.add(Json.map("from",source,"to",best,
+                    "nameSimilarityPercent",(int)Math.round(score*100),
+                    "requiredBy",consumers,
+                    "action","Keep the old column until affected consumers migrate; validate data semantics before renaming."));
+            }
+        }
         return Json.map("added",added,"removed",removed,"reordered",reordered,"impacted",impacted,
-            "note","Diff compares headers only. Run check to validate the complete target contract.");
+            "affectedIntegrations",impacted.size(),"renameCandidates",renameCandidates,
+            "note","Diff compares headers only. Rename suggestions are name-based hypotheses, not verified migrations. Run check against the target contract.");
     }
     private static final class Issues {
         int total;List<Object> saved=new ArrayList<>();

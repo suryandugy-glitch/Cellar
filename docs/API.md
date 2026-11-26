@@ -45,3 +45,33 @@ For 429 or 503/504, use `Retry-After` when present before retrying. Save the
 POST bodies have per-route limits. The check and scout envelopes allow up to
 9 MiB and compare up to 17 MiB. The CSV engine separately limits each CSV to
 8 MiB. JSON escaping can increase the envelope size.
+
+## Header migration analysis: `POST /api/diff`
+
+Send two CSV exports to compare their headers against the currently configured contract:
+
+```json
+{
+  "before": "order_id,sku,total_cents,currency\n",
+  "after": "id,sku,total_cents,currency\n"
+}
+```
+
+The response keeps existing keys `added`, `removed`, `reordered`, `impacted`, and `note`, and adds:
+
+- `affectedIntegrations`: number of integrations listed in `impacted`.
+- `renameCandidates`: conservative, deterministic header-name suggestions. Each item includes `from`, `to`, `nameSimilarityPercent`, `requiredBy` (integration IDs requiring the old name), and `action`.
+
+Example candidate:
+
+```json
+{
+  "from": "order_id",
+  "to": "id",
+  "nameSimilarityPercent": 80,
+  "requiredBy": ["inventory-report"],
+  "action": "Keep the old column until affected consumers migrate; validate data semantics before renaming."
+}
+```
+
+These are **hypotheses based on header names**, not verified semantic renames. The algorithm requires a name similarity of at least 65%, assigns each new header to at most one removed header, and omits candidates if either side has over 100 changed columns. It compares headers only and never uses or includes CSV cell values. Always run `check` and coordinate migrations with affected consumers before releasing.
