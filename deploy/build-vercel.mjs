@@ -13,6 +13,9 @@ function restrictConnections(html, origin = '') {
 }
 
 let landing = await readFile(new URL(site + '/index.html', root), 'utf8');
+let studio = await readFile(new URL(site + '/studio.html', root), 'utf8');
+studio = studio.replace(/  <link rel="canonical" href="[^"]*">\r?\n/, siteOrigin
+  ? '  <link rel="canonical" href="' + siteOrigin + '/">\n' : '');
 landing = landing.replace(/  <link rel="canonical" href="[^"]*">\r?\n/, siteOrigin
   ? '  <link rel="canonical" href="' + siteOrigin + '/">\n' +
     '  <meta property="og:url" content="' + siteOrigin + '/">\n'
@@ -28,7 +31,8 @@ if (workspaceOrigin) {
 const demo = await readFile(new URL(web + '/index.html', root), 'utf8');
 await rm(output, { recursive: true, force: true });
 await mkdir(new URL('samples/', output), { recursive: true });
-await writeFile(new URL('index.html', output), restrictConnections(landing));
+await writeFile(new URL('index.html', output), restrictConnections(studio));
+await writeFile(new URL('guard.html', output), restrictConnections(landing));
 await writeFile(new URL('demo.html', output), restrictConnections(demo.replace('<html ', '<html data-preview ')));
 if (workspaceOrigin) {
   const workspace = demo.replace('<html ', '<html data-api-origin="' + workspaceOrigin + '" ')
@@ -54,4 +58,4 @@ const assets = [
     .map(file => ({ source: site + '/samples/' + file, name: 'samples/' + file }))
 ];
 await Promise.all(assets.map(({ source, name }) => copyFile(new URL(source, root), new URL(name, output))));
-console.log('Built the Cellar public site in build/vercel.');
+console.log('Built the Cellar Studio company site and Guard product site in build/vercel.');
