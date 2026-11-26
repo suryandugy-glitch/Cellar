@@ -27,6 +27,10 @@ jobs:
       - name: Check the Vercel build against the Java-generated site
         run: |
           node deploy/build-vercel.mjs
+          grep -q 'Cellar Studio' build/pages/index.html
+          grep -q 'CSV compatibility checks' build/pages/guard.html
+          grep -q 'Cellar Studio' build/vercel/index.html
+          grep -q 'CSV compatibility checks' build/vercel/guard.html
           diff -r --exclude='*.html' build/pages build/vercel
           for page in demo.html guide.html walkthrough.html workplace.html; do
             sed '/<meta http-equiv="Content-Security-Policy"/d' "build/vercel/$page" | diff "build/pages/$page" -
