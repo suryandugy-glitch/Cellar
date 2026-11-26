@@ -16,6 +16,7 @@ assert.ok(key);
 
 const assets = new Map([
   ['/', ['index.html', 'text/html']],
+  ['/guard.html', ['guard.html', 'text/html']],
   ['/workspace.html', ['workspace.html', 'text/html']],
   ['/app.js', ['app.js', 'text/javascript']],
   ['/app.css', ['app.css', 'text/css']],
