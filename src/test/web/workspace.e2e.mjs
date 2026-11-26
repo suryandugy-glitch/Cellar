@@ -73,7 +73,8 @@ try {
   });
   assert.equal(unsupported.status(), 403);
 
-  await page.goto(siteOrigin);
+  // Studio owns the site root; Cellar Guard's product page hosts the workspace entry.
+  await page.goto(siteOrigin + '/guard.html');
   await page.getByRole('link', { name: 'Open workspace' }).click();
   await page.getByRole('heading', { name: 'Unlock Cellar' }).waitFor();
   await page.getByLabel('Access key').fill('incorrect-test-key');
