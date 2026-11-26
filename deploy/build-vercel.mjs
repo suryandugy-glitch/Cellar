@@ -35,7 +35,7 @@ if (workspaceOrigin) {
     .replace('<title>', '<meta name="robots" content="noindex">\n  <title>');
   await writeFile(new URL('workspace.html', output), restrictConnections(workspace, workspaceOrigin));
 }
-for (const page of ['walkthrough.html', 'guide.html', 'workplace.html']) {
+for (const page of ['walkthrough.html', 'guide.html', 'workplace.html', 'studio.html']) {
   const html = await readFile(new URL(site + '/' + page, root), 'utf8');
   await writeFile(new URL(page, output), restrictConnections(html));
   if (page === 'guide.html' && !workspaceOrigin) {
@@ -48,7 +48,7 @@ for (const page of ['walkthrough.html', 'guide.html', 'workplace.html']) {
 }
 
 const assets = [
-  ...['landing.css', 'landing.js', 'walkthrough.js', 'guide.js', 'trace-grid.svg'].map(name => ({ source: site + '/' + name, name })),
+  ...['landing.css', 'landing.js', 'walkthrough.js', 'guide.js', 'trace-grid.svg', 'studio.css', 'studio.js'].map(name => ({ source: site + '/' + name, name })),
   ...['app.css', 'app.js', 'logo.svg'].map(name => ({ source: web + '/' + name, name })),
   ...['passing.csv', 'passing.json', 'breaking.csv', 'breaking.json', 'fixed.csv', 'fixed.json']
     .map(file => ({ source: site + '/samples/' + file, name: 'samples/' + file }))
