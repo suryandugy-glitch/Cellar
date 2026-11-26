@@ -253,4 +253,4 @@ Scoped API tokens for CI · per-repository workspaces · Slack and email alerts 
 
 ## Contributing
 
-Issues and ideas are welcome at [github.com/suryandugy-glitch/Cellar](https://github.com/suryandugy-glitch/Cellar-Studio). See [CONTRIBUTING.md](CONTRIBUTING.md). Licensed under the [MIT License](LICENSE).
+Issues and ideas are welcome at [github.com/suryandugy-glitch/Cellar-Studio](https://github.com/suryandugy-glitch/Cellar-Studio). See [CONTRIBUTING.md](CONTRIBUTING.md). Licensed under the [MIT License](LICENSE).

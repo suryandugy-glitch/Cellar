@@ -6,7 +6,7 @@ This repository is the **Cellar Guard Java 21 product** and the planning home fo
 
 ## Open a ready-to-code environment in GitHub
 
-1. Open the [Cellar repository](https://github.com/suryandugy-glitch/Cellar).
+1. Open the [Cellar repository](https://github.com/suryandugy-glitch/Cellar-Studio).
 2. Select **Code → Codespaces → Create codespace on main**. The configuration is already merged into `main`.
 3. GitHub reads `.devcontainer/devcontainer.json` and provisions a JDK 21 environment with Node 22 for future frontend tooling.
 4. The container runs `java Build.java test` once on creation. Wait for that command to finish before making changes.

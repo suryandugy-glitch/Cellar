@@ -38,7 +38,7 @@ pip install git-filter-repo
 ### History Purge Steps
 ```sh
 # 1. Ensure you have a fresh, full clone of the repository
-git clone https://github.com/suryandugy-glitch/Cellar.git cellar-purge
+git clone https://github.com/suryandugy-glitch/Cellar-Studio.git cellar-purge
 cd cellar-purge
 
 # 2. Purge the data directory from all branches and tags
@@ -58,7 +58,7 @@ Every collaborator must discard their previous local clone to prevent reintroduc
 ```sh
 cd ..
 rm -rf Cellar
-git clone https://github.com/suryandugy-glitch/Cellar.git
+git clone https://github.com/suryandugy-glitch/Cellar-Studio.git
 ```
 
 ---
