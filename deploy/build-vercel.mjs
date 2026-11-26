@@ -17,8 +17,8 @@ let studio = await readFile(new URL(site + '/studio.html', root), 'utf8');
 studio = studio.replace(/  <link rel="canonical" href="[^"]*">\r?\n/, siteOrigin
   ? '  <link rel="canonical" href="' + siteOrigin + '/">\n' : '');
 landing = landing.replace(/  <link rel="canonical" href="[^"]*">\r?\n/, siteOrigin
-  ? '  <link rel="canonical" href="' + siteOrigin + '/">\n' +
-    '  <meta property="og:url" content="' + siteOrigin + '/">\n'
+  ? '  <link rel="canonical" href="' + siteOrigin + '/guard.html">\n' +
+    '  <meta property="og:url" content="' + siteOrigin + '/guard.html">\n'
   : '');
 if (workspaceOrigin) {
   landing = landing.replace('href="./guide.html#quick-start">Open workspace',
