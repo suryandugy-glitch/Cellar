@@ -2,6 +2,10 @@
 
 > **Working direction, not a declaration that all products are production-ready.** Cellar remains the established name of the CSV compatibility checker. **Cellarverse** is a proposed umbrella for a connected family of developer tools.
 
+## Cellar Studio (initial hub)
+
+[Cellar Studio](https://suryandugy-glitch.github.io/Cellar/studio.html) is the first public product directory, with search, maturity filters, and links to existing projects. It is a static presentation layer. Shared sign-in, central reporting, and team workspaces remain future proposals.
+
 ## The company promise
 
 **Find fragile software boundaries before they break users.**
