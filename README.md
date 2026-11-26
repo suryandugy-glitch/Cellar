@@ -36,7 +36,8 @@
 | Find code, backend, tests and website files | [Codebase map](docs/CODEBASE_MAP.md) |
 | Find all technical and product documentation | [Documentation index](docs/README.md) |
 | Contribute a fix or feature | [Contributing](CONTRIBUTING.md) |
-| Explore the proposed Cellar Studio company | [Cellar Studio roadmap](docs/CELLAR_STUDIO.md) |
+| Explore the Cellar Studio company | [Cellar Studio roadmap](docs/CELLAR_STUDIO.md) |
+| See company structure and core governance | [Core governance](docs/CORE_GOVERNANCE.md) |
 
 **Current product:** Cellar checks CSV exports against contracts using a Java 21 backend, CLI and local web workspace. **Platform direction:** Cellar Studio will organize other developer tools, but those products are not all implemented in this repository. The public demonstration website is not the full Java backend.
 
