@@ -4,11 +4,12 @@
   "installCommand": "",
   "buildCommand": "node deploy/build-vercel.mjs",
   "outputDirectory": "build/vercel",
-  "rewrites": [
+  "redirects": [
     {
       "source": "/",
       "has": [{ "type": "host", "value": "cellar-csv.vercel.app" }],
-      "destination": "/guard.html"
+      "destination": "/guard.html",
+      "permanent": false
     }
   ],
   "headers": [
