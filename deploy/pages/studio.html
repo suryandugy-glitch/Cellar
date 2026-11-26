@@ -16,9 +16,11 @@
   <link rel="icon" href="./logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./studio.css">
   <link rel="stylesheet" href="./studio-brutalist.css">
+  <link rel="stylesheet" href="./minimal-brutal.css">
   <script src="./studio.js" defer></script>
+  <script src="./minimal-motion.js" defer></script>
 </head>
-<body>
+<body class="cellar-home">
   <!-- Software / dark charcoal + Cellar electric green / app-frame hero / evidence graph moment -->
   <header class="site-header">
     <div class="wrap header-inner">
@@ -91,7 +93,7 @@
         <div class="section-heading"><div><p class="eyebrow">Engineering method</p><h2>A tool is only useful when it shows its evidence.</h2></div><p>Our common approach: reproduce the failure, explain the affected boundary, and give the engineer a result they can verify.</p></div>
         <div class="method-layout">
           <div class="method-steps"><div><span>01</span><strong>Define a boundary</strong><p>A contract, lock dependency or storage invariant.</p></div><div><span>02</span><strong>Run a controlled check</strong><p>Use concrete input and repeatable conditions.</p></div><div><span>03</span><strong>Inspect the evidence</strong><p>Report the failure and its likely consequence.</p></div></div>
-          <div class="evidence-visual" aria-label="Verification pathway" role="img"><div class="trace-node">INPUT</div><div class="trace-path"><i></i><i></i><i></i></div><div class="trace-node center">CHECK</div><div class="trace-path"><i></i><i></i><i></i></div><div class="trace-node verdict">VERDICT</div></div>
+          <div class="evidence-visual"><img src="./verification-schematic.svg" width="840" height="370" loading="lazy" alt="CSV input compared with an inventory contract, resulting in a blocked release because order_id is missing"></div>
         </div>
       </div>
     </section>
