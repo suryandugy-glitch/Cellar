@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 /** Snapshot-based JVM deadlock cycle detector. No external dependencies. */
 public final class DeadlockSentinel {
-    private static final Pattern HEADER = Pattern.compile("^\\\"([^\\\"]+)\\\".*");
+    private static final Pattern HEADER = Pattern.compile("^\\\"([^\\\"]+)\\\"(?:\\s+#(\\d+))?.*");
     private static final Pattern LOCKED = Pattern.compile(".*- locked <(0x[0-9a-fA-F]+)>.*");
     private static final Pattern WAITING = Pattern.compile(".*- (?:waiting to lock|parking to wait for) <(0x[0-9a-fA-F]+)>.*");
     private static final Pattern OWNABLE = Pattern.compile(".*- <(0x[0-9a-fA-F]+)> \\(a .*");
@@ -64,6 +64,7 @@ public final class DeadlockSentinel {
     public static Map<String, ThreadInfo> parse(String dump) {
         Map<String, ThreadInfo> result = new LinkedHashMap<>();
         String name = null;
+        int anonymousThread = 0;
         Set<String> owned = new HashSet<>();
         String waiting = null;
         boolean ownable = false;
@@ -71,7 +72,10 @@ public final class DeadlockSentinel {
             Matcher header = HEADER.matcher(line);
             if (header.matches()) {
                 if (name != null) result.put(name, new ThreadInfo(name, Set.copyOf(owned), waiting));
-                name = header.group(1);
+                // Thread names are not unique: pools routinely contain identically named workers.
+                // Prefer the JVM dump's #id, retaining a unique fallback for abbreviated dumps.
+                String id = header.group(2);
+                name = header.group(1) + (id == null ? " [entry " + (++anonymousThread) + "]" : " [#" + id + "]");
                 owned = new HashSet<>();
                 waiting = null;
                 ownable = false;

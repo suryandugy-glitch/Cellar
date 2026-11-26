@@ -25,3 +25,17 @@ body{background:var(--bg)}
 /* Display the original Cellar Studio logo inside the orbit core. */
 .core .core-logo{display:block;width:84px;height:84px;max-width:76%;max-height:76%;object-fit:contain;transform:rotate(10deg);filter:drop-shadow(0 5px 16px #07191666)}
 @media(max-width:620px){.core .core-logo{width:74px;height:74px}}
+
+/* Design-engineering pass: keep microinteractions fast and opt-in for hover devices. */
+:root{--studio-ease-out:cubic-bezier(.23,1,.32,1)}
+.primary-action,.secondary-action,.segments button{transition:background-color 160ms var(--studio-ease-out),border-color 160ms var(--studio-ease-out),transform 140ms var(--studio-ease-out)}
+.primary-action:active,.secondary-action:active,.segments button:active{transform:scale(.97)}
+@media(hover:hover) and (pointer:fine){
+  .product-card:hover{transform:translateY(-3px)}
+  .primary-action:hover,.secondary-action:hover{transform:translateY(-1px)}
+}
+@media(hover:none){.product-card:hover,.primary-action:hover,.secondary-action:hover{transform:none}}
+/* Preserve the original brand mark and architectural diagram on narrow screens. */
+@media(max-width:820px){.hero-visual{display:grid;height:190px;transform:scale(.72);margin-block:-24px}}
+@media(max-width:600px){.hero-visual{height:158px;transform:scale(.62);margin-block:-25px}}
+@media(prefers-reduced-motion:reduce){.hero-visual .orbit{animation:none!important}.product-card,.primary-action,.secondary-action,.segments button{transition:none!important}}
