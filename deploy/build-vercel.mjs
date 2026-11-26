@@ -39,7 +39,7 @@ if (workspaceOrigin) {
     .replace('<title>', '<meta name="robots" content="noindex">\n  <title>');
   await writeFile(new URL('workspace.html', output), restrictConnections(workspace, workspaceOrigin));
 }
-for (const page of ['walkthrough.html', 'guide.html', 'workplace.html', 'studio.html']) {
+for (const page of ['walkthrough.html', 'guide.html', 'workplace.html', 'studio.html', 'explore.html', 'deadlock.html']) {
   const html = await readFile(new URL(site + '/' + page, root), 'utf8');
   await writeFile(new URL(page, output), restrictConnections(html));
   if (page === 'guide.html' && !workspaceOrigin) {
