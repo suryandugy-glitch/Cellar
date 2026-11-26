@@ -21,6 +21,8 @@
 
 ---
 
+> **Exploring Cellarverse:** Cellar Guard is the CSV compatibility product within a proposed family of developer tools. See the [Cellarverse product map and roadmap](docs/CELLARVERSE.md) and [repository standards](docs/ECOSYSTEM_REPO_STANDARDS.md). Existing product names, maintainers, and deployments are unchanged.
+
 ## What is Cellar?
 
 Cellar is **spell-check for the files other software reads.** Your app produces a CSV. Your customers' tools expect certain columns. If someone renames or removes one, nothing looks wrong on your side, but a customer's import fails days later.
