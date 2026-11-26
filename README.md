@@ -23,6 +23,8 @@
 
 > **Exploring Cellarverse:** Cellar Guard is the CSV compatibility product within a proposed family of developer tools. See the [Cellarverse product map and roadmap](docs/CELLARVERSE.md) and [repository standards](docs/ECOSYSTEM_REPO_STANDARDS.md). Existing product names, maintainers, and deployments are unchanged.
 
+**Cellar Studio preview:** [Explore the Cellarverse product directory](https://suryandugy-glitch.github.io/Cellar/studio.html). This is a navigable directory, not yet a shared account or cloud dashboard.
+
 ## Start here
 
 **New to Cellar?** Choose the guide that matches what you want to do:
