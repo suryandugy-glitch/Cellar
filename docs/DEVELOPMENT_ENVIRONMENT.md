@@ -1,11 +1,13 @@
 # Cellarverse development workspace
 
+For a first-time explanation, read [Getting started](GETTING_STARTED.md) and the [documentation index](README.md).
+
 This repository is the **Cellar Guard Java 21 product** and the planning home for the proposed Cellarverse ecosystem. It is **not** yet a monorepo for every Cellarverse product; linked products retain their own source and release cycles.
 
 ## Open a ready-to-code environment in GitHub
 
 1. Open the [Cellar repository](https://github.com/suryandugy-glitch/Cellar).
-2. Select **Code → Codespaces → Create codespace**. Until this pull request is merged, select the `docs/cellarverse-ecosystem-2026` branch to use its configuration.
+2. Select **Code → Codespaces → Create codespace on main**. The configuration is already merged into `main`.
 3. GitHub reads `.devcontainer/devcontainer.json` and provisions a JDK 21 environment with Node 22 for future frontend tooling.
 4. The container runs `java Build.java test` once on creation. Wait for that command to finish before making changes.
 5. Open a terminal in the repository root and run `sh run.sh`. Forwarded port 8080 serves the local Cellar web app; the launcher may select another port if 8080 is occupied (forward that port manually).
