@@ -7,7 +7,7 @@
 There are **two related but distinct things**:
 
 1. **Cellar (the working product):** a Java 21 CSV contract checker with a local web workspace, CLI, tests and public demonstration website. This repository contains its code.
-2. **Cellarverse (the proposed company ecosystem):** a plan for connecting several developer tools under one identity. The other products are **not implemented inside this repository**. See [Cellarverse](CELLARVERSE.md).
+2. **Cellar Studio (the primary company platform):** a product directory today, with a roadmap for connecting developer tools under one identity. The other products are **not implemented inside this repository**. See [Cellar Studio](CELLAR_STUDIO.md).
 
 The main README describes Cellar Guard's current behavior; the ecosystem roadmap describes planned work. A planned feature is not a shipped feature.
 
@@ -19,7 +19,7 @@ The main README describes Cellar Guard's current behavior; the ecosystem roadmap
 | Open GitHub Codespaces and run it | [Development environment](DEVELOPMENT_ENVIRONMENT.md) |
 | Find source folders, test files and commands | [Codebase map](CODEBASE_MAP.md) |
 | Join the team or open a useful PR | [Contributing](../CONTRIBUTING.md) |
-| Understand Cellarverse's products and priorities | [Cellarverse roadmap](CELLARVERSE.md) |
+| Understand Cellar Studio's products and priorities | [Cellar Studio roadmap](CELLAR_STUDIO.md) |
 | Follow agreed standards across projects | [Ecosystem repository standards](ECOSYSTEM_REPO_STANDARDS.md) |
 | Understand why the product exists | [Product requirements](PRD.md) |
 | See the overall backend architecture | [High-level design](HLD.md) |
