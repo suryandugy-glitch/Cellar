@@ -8,6 +8,10 @@
 
 The [core governance and company structure](CORE_GOVERNANCE.md) names Suryandu Ganguly and Gunjan Roy as the current core decision-makers and explains the public/private access boundary.
 
+## Repository hierarchy
+
+The planned **primary** GitHub repository is `suryandugy-glitch/Cellar-Studio`. This existing `suryandugy-glitch/Cellar` repository remains the **child Cellar Guard product**. The parent repo is not yet created. Follow the [repository hierarchy and migration plan](REPOSITORY_HIERARCHY.md) before moving Studio-specific files.
+
 ## Product hierarchy
 
 - **Cellar Studio** — primary identity, navigation, documentation, and future optional shared workspace.
