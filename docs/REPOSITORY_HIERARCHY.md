@@ -9,7 +9,7 @@
 | Repository | Role | Code and content | Status |
 | --- | --- | --- | --- |
 | `suryandugy-glitch/Cellar-Studio` | **Main company/platform repository** | Studio homepage, company structure, shared design system, product registry, cross-product interfaces, integration orchestrator and umbrella documentation | **Created via rename of the former `Cellar` repo; Studio home now at website root** |
-| [`suryandugy-glitch/Cellar`](https://github.com/suryandugy-glitch/Cellar) | **Child product: Cellar Guard** | Java 21 CSV contract checker, CLI, local backend, product API, tests and product-specific site | Existing working repository |
+| `Cellar` (future child repo) | **Child product: Cellar Guard** | Java 21 CSV contract checker, CLI, local backend, product API, tests and product-specific site | **Not separated yet: code currently lives in Cellar-Studio** |
 | [`buildclinic`](https://github.com/suryandugy-glitch/buildclinic) | Child product candidate | Build diagnostics | Existing separate repository |
 | [`ClauseCraft`](https://github.com/suryandugy-glitch/ClauseCraft) | Child product candidate | Document review prototype | Existing separate repository |
 | [`systems-bottleneck-lab`](https://github.com/suryandugy-glitch/systems-bottleneck-lab) | Studio Labs candidate | PlanCliff research | Existing separate repository |
