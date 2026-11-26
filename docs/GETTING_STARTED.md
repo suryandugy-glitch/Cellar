@@ -6,7 +6,7 @@ Suppose your application sends a CSV file to a customer each week. The customer 
 
 **Cellar checks the export against agreed rules before it ships.** It reports which integration would break, explains the evidence and gives a release verdict.
 
-The **Cellarverse** idea is to apply that same evidence-first approach to other developer problems, such as build logs and database performance. Those products have their own repositories and different stages of maturity. They do not all run here.
+The **Cellar Studio** platform is intended to apply that same evidence-first approach to other developer problems, such as build logs and database performance. Those products have their own repositories and different stages of maturity. They do not all run here.
 
 ## Choose your path
 
@@ -48,14 +48,14 @@ The first command compiles and runs the Java tests. The second checks the config
 
 - Java validation, API, web UI bundled with the backend: this **Cellar** repository.
 - Static website and demo pages: this repository's `deploy/` code.
-- Other Cellarverse products, such as BuildClinic or PlanCliff: **their own repos**.
-- Cross-product strategy, shared interfaces and documentation: `docs/CELLARVERSE.md` and focused issues here, until a dedicated hub exists.
+- Other Cellar Studio products, such as BuildClinic or PlanCliff: **their own repos**.
+- Cross-product strategy, shared interfaces and documentation: `docs/CELLAR_STUDIO.md` and focused issues here, until a dedicated hub exists.
 
 See the [codebase map](CODEBASE_MAP.md) and [development guide](DEVELOPMENT_ENVIRONMENT.md) for more.
 
 ## Common questions
 
-**Is this the entire Cellarverse platform?** No. It is the existing Guard product plus the ecosystem's initial planning documents.
+**Is this the entire Cellar Studio platform?** Not yet. It is the existing Guard product plus the ecosystem's initial planning documents.
 
 **Does the Vercel website run the Java backend automatically?** No. The static/demo site and the Java workspace are different deployments. For a remote workspace, follow [web deployment guidance](WEB_SECURITY.md).
 

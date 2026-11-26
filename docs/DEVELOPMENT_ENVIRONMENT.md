@@ -1,8 +1,8 @@
-# Cellarverse development workspace
+# Cellar Studio development workspace
 
 For a first-time explanation, read [Getting started](GETTING_STARTED.md) and the [documentation index](README.md).
 
-This repository is the **Cellar Guard Java 21 product** and the planning home for the proposed Cellarverse ecosystem. It is **not** yet a monorepo for every Cellarverse product; linked products retain their own source and release cycles.
+This repository is the **Cellar Guard Java 21 product** and the planning home for the proposed Cellar Studio ecosystem. It is **not** yet a monorepo for every Cellar Studio product; linked products retain their own source and release cycles.
 
 ## Open a ready-to-code environment in GitHub
 
@@ -29,7 +29,7 @@ The `data/`, `build/`, and `dist/` paths hold local/generated files and should n
 
 ## Work on the ecosystem
 
-1. Read [Cellarverse product map](CELLARVERSE.md) and [repo standards](ECOSYSTEM_REPO_STANDARDS.md).
+1. Read [Cellar Studio product map](CELLAR_STUDIO.md) and [repo standards](ECOSYSTEM_REPO_STANDARDS.md).
 2. Create a focused issue with a user problem, acceptance criteria, tests and target product.
 3. Create a `feat/<short-name>` or `fix/<short-name>` branch from updated `main`.
 4. Keep Cellar Guard changes in this repository; change other products in their own repositories. Common contracts and design assets can be specified here before adopting them elsewhere.
@@ -37,7 +37,7 @@ The `data/`, `build/`, and `dist/` paths hold local/generated files and should n
 
 ## Proposed next work
 
-- A public Cellarverse hub with transparent product-maturity labels and working demos.
+- A public Cellar Studio hub with transparent product-maturity labels and working demos.
 - A versioned, privacy-conscious common findings schema and sample evidence fixtures.
 - Reusable accessible color, typography and motion tokens for product sites.
 - A local-first release-readiness view that combines actual output from Guard and BuildClinic.

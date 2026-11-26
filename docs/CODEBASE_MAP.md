@@ -27,7 +27,7 @@ Use the existing structure rather than creating a new application framework just
 3. Cellar produces rule findings, suggested next steps and a release verdict.
 4. The web workspace presents the result; CLI commands can emit machine-usable status codes.
 
-This is an explanation of the product flow, not a claim that Cellarverse's future shared reporting format is already implemented.
+This is an explanation of the product flow, not a claim that Cellar Studio's future shared reporting format is already implemented.
 
 ## Verify changes
 
@@ -49,4 +49,4 @@ Generated output such as `build/`, `dist/` and local `data/` is not source code.
 
 ## Where to propose ecosystem work
 
-See [Cellarverse](CELLARVERSE.md). Open a GitHub issue with the user problem, affected product, actual evidence, intended scope, acceptance criteria and tests. Do not silently rename or migrate other contributors' repositories.
+See [Cellar Studio](CELLAR_STUDIO.md). Open a GitHub issue with the user problem, affected product, actual evidence, intended scope, acceptance criteria and tests. Do not silently rename or migrate other contributors' repositories.

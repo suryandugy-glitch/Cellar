@@ -21,9 +21,9 @@
 
 ---
 
-> **Exploring Cellarverse:** Cellar Guard is the CSV compatibility product within a proposed family of developer tools. See the [Cellarverse product map and roadmap](docs/CELLARVERSE.md) and [repository standards](docs/ECOSYSTEM_REPO_STANDARDS.md). Existing product names, maintainers, and deployments are unchanged.
+> **Cellar Studio platform:** Cellar Guard is the CSV compatibility product within a proposed family of developer tools. See the [Cellar Studio product map and roadmap](docs/CELLAR_STUDIO.md) and [repository standards](docs/ECOSYSTEM_REPO_STANDARDS.md). Existing product names, maintainers, and deployments are unchanged.
 
-**Cellar Studio preview:** [Explore the Cellarverse product directory](https://suryandugy-glitch.github.io/Cellar/studio.html). This is a navigable directory, not yet a shared account or cloud dashboard.
+**Cellar Studio preview:** [Explore the Cellar Studio product directory](https://suryandugy-glitch.github.io/Cellar/studio.html). This is a navigable directory, not yet a shared account or cloud dashboard.
 
 ## Start here
 
@@ -36,9 +36,9 @@
 | Find code, backend, tests and website files | [Codebase map](docs/CODEBASE_MAP.md) |
 | Find all technical and product documentation | [Documentation index](docs/README.md) |
 | Contribute a fix or feature | [Contributing](CONTRIBUTING.md) |
-| Explore the proposed Cellarverse company | [Cellarverse roadmap](docs/CELLARVERSE.md) |
+| Explore the proposed Cellar Studio company | [Cellar Studio roadmap](docs/CELLAR_STUDIO.md) |
 
-**Current product:** Cellar checks CSV exports against contracts using a Java 21 backend, CLI and local web workspace. **Future direction:** Cellarverse may connect other developer tools, but those products are not all implemented in this repository. The public demonstration website is not the full Java backend.
+**Current product:** Cellar checks CSV exports against contracts using a Java 21 backend, CLI and local web workspace. **Platform direction:** Cellar Studio will organize other developer tools, but those products are not all implemented in this repository. The public demonstration website is not the full Java backend.
 
 ## What is Cellar?
 

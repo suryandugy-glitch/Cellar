@@ -1,4 +1,4 @@
-# Cellarverse — repository and product standards
+# Cellar Studio — repository and product standards
 
 ## Recommended GitHub layout
 
@@ -9,7 +9,7 @@ Keep product repositories separate while they have independent release cycles:
 - `ClauseCraft` — document analysis; maintain clear non-legal-advice limits.
 - `systems-bottleneck-lab` — experiments, benchmarks and reproducible datasets.
 - `PQL` and `PQL-Storage` — crash-consistency research; preserve their history and contributors.
-- A future `cellarverse-hub` repository can hold only company-site code and shared brand assets after the navigation and naming are finalized.
+- The Studio directory currently lives in `Cellar/deploy/pages/studio.html`; a dedicated `cellar-studio-hub` repository is optional if independent deployment becomes useful.
 
 ## Every product README should answer
 
