@@ -29,4 +29,15 @@
   }
   search.addEventListener('input', update);
   update();
+  // Keyboard-first product discovery: "/" focuses search; Escape clears or exits.
+  document.addEventListener('keydown', event => {
+    const target = event.target;
+    const typing = target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+    if (event.key === '/' && !typing && !event.altKey && !event.ctrlKey && !event.metaKey) {
+      event.preventDefault(); search.focus();
+    } else if (event.key === 'Escape' && document.activeElement === search) {
+      if (search.value) { search.value = ''; update(); }
+      else search.blur();
+    }
+  });
 })();
