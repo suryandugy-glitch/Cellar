@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+:root { font-family:'DM Sans',Inter,system-ui,sans-serif; }
+body.studio-detail { font-family:'DM Sans',Inter,system-ui,sans-serif; }
+.studio-detail h1,.studio-detail h2,.studio-detail h3,.studio-detail .brand { font-family:'Space Grotesk','DM Sans',system-ui,sans-serif; }
+.studio-detail .brand { letter-spacing:-.055em; }
+.studio-detail .brand img { object-fit:contain; }
+.studio-detail :is(a,button):focus-visible { outline:2px solid #b8f17e; outline-offset:4px; }
+.studio-detail .detail-menu-toggle { display:none; width:44px; height:44px; flex:none; place-items:center; border:1px solid #4e6754; border-radius:5px; background:#152a1d; color:#eef9f0; font:500 22px/1 'DM Sans',sans-serif; cursor:pointer; }
+.studio-detail .detail-menu-toggle[aria-expanded="true"] { border-color:#b8f17e; }
+.studio-explore .nav-inner,.studio-deadlock .header-inner { position:relative; }
+.studio-explore .nav-inner { max-width:1260px; }
+.studio-explore .nav-links a { padding:11px 4px; }
+.studio-explore .illustration { border-radius:10px; }
+.studio-explore .card,.studio-explore .doc { border-radius:7px; }
+.studio-explore .card:before { width:26px;height:2px; }
+.studio-deadlock .ring { animation-duration:48s; }
+.studio-deadlock .controls button { border-radius:5px; }
+@media(max-width:820px) {
+  .studio-detail .detail-menu-toggle { display:grid; margin-left:auto; }
+  .studio-explore .nav-inner { min-height:70px; flex-direction:row; align-items:center; }
+  .studio-explore .nav-links,.studio-deadlock header nav { display:none; position:absolute; top:calc(100% + 1px); left:12px; right:12px; z-index:10; flex-direction:column; align-items:stretch; gap:0; border:1px solid #486b51; border-radius:7px; background:#10251a; padding:10px; box-shadow:0 20px 42px #0008; }
+  .studio-explore .nav-links.is-open,.studio-deadlock header nav.is-open { display:flex; }
+  .studio-explore .nav-links a,.studio-deadlock header nav a { display:block; min-height:44px; padding:12px; color:#e9f4e7; text-decoration:none; }
+  .studio-explore .nav-links a:hover,.studio-deadlock header nav a:hover { color:#b8f17e; background:#203a27; }
+  .studio-deadlock .header-inner { flex-wrap:nowrap; }
+  .studio-detail .hero { padding-top:45px; }
+}
+@media(max-width:500px) {
+  .studio-detail .brand { font-size:1rem; }
+  .studio-explore .nav-inner { padding-inline:20px; }
+  .studio-deadlock .hero { gap:28px; }
+  .studio-explore .hero h1 { font-size:clamp(2.85rem,12vw,4.2rem); }
+}
+@media(prefers-reduced-motion:reduce) { .studio-deadlock .ring { animation:none; } }
+
+/* The same raw engineering geometry continues on detail and research pages. */
+.studio-detail :is(nav,header) { border-color:#6d825b; }
+.studio-detail .brand { font-weight:700;text-transform:uppercase; }
+.studio-detail h1 { font-weight:700;letter-spacing:-.09em; }
+.studio-detail h1 em { text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:9px; }
+.studio-detail .eyebrow { letter-spacing:.15em; }
+.studio-detail .hero { border-bottom:2px solid #4f6b51; }
+.studio-detail :is(.card,.doc,.diagram,.illustration,.step,.thread,.verdict,pre,.tags span,.tag,.button,.controls button) { border-radius:0; }
+.studio-detail :is(.card,.doc,.step,.thread) { border-width:2px; }
+.studio-detail .card:hover { transform:translate(-3px,-3px);box-shadow:6px 6px 0 #294731; }
+.studio-detail .illustration,.studio-detail .diagram { border:2px solid #b8f17e;box-shadow:8px 8px 0 #294731; }
+.studio-detail .button.primary,.studio-detail .controls button[aria-pressed="true"] { box-shadow:4px 4px 0 #3e5937; }
+.studio-detail .button:hover { transform:translate(-2px,-2px); }
+.studio-detail .diagram:before,.studio-detail .illustration:before { background-size:22px 22px; }
+.studio-detail .detail-menu-toggle { border-radius:0;border-width:2px; }
+@media(max-width:620px) {
+  .studio-detail .illustration,.studio-detail .diagram { box-shadow:4px 4px 0 #294731; }
+  .studio-detail .card:hover { transform:none;box-shadow:none; }
+  .studio-detail h1 em { text-decoration-thickness:2px;text-underline-offset:6px; }
+}

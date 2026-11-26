@@ -1,6 +1,6 @@
 'use strict';
 
-const repo = 'https://github.com/suryandugy-glitch/Cellar';
+const productSite = 'https://cellar-studio-hq.vercel.app';
 const root = document.querySelector('#app');
 const preview = document.documentElement.hasAttribute('data-preview');
 const apiOrigin = document.documentElement.dataset.apiOrigin || '';
@@ -295,7 +295,7 @@ function shell(id, content) {
     group(preview ? 'Preview' : 'Workspace', pick(preview ? ['check'] : ['overview', 'check', 'contracts', 'compare'])),
     preview ? null : group('Explore', pick(['setup', 'architecture', 'features', 'cli', 'why'])),
     preview ? null : group('Monitor', pick(['history', 'inbox', 'activity'])),
-    group('Resources', [docs && navItem(docs), link('GitHub', repo, { style: 'nav-link', glyph: 'github', external: true })].filter(Boolean)),
+    group('Resources', [docs && navItem(docs), link('Product website', productSite + '/guard.html', { style: 'nav-link', glyph: 'book', external: true })].filter(Boolean)),
     preview ? null : node('div', { class: 'sidebar-bottom' },
       connection,
       state.session.keyRequired ? button('Lock workspace', () => {
@@ -552,8 +552,8 @@ function setupPage() {
       node('p', { class: 'muted' }, 'Use synthetic or redacted fixtures. Review each contract with its owner, start in advisory mode, and make checks blocking only after the team agrees on the rules.')),
     panel('Pilot readiness', pilotChecklist()),
     panel('Need the full rollout notes?', node('div', { class: 'pad actions' },
-      link('Open startup playbook', repo + '/blob/main/docs/STARTUP_PLAYBOOK.md', { external: true }),
-      link('Read CI setup', repo + '#use-it-in-ci', { external: true }))));
+      link('Read rollout guidance', productSite + '/guide.html#quick-start', { external: true }),
+      link('Read CI setup', productSite + '/guide.html#commands', { external: true }))));
 }
 
 function sampleCheck() {
@@ -582,7 +582,7 @@ function sampleCheck() {
     return item;
   }
   return node('div', { class: 'page' },
-    pageHeading('Sample checks', 'Explore reports generated from two synthetic CSV exports.', link('Install Cellar', repo + '#quick-start', { external: true })),
+    pageHeading('Sample checks', 'Explore reports generated from two synthetic CSV exports.', link('Install Cellar', productSite + '/guide.html#quick-start', { external: true })),
     node('nav', { class: 'actions', 'aria-label': 'Sample reports' }, sampleLink('passing', 'Passing sample'), sampleLink('breaking', 'Breaking sample')),
     output);
 }
@@ -1074,12 +1074,12 @@ function activityPage() {
 }
 
 function documentation() {
-  const docs = name => repo + '/blob/main/docs/' + name;
+  const docs = () => productSite + '/explore.html#docs';
   return node('div', { class: 'page' },
     pageHeading('Documentation', 'Set up Cellar, define integration contracts, and run checks before release.'),
     preview ? panel('Run Cellar locally', node('div', { class: 'pad stack' },
       node('p', {}, 'Use Java 21 or newer to run Cellar and check your own exports. The sample checks here use synthetic data.'),
-      node('div', { class: 'actions' }, link('Quick start', repo + '#quick-start', { external: true }),
+      node('div', { class: 'actions' }, link('Quick start', productSite + '/guide.html#quick-start', { external: true }),
         link('See sample checks', '#check'))))
     : panel('Run your first check', node('div', { class: 'pad stack' },
       node('ol', {},
@@ -1094,11 +1094,11 @@ function documentation() {
       panel('Use Cellar in CI', node('div', { class: 'pad stack' },
         node('p', {}, 'Build with Java 21 and run the CLI against a synthetic export from your pipeline. Exit 0 allows the release, exit 1 blocks it, and exit 2 signals an input error.'),
         node('pre', {}, 'java Build.java package\njava -jar dist/cellar.jar check --csv build/export.csv --summary'),
-        node('div', {}, link('CI setup', repo + '#use-it-in-ci', { external: true }))))),
+        node('div', {}, link('CI setup', productSite + '/guide.html#commands', { external: true }))))),
     panel('Server and project references', node('div', { class: 'pad actions' },
-      link('Deployment', repo + '#share-it-on-a-server', { external: true }),
+      link('Deployment', productSite + '/guide.html#commands', { external: true }),
       link('Security', docs('WEB_SECURITY.md'), { external: true }),
-      link('Roadmap', repo + '#roadmap', { external: true }))));
+      link('Roadmap', productSite + '/explore.html#roadmap', { external: true }))));
 }
 
 function architecturePage() {
@@ -1125,7 +1125,7 @@ function architecturePage() {
     detail.replaceChildren(node('div', { class: 'architecture-detail-copy' },
       node('span', { class: 'eyebrow' }, 'CELLAR COMPONENT'),
       node('h2', {}, component.name), node('p', { class: 'muted' }, component.detail)),
-      link('View ' + component.file, 'https://github.com/suryandugy-glitch/Cellar/blob/main/src/main/java/io/cellar/' + component.file, { external: true, style: 'btn compact' }));
+      node('code', { class: 'architecture-source' }, 'Java source: ' + component.file));
   }
   select(components[0]);
   return node('div', { class: 'page' },
@@ -1142,7 +1142,7 @@ function architecturePage() {
         node('div', { class: 'actions' }, link('Check an export', '#check', { style: 'btn primary' }), link('CLI commands', '#cli', { style: 'btn' })))),
       panel('Data boundary', node('div', { class: 'pad stack' },
         node('p', {}, 'Cell values are processed for the check but not retained in reports. Reports contain structural details such as column names, counts, and record numbers.'),
-        link('Security notes', repo + '/blob/main/docs/WEB_SECURITY.md', { style: 'btn text compact', external: true })))));
+        link('Security notes', productSite + '/explore.html#policies', { style: 'btn text compact', external: true })))));
 }
 
 function featuresPage() {
@@ -1182,7 +1182,7 @@ function cliPage() {
     ['Verify activity chain', 'java -jar dist/cellar.jar audit-verify', 'Checks the tamper-evident activity log when the master key is configured.']
   ];
   return node('div', { class: 'page' },
-    pageHeading('CLI commands', 'Run the same Java validation engine from a terminal or CI job.', link('CI example', repo + '#use-it-in-ci', { external: true })),
+    pageHeading('CLI commands', 'Run the same Java validation engine from a terminal or CI job.', link('CI example', productSite + '/guide.html#commands', { external: true })),
     node('section', { class: 'cli-intro panel pad' }, node('span', { class: 'eyebrow' }, 'JAVA 21+ · NO EXTRA RUNTIME DEPENDENCIES'),
       node('h2', {}, 'Make the release gate repeatable.'),
       node('p', { class: 'muted' }, 'Commands below match the CLI accepted by this repository. Copy one and replace example file paths with your generated export.'),
