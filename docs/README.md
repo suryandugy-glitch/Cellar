@@ -21,6 +21,7 @@ The main README describes Cellar Guard's current behavior; the ecosystem roadmap
 | Join the team or open a useful PR | [Contributing](../CONTRIBUTING.md) |
 | Understand Cellar Studio's products and priorities | [Cellar Studio roadmap](CELLAR_STUDIO.md) |
 | See company structure, core roles and governance | [Core governance](CORE_GOVERNANCE.md) |
+| Understand the main Studio repo vs child Cellar repo | [Repository hierarchy and migration](REPOSITORY_HIERARCHY.md) |
 | Follow agreed standards across projects | [Ecosystem repository standards](ECOSYSTEM_REPO_STANDARDS.md) |
 | Understand why the product exists | [Product requirements](PRD.md) |
 | See the overall backend architecture | [High-level design](HLD.md) |

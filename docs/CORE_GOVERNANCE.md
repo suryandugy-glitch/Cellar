@@ -11,6 +11,10 @@ This document defines **decision ownership**, not access control. The Cellar Git
 
 **Only these two users are named as the current Cellar Studio core team.** This is a governance designation, not a claim that other collaborators have lost their GitHub permissions. Gunjan currently has write access to this repository as of this documentation update.
 
+## Repository ownership
+
+**Cellar Studio is the parent company repository (planned new `Cellar-Studio` repo); Cellar Guard is the existing child product repository (`Cellar`).** See the [repository hierarchy plan](REPOSITORY_HIERARCHY.md). Listing a product under Studio does not transfer its repository permissions.
+
 ## Company structure
 
 ```text
