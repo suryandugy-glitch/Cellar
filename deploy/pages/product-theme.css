@@ -26,7 +26,7 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid 
 .header-inner { width: min(1260px,calc(100% - 112px)); min-height: 74px; }
 .brand { font-size: 1.08rem; letter-spacing: -.045em; font-weight: 700; color: var(--ink); }
 .brand img { filter: none; }
-.site-nav { gap: .1rem; }
+.site-nav { gap: .1rem; flex-wrap:nowrap; white-space:nowrap; }
 .site-nav a { color: #b6c3b9; border-radius: 4px; font-size: .88rem; font-weight: 600; }
 .site-nav a:hover, .site-nav a[aria-current="page"] { background: #1b3022; color: #d6ffae; }
 .header-actions { gap: .6rem; }
@@ -159,6 +159,11 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid 
 
 .mobile-nav-toggle { display:none; min-width:44px; height:44px; background:transparent; color:inherit; border:1px solid var(--line); border-radius:4px; font-size:1.35rem; line-height:1; }
 .mobile-nav-toggle[aria-expanded="true"] { border-color:#b8f17e; }
+@media(max-width:1460px) {
+  .site-nav a { padding-inline:.45rem; font-size:.74rem; }
+  .header-actions .repo-button { display:none; }
+  .header-actions .button { white-space:nowrap;flex:none; }
+}
 @media(max-width:1120px) {
   .site-nav a { padding-inline:.42rem; font-size:.81rem; }
   .header-inner { width:calc(100% - 48px); }
