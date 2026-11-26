@@ -1,0 +1,10 @@
+# Cellar Studio core brand, governance and platform-facing changes.
+# Review routing only. Enforce reviews using GitHub branch rules/settings.
+# GitHub usernames must have repository write access.
+.github/CODEOWNERS @suryandugy-glitch @roy-gunjan743
+/docs/CELLAR_STUDIO.md @suryandugy-glitch @roy-gunjan743
+/docs/CORE_GOVERNANCE.md @suryandugy-glitch @roy-gunjan743
+/docs/ECOSYSTEM_REPO_STANDARDS.md @suryandugy-glitch @roy-gunjan743
+/deploy/pages/studio.html @suryandugy-glitch @roy-gunjan743
+/deploy/pages/studio.css @suryandugy-glitch @roy-gunjan743
+/deploy/pages/studio.js @suryandugy-glitch @roy-gunjan743
