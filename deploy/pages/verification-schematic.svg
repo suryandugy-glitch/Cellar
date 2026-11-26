@@ -2,42 +2,42 @@
   <title id="title">Cellar release verification schematic</title>
   <desc id="desc">A CSV export passes through a declared contract and produces a blocked release verdict when a required column is missing.</desc>
   <defs>
-    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#4a624b" stroke-width=".4" opacity=".45"/></pattern>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#888883" stroke-width=".4" opacity=".45"/></pattern>
   </defs>
-  <rect width="840" height="370" fill="#101612"/>
+  <rect width="840" height="370" fill="#141414"/>
   <rect width="840" height="370" fill="url(#grid)"/>
   <g font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="12" letter-spacing="1">
-    <text x="30" y="34" fill="#abc19f">CELLAR / VERIFICATION LAB</text><text x="808" y="34" text-anchor="end" fill="#7c9180">PLATE 001</text>
+    <text x="30" y="34" fill="#d3d3ce">CELLAR / VERIFICATION LAB</text><text x="808" y="34" text-anchor="end" fill="#a0a09a">PLATE 001</text>
   </g>
-  <g stroke="#759076" stroke-width="2" fill="#151f18">
+  <g stroke="#969690" stroke-width="2" fill="#202020">
     <rect x="30" y="84" width="220" height="203"/>
     <rect x="311" y="84" width="220" height="203"/>
-    <rect x="592" y="84" width="218" height="203" stroke="#bad5a4"/>
+    <rect x="592" y="84" width="218" height="203" stroke="#efefeb"/>
   </g>
   <g font-family="ui-monospace, SFMono-Regular, Consolas, monospace">
-    <text x="48" y="112" font-size="11" fill="#a4b89f">01 / INPUT</text>
-    <text x="329" y="112" font-size="11" fill="#a4b89f">02 / RULES</text>
-    <text x="610" y="112" font-size="11" fill="#c9d7bb">03 / VERDICT</text>
+    <text x="48" y="112" font-size="11" fill="#bdbdb7">01 / INPUT</text>
+    <text x="329" y="112" font-size="11" fill="#bdbdb7">02 / RULES</text>
+    <text x="610" y="112" font-size="11" fill="#e7e7e2">03 / VERDICT</text>
     <text x="48" y="151" font-size="18" fill="#f1eee5" font-weight="700">orders.csv</text>
-    <rect x="48" y="171" width="184" height="29" fill="#26302a" stroke="#5a6b5b"/>
+    <rect x="48" y="171" width="184" height="29" fill="#303030" stroke="#8a8a83"/>
     <text x="57" y="189" font-size="11" fill="#e5e5db">id,sku,total_cents</text>
-    <text x="48" y="248" font-size="11" fill="#a6b1a4">CANDIDATE / v3</text>
+    <text x="48" y="248" font-size="11" fill="#b8b8b2">CANDIDATE / v3</text>
     <text x="329" y="151" font-size="18" fill="#f1eee5" font-weight="700">inventory</text>
     <rect x="329" y="171" width="184" height="29" fill="#2f2423" stroke="#ab817c"/>
     <text x="339" y="189" font-size="11" fill="#eed3c8">requires order_id</text>
-    <text x="329" y="248" font-size="11" fill="#a6b1a4">CONTRACT / immutable</text>
+    <text x="329" y="248" font-size="11" fill="#b8b8b2">CONTRACT / immutable</text>
     <text x="610" y="155" font-size="26" fill="#f0d4c6" font-weight="700">BLOCK</text>
     <text x="610" y="190" font-size="13" fill="#d6bbb0">Missing column</text>
     <text x="610" y="208" font-size="13" fill="#f0d4c6">order_id</text>
-    <text x="610" y="249" font-size="11" fill="#b8c4ae">EXIT STATUS 1</text>
+    <text x="610" y="249" font-size="11" fill="#ccccca">EXIT STATUS 1</text>
   </g>
-  <g stroke="#b9d2a1" fill="none" stroke-width="2">
+  <g stroke="#e8e8e2" fill="none" stroke-width="2">
     <path d="M250 182H304"/><path d="m296 175 8 7-8 7"/>
     <path d="M531 182H585"/><path d="m577 175 8 7-8 7"/>
   </g>
   <g font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="11">
-    <text x="30" y="333" fill="#c5d7b9">EVIDENCE BEFORE RELEASE</text>
-    <text x="810" y="333" text-anchor="end" fill="#859989">SCHEMA → CHECK → DECISION</text>
+    <text x="30" y="333" fill="#e2e2dd">EVIDENCE BEFORE RELEASE</text>
+    <text x="810" y="333" text-anchor="end" fill="#a8a8a2">SCHEMA → CHECK → DECISION</text>
   </g>
-  <rect x="30" y="348" width="780" height="2" fill="#b9d2a1"/>
+  <rect x="30" y="348" width="780" height="2" fill="#e8e8e2"/>
 </svg>
