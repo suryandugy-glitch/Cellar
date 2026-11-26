@@ -21,6 +21,8 @@
 
 ---
 
+> **Repository hierarchy:** **Cellar Studio** is the intended main company/platform repository, while this **Cellar** repository is its child product (Cellar Guard). The parent `Cellar-Studio` repository has not been created yet; see the [repository migration plan](docs/REPOSITORY_HIERARCHY.md).
+
 > **Cellar Studio platform:** Cellar Guard is the CSV compatibility product within a proposed family of developer tools. See the [Cellar Studio product map and roadmap](docs/CELLAR_STUDIO.md) and [repository standards](docs/ECOSYSTEM_REPO_STANDARDS.md). Existing product names, maintainers, and deployments are unchanged.
 
 **Cellar Studio preview:** [Explore the Cellar Studio product directory](https://suryandugy-glitch.github.io/Cellar/studio.html). This is a navigable directory, not yet a shared account or cloud dashboard.
