@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/logo.svg" alt="Cellar" width="240"></p>
+<p align="center"><img src="assets/logo.svg" alt="Cellar Studio" width="360"></p>
 
 <h3 align="center">Catch the CSV change that breaks a customer's import, before it ships.</h3>
 
