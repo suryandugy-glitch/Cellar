@@ -1,6 +1,6 @@
 # Contributing to Cellar
 
-Thank you for helping. **This repository contains Cellar Guard, the CSV contract checker.** Other proposed Cellarverse tools currently have separate repositories.
+Thank you for helping. **This repository contains Cellar Guard, the CSV contract checker.** Other proposed Cellar Studio tools currently have separate repositories.
 
 ## Your first contribution
 
