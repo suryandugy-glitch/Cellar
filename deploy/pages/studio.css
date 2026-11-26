@@ -21,3 +21,7 @@ body{background:var(--bg)}
 ::selection{background:#b8f17e;color:#0b1b13}
 @keyframes studio-orbit{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.hero-visual .orbit,.hero-visual *{animation:none!important}*,*:before,*:after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* Display the original Cellar Studio logo inside the orbit core. */
+.core .core-logo{display:block;width:84px;height:84px;max-width:76%;max-height:76%;object-fit:contain;transform:rotate(10deg);filter:drop-shadow(0 5px 16px #07191666)}
+@media(max-width:620px){.core .core-logo{width:74px;height:74px}}
