@@ -36,6 +36,18 @@ public final class DeadlockSentinelTest {
                 - <0x002> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
             """;
         check(DeadlockSentinel.analyze(synchronizers).cycles().size() == 1, "ownable synchronizer cycle");
+        String repeatedNames = """
+            "pool-worker" #51
+                - waiting to lock <0x002> (a java.lang.Object)
+                - locked <0x001> (a java.lang.Object)
+            "pool-worker" #52
+                - waiting to lock <0x001> (a java.lang.Object)
+                - locked <0x002> (a java.lang.Object)
+            """;
+        var repeated = DeadlockSentinel.analyze(repeatedNames);
+        check(repeated.threadsParsed() == 2, "identically named JVM threads must remain distinct");
+        check(repeated.cycles().size() == 1, "deadlock among same-named threads must be detected");
+        check(DeadlockSentinel.report(repeated).contains("#51"), "report must identify the JVM thread");
         System.out.println("DeadlockSentinelTest: all tests passed");
     }
 }
