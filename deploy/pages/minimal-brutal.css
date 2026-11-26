@@ -240,3 +240,36 @@ body.studio-detail { --bg:#0d0d0d;--panel:#202020;--line:#6f6f69;--ink:#f2f2ee;-
 .studio-explore .nav-links a,.studio-deadlock header nav a { color:#e6e6e1; }
 .studio-explore .nav-links a:hover,.studio-deadlock header nav a:hover { color:#fff;background:#333; }
 .studio-detail :is(.tag,.tags span,.verdict,.controls button,pre) { border-radius:0; }
+
+/* Final colour audit: no brand-green remnants in the Studio demo or product directory. */
+.cellar-home .hero-facts { border-top-color:#777771; }
+.cellar-home .button-secondary { border-color:#8b8b85; }
+.cellar-home .window-id,.cellar-home .frame-label span,.cellar-home .frame-bottom { color:#b1b1ab; }
+.cellar-home .csv-head { background:#202020;border-color:#777771; }
+.cellar-home .csv-head.changed { background:#302923;border-color:#927d6d; }
+.cellar-home .csv-head span,.cellar-home .result-row>span:last-child { color:#bdbdb6; }
+.cellar-home .result-row { border-color:#666660; }
+.cellar-home .result-status.pass { color:#f2f2ee;background:#393939;border:1px solid #a7a7a1; }
+.cellar-home .directory-tools { border-color:#777771; }
+.cellar-home .search-field input,.cellar-home .search-field kbd { border-color:#85857e; }
+.cellar-home .search-field input::placeholder { color:#999993; }
+.cellar-home .segments button { color:#d0d0ca; }
+.cellar-home .segments button[aria-pressed="true"] { color:#fff;background:#383838;border-color:#a5a5a0; }
+.cellar-home .segments button:hover { background:#292929; }
+.cellar-home .card-link { border-color:#6c6c67; }
+.cellar-home :is(.mini-ui,.mini-terminal,.mini-document,.mini-chart,.mini-storage,.mini-locks,.mini-learn) {
+  color:#d0d0ca;background:#181818;border-color:#71716b;
+}
+.cellar-home .mini-rail { background:linear-gradient(90deg,#ecece7 50%,#8d8d87 50%); }
+.cellar-home .mini-document i { background:#85857f; }
+.cellar-home .mini-document i:nth-child(2) { background:#deded8; }
+.cellar-home .mini-chart span { background:#686863;border-color:#e2e2dd; }
+.cellar-home .mini-chart span:nth-child(5) { background:#969690;border-color:#fff; }
+.cellar-home :is(.mini-storage,.mini-locks,.mini-learn) span { border-color:#8c8c86; }
+
+/* Keep pass/fail meaning in the text and icons, not a bright green accent. */
+.cellar-product .pipeline-live i { background:#dddcd7;box-shadow:none; }
+.cellar-product .preview-results .restored,.cellar-product .csv-head .restored { color:#e6e6e1; }
+.cellar-product .privacy-mark { color:#dadad4; }
+[data-theme="light"] .cellar-product .preview-results .restored { color:#e6e6e1; }
+[data-theme="light"] .cellar-product .privacy-mark { color:#373733; }
