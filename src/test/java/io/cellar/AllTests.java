@@ -49,6 +49,27 @@ public final class AllTests {
             test("determinism cell redaction",()->{var c=single(",\"rules\":{\"a\":{\"type\":\"integer\"}}");var r=Checker.check(c,"a\nPRIVATE-SECRET\n",false);eq(Json.write(r),Json.write(Checker.check(c,"a\nPRIVATE-SECRET\n",false)));ok(!(Json.write(r)+Reports.text(r)+Reports.markdown(r)).contains("PRIVATE-SECRET"));});
             test("issue cap full count",()->{var r=Checker.check(single(",\"rules\":{\"a\":{\"type\":\"integer\"}}"),"a\n"+"x\n".repeat(250),false);var i=Json.object(((List<?>)r.get("results")).getFirst());eq(i.get("issueCount"),250);eq(((List<?>)i.get("issues")).size(),200);eq(i.get("truncated"),true);});
             test("diff impact",()->{var r=Checker.diff(Contract.parse(Demo.CONFIG),Demo.CSV,Demo.csv(true));eq(r.get("removed"),List.of("order_id"));eq(r.get("added"),List.of("id"));eq(((List<?>)r.get("impacted")).size(),1);});
+            test("diff rename migration impact",()->{
+                var r=Checker.diff(Contract.parse(Demo.CONFIG),Demo.CSV,Demo.csv(true));
+                eq(r.get("affectedIntegrations"),1);
+                var suggestions=(List<?>)r.get("renameCandidates");
+                eq(suggestions.size(),1);
+                var suggestion=Json.object(suggestions.getFirst());
+                eq(suggestion.get("from"),"order_id");
+                eq(suggestion.get("to"),"id");
+                eq(suggestion.get("requiredBy"),List.of("inventory-report"));
+                ok(((Integer)suggestion.get("nameSimilarityPercent"))>=65);
+                ok(!Json.write(suggestion).contains("ORD-001"));
+            });
+            test("diff avoids speculative low-score renames",()->{
+                var r=Checker.diff(single(""),"a,b\n","x,y\n");
+                eq(r.get("renameCandidates"),List.of());
+                eq(r.get("affectedIntegrations"),1);
+            });
+            test("diff rename targets stay unique",()->{
+                var r=Checker.diff(single(""),"a,abc\n","abcd\n");
+                eq(((List<?>)r.get("renameCandidates")).size(),1);
+            });
             test("diff reorder",()->eq(Checker.diff(single(""),"a,b\n","b,a\n").get("reordered"),true));
             test("invalid configs typo rejection",()->{for(String c:List.of("{}","null","{\"integrations\":[]}","{\"integrations\":[{\"id\":\"x\",\"required\":[\"a\"],\"requried\":[]}]}"))invalid(()->Contract.parse(c));invalid(()->single(",\"severity\":\"oops\""));invalid(()->single(",\"rules\":{\"a\":{\"type\":\"string\",\"min\":0}}"));invalid(()->single(",\"minRows\":-1"));invalid(()->single(",\"rules\":{\"b\":{}}"));});
             test("JSON strict nesting duplicate keys",()->{for(String s:List.of("{\"a\":1,\"a\":2}","[1,]","01","1e","{x:1}","\"\n\"","[".repeat(70)+"]".repeat(70)))invalid(()->Json.parse(s));});
