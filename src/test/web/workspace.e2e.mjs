@@ -108,7 +108,8 @@ try {
   const trend = page.getByRole('list', { name: 'Recent release outcomes' });
   await trend.waitFor();
   assert.equal(await trend.locator('.trend-dot.passed').count(), 1);
-  assert.equal(await trend.locator('.trend-dot.blocked').count(), 1);
+  // The earlier API smoke check creates one blocked run before the browser creates another.
+  assert.equal(await trend.locator('.trend-dot.blocked').count(), 2);
   await page.getByText('No integration findings in this run.', { exact: true }).waitFor();
   await page.getByRole('navigation', { name: 'Explore' }).getByRole('link', { name: 'Pilot setup' }).click();
   await page.getByText('1 of 6 steps complete', { exact: true }).waitFor();
