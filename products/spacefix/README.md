@@ -1,6 +1,6 @@
 # Cellar SpaceFix
 
-Download [SpaceFix.exe for Windows x64](https://github.com/suryandugy-glitch/Cellar-Studio/releases/download/spacefix-v1.0.0/SpaceFix.exe), run the per-user installer, and open SpaceFix from the Start menu. The installer includes its Java runtime.
+Download [SpaceFix.exe for Windows x64](https://github.com/suryandugy-glitch/Cellar-Studio/releases/download/spacefix-v1.0.1/SpaceFix.exe). Open Downloads and double-click the file. SpaceFix opens directly with its bundled runtime. For a Start menu shortcut, use [SpaceFix Setup](https://github.com/suryandugy-glitch/Cellar-Studio/releases/download/spacefix-v1.0.1/SpaceFix-Setup.exe).
 
 For the optional portable Java ZIP: Extract it and double-click Start-SpaceFix.cmd on a Windows desktop with Java 21 or newer. On another desktop with Java 21+, run `java -jar SpaceFix.jar`.
 

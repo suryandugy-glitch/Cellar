@@ -7,7 +7,7 @@
   "redirects": [
     {
       "source": "/SpaceFix.exe",
-      "destination": "https://github.com/suryandugy-glitch/Cellar-Studio/releases/download/spacefix-v1.0.0/SpaceFix.exe",
+      "destination": "https://github.com/suryandugy-glitch/Cellar-Studio/releases/download/spacefix-v1.0.1/SpaceFix.exe",
       "permanent": false
     },
     {
