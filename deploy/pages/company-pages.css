@@ -167,7 +167,8 @@ html[data-theme="dark"] .company-field-error{color:#ffb4a9}
   .company-hero{padding-block:60px}.company-hero h1{font-size:clamp(3.15rem,12vw,5.4rem)}
   .company-hero-actions,.company-link-row{display:grid;grid-template-columns:1fr}.company-button{width:100%}
   .company-stamp{transform:none;min-height:310px;box-shadow:7px 7px 0 var(--company-shadow)}
-  .company-stamp-about strong,.company-stamp-credentials strong{font-size:clamp(3.3rem,13vw,5rem)}
+  .company-stamp-about strong{font-size:clamp(3.3rem,13vw,5rem)}
+  .company-stamp-credentials strong{font-size:clamp(2.2rem,8vw,3.6rem);overflow-wrap:anywhere}
   .company-stamp-license strong{font-size:clamp(8rem,30vw,12rem)}
   .company-section{padding-block:75px}.company-section-heading h2,.company-split h2{font-size:clamp(2.6rem,10vw,4rem)}
   .company-bento-three,.company-bento-two{grid-template-columns:1fr}.company-bento-three>.company-panel:last-child{grid-column:auto}
