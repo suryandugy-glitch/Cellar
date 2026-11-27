@@ -6,8 +6,8 @@ import java.time.Instant;
 /** Non-destructive regression checks: test fixtures are the only files written. */
 public class SpaceFixTest {
     public static void main(String[] args) throws Exception {
-        Path source = Files.createDirectory(Path.of(args[0], "source"));
-        Path dest = Files.createDirectory(Path.of(args[0], "dest"));
+        Path source = Files.createDirectory(Path.of(args[0], "source").toAbsolutePath());
+        Path dest = Files.createDirectory(Path.of(args[0], "dest").toAbsolutePath());
         Path small = Files.writeString(source.resolve("a.txt"), "a");
         Path large = Files.writeString(source.resolve("b.txt"), "large file");
         Path nested = Files.createDirectory(source.resolve("nested"));
