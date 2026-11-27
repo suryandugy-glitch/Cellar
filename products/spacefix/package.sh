@@ -3,7 +3,7 @@ set -eu
 cd "$(dirname "$0")"
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
-java -m jdk.compiler/com.sun.tools.javac.Main -source 21 -target 21 -d "$tmp/classes" SpaceFix.java
+java -m jdk.compiler/com.sun.tools.javac.Main -source 21 -target 21 -d "$tmp/classes" SpaceFix.java SmartScanner.java SpaceFixWindow.java
 java -m jdk.compiler/com.sun.tools.javac.Main -source 21 -target 21 -cp "$tmp/classes" -d "$tmp/tests" SpaceFixTest.java
 java -cp "$tmp/classes:$tmp/tests" SpaceFixTest "$tmp"
 java -m jdk.jartool/sun.tools.jar.Main --create --date=2026-01-01T00:00:00Z --file "$tmp/SpaceFix.jar" --main-class SpaceFix -C "$tmp/classes" .
