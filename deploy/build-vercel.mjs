@@ -41,7 +41,7 @@ if (workspaceOrigin) {
     .replace('<title>', '<meta name="robots" content="noindex">\n  <title>');
   await writeFile(new URL('workspace.html', output), restrictConnections(workspace, workspaceOrigin));
 }
-for (const page of ['walkthrough.html', 'guide.html', 'workplace.html', 'studio.html', 'explore.html', 'deadlock.html']) {
+for (const page of ['walkthrough.html', 'guide.html', 'workplace.html', 'studio.html', 'handbook.html', 'deadlock.html']) {
   const html = await readFile(new URL(site + '/' + page, root), 'utf8');
   await writeFile(new URL(page, output), restrictConnections(html));
   if (page === 'guide.html' && !workspaceOrigin) {
@@ -55,10 +55,13 @@ for (const page of ['walkthrough.html', 'guide.html', 'workplace.html', 'studio.
 
 const assets = [
   { source: site + '/SpaceFix.zip', name: 'SpaceFix.zip' },
-  ...['landing.css', 'landing.js', 'product-theme.css', 'product-shell.js', 'detail-shell.css', 'detail-shell.js', 'minimal-brutal.css', 'neo-bento.css', 'minimal-motion.js', 'verification-schematic.svg', 'walkthrough.js', 'guide.js', 'trace-grid.svg', 'studio.css', 'studio-brutalist.css', 'studio.js'].map(name => ({ source: site + '/' + name, name })),
+  ...['catalog.css', 'catalog-links.js', 'landing.css', 'landing.js', 'product-theme.css', 'product-shell.js', 'detail-shell.css', 'detail-shell.js', 'minimal-brutal.css', 'neo-bento.css', 'minimal-motion.js', 'verification-schematic.svg', 'walkthrough.js', 'guide.js', 'trace-grid.svg', 'studio.css', 'studio-brutalist.css', 'studio.js'].map(name => ({ source: site + '/' + name, name })),
   ...['app.css', 'app.js', 'logo.svg'].map(name => ({ source: web + '/' + name, name })),
   ...['passing.csv', 'passing.json', 'breaking.csv', 'breaking.json', 'fixed.csv', 'fixed.json']
     .map(file => ({ source: site + '/samples/' + file, name: 'samples/' + file }))
 ];
 await Promise.all(assets.map(({ source, name }) => copyFile(new URL(source, root), new URL(name, output))));
+const { execFileSync } = await import('node:child_process');
+const { fileURLToPath } = await import('node:url');
+execFileSync(process.execPath, [fileURLToPath(new URL('deploy/catalog.mjs', root)), fileURLToPath(output)]);
 console.log('Built the Cellar Studio company site and Guard product site in build/vercel.');

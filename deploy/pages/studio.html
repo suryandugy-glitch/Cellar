@@ -28,15 +28,15 @@
       <a class="skip" href="#main">Skip to content</a>
       <a class="brand" href="./" aria-label="Cellar Studio home"><img src="./logo.svg" width="32" height="32" alt=""><span>CELLAR <b>STUDIO</b></span></a>
       <nav class="desktop-nav" aria-label="Main navigation">
-        <a href="#products">Products</a><a href="#method">Approach</a><a href="./explore.html#docs">Docs</a><a href="./explore.html#contribute">Company</a>
+        <a href="./explore.html">Products</a><a href="./services.html">Services</a><a href="./downloads.html">Downloads</a><a href="./handbook.html#docs">Docs</a><a href="./handbook.html#contribute">Company</a>
       </nav>
       <div class="header-actions">
-        <a class="button button-primary header-cta" href="#products">See the products <span aria-hidden="true">↗</span></a>
+        <a class="button button-primary header-cta" href="./explore.html">See the products <span aria-hidden="true">↗</span></a>
         <button class="menu-toggle" type="button" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open navigation"><span></span><span></span></button>
       </div>
     </div>
     <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation" hidden>
-      <a href="#products">Products</a><a href="#method">Approach</a><a href="./explore.html#docs">Documentation</a><a href="./explore.html#contribute">Company</a><a href="./guard.html">Cellar Guard</a>
+      <a href="./explore.html">Products</a><a href="./services.html">Services</a><a href="./downloads.html">Downloads</a><a href="./handbook.html#docs">Documentation</a><a href="./handbook.html#contribute">Company</a><a href="./guard.html">Cellar Guard</a>
     </nav>
   </header>
   <main id="main">
@@ -47,7 +47,7 @@
           <h1>Find the failure <span>before release.</span></h1>
           <p class="hero-lead">Cellar Studio builds developer tools that test fragile software boundaries. Start with CSV compatibility checks, then see our systems research.</p>
           <div class="hero-actions">
-            <a href="#products" class="button button-primary">See the products <span aria-hidden="true">↗</span></a>
+            <a href="./explore.html" class="button button-primary">See the products <span aria-hidden="true">↗</span></a>
             <a href="./guard.html" class="button button-secondary">Try Cellar Guard</a>
           </div>
           <div class="hero-facts"><span>Java 21 foundation</span><span>8 project directions</span><span>Working Guard pilot</span></div>
@@ -68,28 +68,11 @@
       </div>
     </section>
 
-    <section class="portfolio section" id="products" style="--h:2">
-      <div class="wrap">
-        <div class="section-heading"><div><p class="eyebrow">Product directory</p><h2>Tools for the problems engineers find too late.</h2></div><p>A working CSV checker, a downloadable desktop pilot, and focused research at different stages. Every project's maturity is labeled.</p></div>
-        <div class="directory-tools">
-          <label class="search-field" for="product-search"><span>Find a project</span><input id="product-search" type="search" placeholder="Search tools or engineering problems" autocomplete="off"><kbd>/</kbd></label>
-          <div class="segments" role="group" aria-label="Filter products by maturity"><button data-filter="all" type="button" aria-pressed="true">All</button><button data-filter="pilot" type="button" aria-pressed="false">Pilot</button><button data-filter="prototype" type="button" aria-pressed="false">Prototype</button><button data-filter="research" type="button" aria-pressed="false">Research</button></div>
-        </div>
-        <p class="result-count" id="result-count" aria-live="polite">8 projects</p>
-        <div class="product-grid" id="product-grid">
-          <a class="product-card product-guard" href="./guard.html" data-kind="pilot" data-search="cellar guard csv contracts java release compatibility"><div class="card-top"><span class="product-index">01 / CSV contracts</span><span class="status">Working pilot</span></div><div class="mini-ui" aria-hidden="true"><div class="mini-row"><span>order_id</span><b>required</b></div><div class="mini-row muted"><span>id</span><i>changed</i></div><div class="mini-rail"></div></div><h3>Cellar Guard</h3><p>Catch a changed CSV contract before a customer import breaks.</p><span class="card-link">Open the checker <span aria-hidden="true">↗</span></span></a>
-          <a class="product-card" href="./explore.html#buildclinic" data-kind="prototype" data-search="buildclinic build logs failures diagnostics"><div class="card-top"><span class="product-index">02 / Build diagnostics</span><span class="status">Early-stage</span></div><div class="mini-terminal" aria-hidden="true"><span>BUILD FAILED</span><span>↳ failing task located</span><span>↳ inspect root cause</span></div><h3>BuildClinic</h3><p>Turn noisy build logs into specific failure explanations.</p><span class="card-link">Read the product brief <span aria-hidden="true">↗</span></span></a>
-          <a class="product-card" href="./explore.html#clausecraft" data-kind="prototype" data-search="clausecraft documents contracts review patterns"><div class="card-top"><span class="product-index">03 / Document review</span><span class="status">Prototype</span></div><div class="mini-document" aria-hidden="true"><i></i><i></i><i></i><i></i></div><h3>ClauseCraft</h3><p>Surface document patterns that need human review.</p><span class="card-link">Read the product brief <span aria-hidden="true">↗</span></span></a>
-          <a class="product-card" href="./explore.html#plancliff" data-kind="research" data-search="plancliff databases query plans latency regressions sql"><div class="card-top"><span class="product-index">04 / Database performance</span><span class="status">Research</span></div><div class="mini-chart" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><h3>PlanCliff</h3><p>Investigate query-plan changes that cause latency cliffs.</p><span class="card-link">Read the research plan <span aria-hidden="true">↗</span></span></a>
-          <a class="product-card" href="./explore.html#crashcheck" data-kind="research" data-search="crashcheck sqlite storage crash consistency faults"><div class="card-top"><span class="product-index">05 / Storage reliability</span><span class="status">Research</span></div><div class="mini-storage" aria-hidden="true"><span>WRITE</span><b>FAULT</b><span>RECOVER</span></div><h3>CrashCheck</h3><p>Explore storage guarantees under unexpected termination.</p><span class="card-link">Read the research plan <span aria-hidden="true">↗</span></span></a>
-          <a class="product-card" href="./deadlock.html" data-kind="research" data-search="deadlock sentinel java jvm threads locks cycles"><div class="card-top"><span class="product-index">06 / JVM concurrency</span><span class="status">Research</span></div><div class="mini-locks" aria-hidden="true"><span>THREAD A</span><i>⇄</i><span>THREAD B</span></div><h3>Deadlock Sentinel</h3><p>Detect circular lock waits in Java thread-dump snapshots.</p><span class="card-link">See the trace demo <span aria-hidden="true">↗</span></span></a>
-          <a class="product-card" href="./explore.html#learn" data-kind="prototype" data-search="cellar learn algorithms data structures education"><div class="card-top"><span class="product-index">07 / Engineering education</span><span class="status">Candidate</span></div><div class="mini-learn" aria-hidden="true"><span>O(n)</span><i></i><span>O(log n)</span></div><h3>Cellar Learn</h3><p>Make algorithm behavior visible through interactive lessons.</p><span class="card-link">Read the product brief <span aria-hidden="true">↗</span></span></a>
-          <a class="product-card" href="./explore.html#spacefix" data-kind="pilot" data-search="cellar spacefix windows disk space storage recycle move files desktop download"><div class="card-top"><span class="product-index">08 / Desktop storage</span><span class="status">Downloadable pilot</span></div><div class="mini-storage" aria-hidden="true"><span>COPY</span><b>VERIFY</b><span>RECYCLE</span></div><h3>Cellar SpaceFix</h3><p>Move personal files to a spare drive and verify each copy before recycling the originals.</p><span class="card-link">Get SpaceFix <span aria-hidden="true">↗</span></span></a>
-        </div>
-        <p id="empty-state" class="empty-state" hidden>No projects match that search. Try another engineering term.</p>
-      </div>
-    </section>
-
+    <section class="portfolio section" id="products"><div class="wrap"><div class="section-heading"><h2>Explore the studio.</h2></div><div class="studio-choices">
+      <a href="./explore.html"><strong>Products ↗</strong><span>Browse tools, prototypes, and research briefs.</span></a>
+      <a href="./downloads.html"><strong>Downloads ↗</strong><span>Get desktop releases and setup instructions.</span></a>
+      <a href="./services.html"><strong>Services ↗</strong><span>Explore engineering, verification, and documentation.</span></a>
+    </div></div></section>
     <section class="method section" id="method" data-moment="evidence">
       <div class="wrap">
         <div class="section-heading"><div><p class="eyebrow">Engineering method</p><h2>A tool is only useful when it shows its evidence.</h2></div><p>Our common approach: reproduce the failure, explain the affected boundary, and give the engineer a result they can verify.</p></div>
@@ -101,7 +84,7 @@
     </section>
   </main>
   <footer class="closing">
-    <div class="wrap footer-top"><div><p class="eyebrow">Cellar Studio</p><h2>Read the work behind the tools.</h2><p>Java-based CSV checks and systems research. See each project's status, technical direction, and documentation in one place.</p><a class="button button-primary" href="./explore.html#docs">Read the documentation <span aria-hidden="true">↗</span></a></div><div class="footer-index"><div><strong>Products</strong><a href="./guard.html">Cellar Guard</a><a href="./deadlock.html">Deadlock Sentinel</a><a href="./explore.html#spacefix">Cellar SpaceFix</a><a href="./explore.html">All project briefs</a></div><div><strong>Studio</strong><a href="./explore.html#contribute">Contributing</a><a href="./explore.html#roadmap">Research roadmap</a><a href="./explore.html#docs">Documentation</a></div></div></div>
+    <div class="wrap footer-top"><div><p class="eyebrow">Cellar Studio</p><h2>Read the work behind the tools.</h2><p>Java-based CSV checks and systems research. See each project's status, technical direction, and documentation on its own product page.</p><a class="button button-primary" href="./handbook.html#docs">Read the documentation <span aria-hidden="true">↗</span></a></div><div class="footer-index"><div><strong>Products</strong><a href="./guard.html">Cellar Guard</a><a href="./deadlock.html">Deadlock Sentinel</a><a href="./product-spacefix.html">Cellar SpaceFix</a><a href="./explore.html">Product directory</a></div><div><strong>Studio</strong><a href="./handbook.html#contribute">Contributing</a><a href="./handbook.html#roadmap">Research roadmap</a><a href="./handbook.html#docs">Documentation</a></div></div></div>
     <div class="wrap footer-bottom"><span>Cellar Studio © 2026</span><span>Software engineering and research</span></div>
   </footer>
 </body>
