@@ -189,5 +189,19 @@ public final class SpaceFix {
         buttons(true);
         frame.setVisible(true);
     }
-    public static void main(String[] args) { SwingUtilities.invokeLater(() -> new SpaceFix().show()); }
+    public static void main(String[] args) throws Exception {
+        if (args.length == 1 && args[0].equals("--smoke-test")) {
+            SwingUtilities.invokeAndWait(() -> {
+                SpaceFix app = new SpaceFix();
+                try {
+                    app.show();
+                    if (!app.frame.isShowing()) throw new IllegalStateException("Window failed to open");
+                } finally {
+                    app.frame.dispose();
+                }
+            });
+            return;
+        }
+        SwingUtilities.invokeLater(() -> new SpaceFix().show());
+    }
 }

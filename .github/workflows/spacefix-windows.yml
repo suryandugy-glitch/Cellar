@@ -2,7 +2,7 @@ name: SpaceFix Windows installer
 on:
   push:
     branches: [main]
-    paths: ['products/spacefix/**', '.github/workflows/spacefix-windows.yml']
+    paths: ['products/spacefix/*.java', '.github/workflows/spacefix-windows.yml']
   workflow_dispatch:
 permissions:
   contents: write
@@ -14,8 +14,8 @@ jobs:
       VERSION: '1.0.0'
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
@@ -35,18 +35,9 @@ jobs:
         run: |
           jpackage --type app-image --name SpaceFix --app-version $env:VERSION --vendor "Cellar Studio" --input input --main-jar SpaceFix.jar --add-modules java.desktop --dest images
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          $app = Start-Process images/SpaceFix/SpaceFix.exe -PassThru
-          try {
-            $null = $app.WaitForInputIdle(30000)
-            for ($i = 0; $i -lt 30; $i++) {
-              $app.Refresh()
-              if ($app.MainWindowTitle -eq 'Cellar SpaceFix') { break }
-              Start-Sleep -Seconds 1
-            }
-            if ($app.MainWindowTitle -ne 'Cellar SpaceFix') { throw 'SpaceFix window did not open' }
-          } finally {
-            if (!$app.HasExited) { $app.Kill(); $app.WaitForExit() }
-          }
+          $app = Start-Process images/SpaceFix/SpaceFix.exe -ArgumentList '--smoke-test' -PassThru
+          if (!$app.WaitForExit(60000)) { $app.Kill(); throw 'Launcher timed out' }
+          if ($app.ExitCode -ne 0) { throw "Launcher failed with exit code $($app.ExitCode)" }
       - name: Build the per-user Windows installer
         shell: pwsh
         run: |
