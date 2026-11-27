@@ -35,6 +35,11 @@ jobs:
           for page in demo.html guide.html walkthrough.html workplace.html; do
             sed '/<meta http-equiv="Content-Security-Policy"/d' "build/vercel/$page" | diff "build/pages/$page" -
           done
+      - name: Verify catalog navigation and responsive layouts
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m http.server 8186 --bind 127.0.0.1 --directory build/vercel > /tmp/catalog-http.log 2>&1 &
+          CHROME_BIN="$(command -v google-chrome)" python .github/scripts/check-catalog.py
       - uses: actions/upload-pages-artifact@v4
         if: github.ref == 'refs/heads/main'
         with:

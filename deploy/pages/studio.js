@@ -28,8 +28,8 @@
       updateDirectory();
     });
   }
-  search.addEventListener('input', updateDirectory);
-  updateDirectory();
+  search?.addEventListener('input', updateDirectory);
+  if (search) updateDirectory();
 
   const toggle = document.querySelector('.menu-toggle');
   const mobileMenu = document.querySelector('#mobile-menu');
@@ -41,18 +41,18 @@
     if (open) mobileMenu.querySelector('a')?.focus();
     if (!open && restoreFocus) toggle.focus();
   }
-  toggle.addEventListener('click', () => setMenu(mobileMenu.hidden));
-  mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenu(false)));
+  toggle?.addEventListener('click', () => setMenu(mobileMenu.hidden));
+  mobileMenu?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenu(false)));
   window.addEventListener('resize', () => {
-    if (window.innerWidth >= 1024 && !mobileMenu.hidden) setMenu(false);
+    if (window.innerWidth >= 1024 && mobileMenu && !mobileMenu.hidden) setMenu(false);
   });
   document.addEventListener('keydown', event => {
     const focused = document.activeElement;
     const typing = focused instanceof HTMLElement &&
       (focused.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(focused.tagName));
-    if (event.key === 'Escape' && !mobileMenu.hidden) {
+    if (event.key === 'Escape' && mobileMenu && !mobileMenu.hidden) {
       setMenu(false, true);
-    } else if (event.key === 'Tab' && !mobileMenu.hidden) {
+    } else if (event.key === 'Tab' && mobileMenu && !mobileMenu.hidden) {
       const links = [...mobileMenu.querySelectorAll('a')];
       if (event.shiftKey && focused === links[0]) {
         event.preventDefault();
@@ -61,7 +61,7 @@
         event.preventDefault();
         toggle.focus();
       }
-    } else if (event.key === '/' && !typing && !event.ctrlKey && !event.altKey && !event.metaKey) {
+    } else if (event.key === '/' && search && !typing && !event.ctrlKey && !event.altKey && !event.metaKey) {
       event.preventDefault();
       search.focus();
     } else if (event.key === 'Escape' && focused === search) {
