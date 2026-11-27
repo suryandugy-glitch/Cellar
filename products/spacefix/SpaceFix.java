@@ -84,6 +84,9 @@ public final class SpaceFix {
                     app.frame.dispose();
                 }
             });
+            // The GUI was verified; force the smoke-test process to finish even if
+            // Windows keeps an AWT helper/event thread alive after disposal.
+            System.exit(0);
         } else if (args.length == 0) {
             SwingUtilities.invokeLater(() -> new SpaceFixWindow().show());
         } else {
