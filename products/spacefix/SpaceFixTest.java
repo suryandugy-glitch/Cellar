@@ -10,6 +10,18 @@ public class SpaceFixTest {
         Files.createDirectory(source.resolve("nested"));
         var items = SpaceFix.scan(source);
         if (items.size() != 2 || !items.getFirst().path().equals(large)) throw new AssertionError("preview");
+        if (args.length > 1) {
+            Path otherDrive = Path.of(args[1]);
+            Path batch = SpaceFix.transferBatch(items, otherDrive, Files.size(small) + Files.size(large));
+            SpaceFix.verify(small, batch.resolve(small.getFileName()));
+            SpaceFix.verify(large, batch.resolve(large.getFileName()));
+            try {
+                SpaceFix.transferBatch(items, dest, 1);
+                throw new AssertionError("accepted source volume");
+            } catch (IOException expected) {
+                if (!expected.getMessage().contains("different drive")) throw expected;
+            }
+        }
         Path copy = SpaceFix.copy(items.getFirst(), dest);
         try {
             SpaceFix.copy(items.getFirst(), dest);

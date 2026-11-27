@@ -99,7 +99,8 @@ public final class SpaceFix {
             batch = null;
             model.clear();
             model.addAll(items);
-            status.setText(items.size() + " files in " + source + " — select files to copy.");
+            status.setText(items.isEmpty() ? "No visible files here. Choose a folder containing your files."
+                    : items.size() + " files in " + source + " — select files to copy.");
         });
     }
 
@@ -114,23 +115,27 @@ public final class SpaceFix {
         verified = List.of();
         batch = null;
         work("Copying files and comparing their contents…", () -> {
-            Path dest = destination.toRealPath();
-            var store = Files.getFileStore(dest);
-            if (store.equals(Files.getFileStore(selected.getFirst().path())))
-                throw new IOException("Choose a different drive to free space on the source.");
-            if (store.getUsableSpace() < bytes) throw new IOException("Destination has insufficient free space.");
-            Path dir = Files.createTempDirectory(dest, "SpaceFix-");
-            try {
-                for (Item item : selected) copy(item, dir);
-            } catch (IOException ex) {
-                throw new IOException("Incomplete batch in " + dir + ". Originals retained. " + ex.getMessage(), ex);
-            }
-            return dir;
+            return transferBatch(selected, destination, bytes);
         }, dir -> {
             batch = dir;
             verified = selected;
             status.setText("Verified " + selected.size() + " copies. Open copies to inspect them before cleanup.");
         });
+    }
+
+    static Path transferBatch(List<Item> selected, Path destination, long bytes) throws IOException {
+        Path dest = destination.toRealPath();
+        var store = Files.getFileStore(dest);
+        if (store.equals(Files.getFileStore(selected.getFirst().path())))
+            throw new IOException("Choose a different drive to free space on the source.");
+        if (store.getUsableSpace() < bytes) throw new IOException("Destination has insufficient free space.");
+        Path dir = Files.createTempDirectory(dest, "SpaceFix-");
+        try {
+            for (Item item : selected) copy(item, dir);
+        } catch (IOException ex) {
+            throw new IOException("Incomplete batch in " + dir + ". Originals retained. " + ex.getMessage(), ex);
+        }
+        return dir;
     }
 
     void cleanup() {
