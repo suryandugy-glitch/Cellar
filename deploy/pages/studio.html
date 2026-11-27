@@ -6,89 +6,98 @@
   <meta name="site-kind" content="software">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f6f5ef">
-  <meta name="description" content="Cellar Studio is an independent software engineering and systems research studio. Explore our process, services, and documentation.">
+  <meta name="description" content="Cellar Studio is an independent creative technology company for ambitious ideas, digital products, software and services. The next chapter is taking shape.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Cellar Studio — Developer reliability tools">
-  <meta property="og:description" content="Explore practical engineering, research and technical documentation from Cellar Studio.">
+  <meta property="og:title" content="Cellar Studio — We build what comes next">
+  <meta property="og:description" content="One independent studio. Endless possibilities. Ideas, products, software, services and experiences in the making.">
   <meta name="twitter:card" content="summary_large_image">
-  <title>Cellar Studio — Software engineering & research</title>
+  <title>Cellar Studio — We build what comes next</title>
   <link rel="canonical" href="https://cellar-studio-hq.vercel.app/">
   <link rel="icon" href="./logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./studio.css">
   <link rel="stylesheet" href="./studio-brutalist.css">
   <link rel="stylesheet" href="./minimal-brutal.css">
   <link rel="stylesheet" href="./neo-bento.css">
+  <link rel="stylesheet" href="./studio-vision.css">
   <script src="./studio.js" defer></script>
   <script src="./minimal-motion.js" defer></script>
+  <script src="./studio-vision.js" defer></script>
 </head>
 <body class="cellar-home">
-  <!-- Software / dark charcoal + Cellar electric green / app-frame hero / evidence graph moment -->
   <header class="site-header">
     <div class="wrap header-inner">
       <a class="skip" href="#main">Skip to content</a>
       <a class="brand" href="./" aria-label="Cellar Studio home"><img src="./logo.svg" width="32" height="32" alt=""><span>CELLAR <b>STUDIO</b></span></a>
       <nav class="desktop-nav" aria-label="Main navigation">
-        <a href="./services.html">Services</a><a href="#method">Our process</a><a href="./handbook.html#docs">Docs</a><a href="./handbook.html#contribute">Company</a>
+        <a href="#possibilities">What we do</a><a href="#method">Our approach</a><a href="./services.html">Services</a><a href="#next">About</a>
       </nav>
       <div class="header-actions">
-        <a class="button button-primary header-cta" href="./services.html">Our services</a>
+        <a class="button button-primary header-cta" href="#possibilities">Explore the studio</a>
         <button class="menu-toggle" type="button" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open navigation"><span></span><span></span></button>
       </div>
     </div>
     <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation" hidden>
-      <a href="./services.html">Services</a><a href="#method">Our process</a><a href="./handbook.html#docs">Documentation</a><a href="./handbook.html#roadmap">Roadmap</a><a href="./handbook.html#contribute">Company</a>
+      <a href="#possibilities">What we do</a><a href="#method">Our approach</a><a href="./services.html">Services</a><a href="#next">About</a><a href="./handbook.html#docs">Documentation</a>
     </nav>
   </header>
   <main id="main">
-    <section class="hero section" id="overview" data-enter>
+    <section class="hero section vision-hero" id="overview" data-enter>
       <div class="wrap hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow">Developer infrastructure / Java 21</p>
-          <h1>Find the failure <span>before release.</span></h1>
-          <p class="hero-lead">Cellar Studio investigates difficult software problems through reproducible experiments, clear documentation and careful engineering. Our public product collection is being prepared.</p>
+          <p class="eyebrow vision-eyebrow"><span class="signal-dot" aria-hidden="true"></span> Independent creative technology company</p>
+          <h1 data-no-word-split>We build what <em>comes next.</em></h1>
+          <p class="hero-lead">Products. Software. Services. Experiences. We turn curious ideas into things worth making — and we’re just getting started.</p>
           <div class="hero-actions">
-            <a href="#method" class="button button-primary">Explore our process</a>
-            <a href="./services.html" class="button button-secondary">Studio services</a>
+            <a href="#possibilities" class="button button-primary">Explore our world <span aria-hidden="true">↗</span></a>
+            <a href="#method" class="button button-secondary">How we think</a>
           </div>
-          <div class="hero-facts"><span>Systems thinking</span><span>Repeatable research</span><span>Engineering-first</span></div>
+          <div class="hero-facts"><span>Imagine boldly</span><span>Design intentionally</span><span>Build thoughtfully</span></div>
         </div>
-        <div class="app-frame" aria-label="Illustrative software compatibility report using synthetic data" data-visual>
-          <div class="window-head"><div class="window-mark"><span></span><span></span><span></span></div><strong>inventory-report / release check</strong><span class="window-id">CSV/01</span></div>
-          <div class="window-body">
-            <div class="frame-label">Contract comparison <span>RUN 001</span></div>
-            <div class="csv-head"><span>Previous header</span><code>order_id, sku, total_cents</code></div>
-            <div class="csv-head changed"><span>Candidate header</span><code>id, sku, total_cents</code></div>
-            <div class="frame-divider"></div>
-            <div class="result-row"><span class="result-status fail">FAIL</span><strong>inventory-report</strong><span>Missing <code>order_id</code></span></div>
-            <div class="result-row"><span class="result-status pass">PASS</span><strong>finance-summary</strong><span>Contract satisfied</span></div>
-            <div class="frame-verdict"><div><small>Release gate</small><strong>Do not ship</strong></div><code>EXIT 1</code></div>
+        <div class="vision-board" role="img" aria-label="Animated Cellar Studio graphic showing imagination, design and engineering connected around the original studio mark" data-visual>
+          <div class="vision-board-top"><span><i aria-hidden="true"></i> STUDIO / IN MOTION</span><span>001 — ∞</span></div>
+          <div class="vision-board-stage" aria-hidden="true">
+            <div class="vision-ring vision-ring-outer"></div>
+            <div class="vision-ring vision-ring-inner"></div>
+            <div class="vision-center"><img src="./logo.svg" width="90" height="90" alt=""><strong>THE CREATIVE<br>ENGINE</strong></div>
+            <span class="vision-label vision-label-one">01 / IMAGINE</span>
+            <span class="vision-label vision-label-two">02 / DESIGN</span>
+            <span class="vision-label vision-label-three">03 / BUILD</span>
+            <span class="vision-spark vision-spark-one"></span><span class="vision-spark vision-spark-two"></span><span class="vision-spark vision-spark-three"></span>
           </div>
-          <div class="frame-bottom"><span class="pulse-line" aria-hidden="true"></span><span>Input → contract → verdict</span><span>OFFLINE</span></div>
+          <div class="vision-board-bottom"><span>THE FUTURE IS A WORK IN PROGRESS</span><span aria-hidden="true">↗</span></div>
         </div>
       </div>
     </section>
 
-    <section class="portfolio section" id="products" aria-labelledby="product-hold-title"><div class="wrap">
-      <div class="section-heading"><div><p class="eyebrow">Studio roadmap</p><h2 id="product-hold-title">Products are coming soon.</h2></div><p>We are refining the catalogue before opening it to the public. New software releases will appear here when they are ready to be introduced.</p></div>
-      <div class="studio-choices">
-        <a href="./services.html"><strong>Engineering services</strong><span>See how we approach implementation, technical verification and design.</span></a>
-        <a href="./handbook.html#roadmap"><strong>Research roadmap</strong><span>Read our process for exploring and validating difficult software problems.</span></a>
-        <a href="./handbook.html#docs"><strong>Documentation</strong><span>Understand the systems, boundaries and decisions behind our work.</span></a>
+    <section class="portfolio section vision-possibilities" id="possibilities" aria-labelledby="possibilities-title"><div class="wrap">
+      <div class="section-heading"><div><p class="eyebrow">01 / A world of possibilities</p><h2 id="possibilities-title">One studio.<br><em>Many directions.</em></h2></div><p>We’re building the company before boxing it into a category. The right ideas will decide what comes next.</p></div>
+      <div class="vision-tiles" data-reveal-group>
+        <article class="vision-tile vision-tile-large" data-reveal><span class="tile-index">/ 01 — CREATE</span><div class="tile-symbol" aria-hidden="true">✳</div><h3>Products with <em>purpose.</em></h3><p>Not another product for the sake of a launch. We’re exploring what people really need, then figuring out what’s worth building.</p><span class="tile-footer">In exploration <b aria-hidden="true">↗</b></span></article>
+        <article class="vision-tile vision-tile-blue" data-reveal><span class="tile-index">/ 02 — COLLABORATE</span><div class="tile-symbol" aria-hidden="true">↗</div><h3>Services that <em>move things.</em></h3><p>Thoughtful design, sharp engineering and practical problem-solving — shaped around the people we work with.</p><a class="tile-footer" href="./services.html">What we can do <b aria-hidden="true">↗</b></a></article>
+        <article class="vision-tile vision-tile-coral" data-reveal><span class="tile-index">/ 03 — EXPLORE</span><div class="tile-symbol" aria-hidden="true">◎</div><h3>Room to <em>experiment.</em></h3><p>Some of the best things begin as a question. We make space for prototypes, discoveries and unexpected ideas.</p><a class="tile-footer" href="#method">Our approach <b aria-hidden="true">↗</b></a></article>
       </div>
     </div></section>
-    <section class="method section" id="method" data-moment="evidence">
+    <section class="method section vision-method" id="method">
       <div class="wrap">
-        <div class="section-heading"><div><p class="eyebrow">Engineering method</p><h2>A tool is only useful when it shows its evidence.</h2></div><p>Our common approach: reproduce the failure, explain the affected boundary, and give the engineer a result they can verify.</p></div>
-        <div class="method-layout">
-          <div class="method-steps"><div><span>01</span><strong>Define a boundary</strong><p>A contract, lock dependency or storage invariant.</p></div><div><span>02</span><strong>Run a controlled check</strong><p>Use concrete input and repeatable conditions.</p></div><div><span>03</span><strong>Inspect the evidence</strong><p>Report the failure and its likely consequence.</p></div></div>
-          <div class="evidence-visual"><img src="./verification-schematic.svg" width="840" height="370" loading="lazy" alt="CSV input compared with an inventory contract, resulting in a blocked release because order_id is missing"></div>
+        <div class="section-heading"><div><p class="eyebrow">02 / The Cellar mindset</p><h2>Big imagination.<br><em>Serious craft.</em></h2></div><p>We believe the best work happens when curiosity and execution meet. Here’s the simple thinking behind everything we want to create.</p></div>
+        <div class="vision-process" data-reveal-group>
+          <div data-reveal><span>01</span><strong>Question everything.</strong><p>Start with curiosity. Look for meaningful problems and new perspectives.</p></div>
+          <div data-reveal><span>02</span><strong>Make it matter.</strong><p>Give each idea a clear purpose, useful experience and thoughtful direction.</p></div>
+          <div data-reveal><span>03</span><strong>Build it better.</strong><p>Prototype, test, improve and turn the promising into the practical.</p></div>
         </div>
       </div>
     </section>
+    <section class="vision-next section" id="next"><div class="wrap vision-next-inner" data-reveal>
+      <p class="eyebrow">03 / The beginning of something</p>
+      <h2>What's next?<br><em>We're working on it.</em></h2>
+      <p>No made-up launches. No promises about products we haven’t chosen yet. Just an independent studio with the ambition to make remarkable things.</p>
+      <a class="button button-primary" href="./handbook.html#contribute">Get to know the studio <span aria-hidden="true">↗</span></a>
+    </div></section>
+    <div class="vision-marquee" aria-hidden="true"><div class="vision-marquee-track"><span>IDEAS INTO IMPACT <b>✳</b> BUILD WHAT MATTERS <b>✳</b> THINK DIFFERENTLY <b>✳</b></span><span>IDEAS INTO IMPACT <b>✳</b> BUILD WHAT MATTERS <b>✳</b> THINK DIFFERENTLY <b>✳</b></span></div></div>
   </main>
   <footer class="closing">
-    <div class="wrap footer-top"><div><p class="eyebrow">Cellar Studio</p><h2>Engineering with evidence.</h2><p>Our public product catalogue is in preparation. Explore the studio's technical approach, research process and collaboration areas.</p><a class="button button-primary" href="./handbook.html#docs">Read the documentation</a></div><div class="footer-index"><div><strong>Work with us</strong><a href="./services.html">Services</a><a href="./handbook.html#roadmap">Research</a><a href="./handbook.html#contribute">Contribute</a></div><div><strong>Studio</strong><a href="./handbook.html#contribute">Company</a><a href="./handbook.html#docs">Documentation</a><a href="#products">Coming soon</a></div></div></div>
-    <div class="wrap footer-bottom"><span>Cellar Studio © 2026</span><span>Software engineering and research</span></div>
+    <div class="wrap footer-top"><div><p class="eyebrow">Cellar Studio</p><h2>It's only the beginning.</h2><p>Independent by nature. Curious by design. Built for ideas that deserve to exist.</p><a class="button button-primary" href="#overview">Back to the beginning ↑</a></div><div class="footer-index"><div><strong>Explore</strong><a href="#possibilities">What we do</a><a href="#method">Our approach</a><a href="./services.html">Services</a></div><div><strong>Studio</strong><a href="#next">Our story</a><a href="./handbook.html#docs">Documentation</a><a href="./handbook.html#contribute">Company</a></div></div></div>
+    <div class="wrap footer-bottom"><span>Cellar Studio © 2026</span><span>Independent. Curious. In motion.</span></div>
   </footer>
 </body>
 </html>
