@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 314" role="img" aria-labelledby="title desc">
+  <title id="title">Cellar Guard: CSV export to contract to release verdict</title>
+  <desc id="desc">Three stages: a CSV candidate has an id column, a customer contract requires order_id, and Guard blocks the release with a missing-column finding.</desc>
+  <rect x="23" y="23" width="955" height="268" fill="#111111"/>
+  <rect x="10" y="10" width="955" height="268" fill="#F6F4EE" stroke="#111111" stroke-width="6"/>
+  <rect x="10" y="10" width="955" height="50" fill="#111111"/>
+  <text x="31" y="43" fill="#F6F4EE" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="800" letter-spacing="2">THE RELEASE GATE / AN ACTUAL FAILURE MODE</text>
+  <g font-family="Arial, Helvetica, sans-serif" font-weight="800" fill="#111111">
+    <rect x="30" y="83" width="270" height="137" fill="#FFFFFF" stroke="#111111" stroke-width="5"/>
+    <rect x="362" y="83" width="270" height="137" fill="#FFFFFF" stroke="#111111" stroke-width="5"/>
+    <rect x="694" y="83" width="250" height="137" fill="#FFD659" stroke="#111111" stroke-width="5"/>
+    <text x="47" y="116" font-size="23">01 / CSV EXPORT</text>
+    <text x="379" y="116" font-size="23">02 / CONTRACT</text>
+    <text x="711" y="116" font-size="23">03 / VERDICT</text>
+  </g>
+  <g font-family="Consolas, 'Courier New', monospace" fill="#111111">
+    <text x="47" y="154" font-size="21" font-weight="700">id, sku, amount</text>
+    <text x="47" y="190" font-size="15">candidate / v3</text>
+    <text x="379" y="154" font-size="19" font-weight="700">requires order_id</text>
+    <text x="379" y="190" font-size="15">inventory-report</text>
+    <text x="711" y="159" font-size="33" font-weight="900">BLOCK</text>
+    <text x="711" y="194" font-size="16" font-weight="700">missing order_id</text>
+  </g>
+  <path d="M307 151H350M339 139L351 151L339 163" stroke="#111111" stroke-width="6" fill="none" stroke-linecap="square"/>
+  <path d="M639 151H682M671 139L683 151L671 163" stroke="#111111" stroke-width="6" fill="none" stroke-linecap="square"/>
+  <text x="32" y="254" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="800" letter-spacing="1.2" fill="#111111">REPRODUCIBLE FINDINGS  /  DECLARED CONTRACTS  /  NO CSV CELL VALUES IN REPORTS</text>
+</svg>
