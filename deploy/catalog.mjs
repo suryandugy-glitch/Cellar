@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const studio = 'https://github.com/suryandugy-glitch/';
@@ -39,6 +39,17 @@ const products = [
     workflow:'Trace a small input, inspect each intermediate state, and compare the steps when the input changes. The educational project is a candidate for the Studio portfolio.',
     example:['Input','Small data set','Trace','Intermediate states','Compare','Operation count'], repo:'dsa-visualizer' },
 ];
+function productShowcase() {
+  const cards = products.map(p => `<a class="showcase-item" href="./product-${p.id}.html">
+    <span class="showcase-meta"><span>${p.area}</span><span>${p.status}</span></span>
+    <strong class="showcase-name">${p.name}</strong><span class="showcase-summary">${p.intro}</span>
+    <span class="showcase-sample"><span>${p.example[0]} · ${p.example[1]}</span><span>${p.example[2]} · ${p.example[3]}</span><span>${p.example[4]} · ${p.example[5]}</span></span>
+    <span class="showcase-card-foot"><span>Read product brief</span><span aria-hidden="true">↗</span></span></a>`).join('');
+  return `<section class="showcase" id="product-showcase" aria-label="Product showcase"><div class="showcase-head"><h2>Explore the experiments.</h2>
+    <div class="showcase-controls" hidden><button type="button" data-step="-1" aria-label="Previous products">←</button>
+    <button type="button" data-play>Pause</button><button type="button" data-step="1" aria-label="Next products">→</button></div></div>
+    <div class="showcase-rail">${cards}</div></section>`;
+}
 const services = [
   ['engineering','Software & product engineering','Turn promising ideas into solid, usable digital experiences.','Start with the problem, clarify the purpose, and build in small, meaningful steps.','A thoughtfully implemented concept with room to learn and improve.'],
   ['research','Research & prototyping','Explore possibilities before committing to a direction.','Ask better questions, test assumptions with focused experiments, and follow the evidence.','A clearer direction, tangible prototypes and lessons for what comes next.'],
@@ -70,4 +81,10 @@ await save('services','Services',head('Our possibilities','From idea to impact.'
 for (const [id,name,desc,scope,result] of services) {
   await save('service-'+id,name,back('Services','./services.html')+head('Studio capabilities',name,desc)+`<section class="brief"><h2>Our approach</h2><div><h3>How we think</h3><p>${scope}</p><h3>What we aim for</h3><p>${result}</p>${link(['Explore the studio','./'])}</div></section>`);
 }
-await save('explore','Products',head('An open canvas','The best ideas start with a question.','Products are coming soon. We’re taking time to decide what deserves to exist before giving it a name or a launch date.')+'<section class="brief"><h2>No catalogue. Just possibility.</h2><div><p>Cellar Studio is a home for software, products, services and experiments. Our first public product is still undecided. When that changes, this page will tell the story.</p>'+link(['Explore what we do','./#possibilities'])+link(['Discover our approach','./#method'])+'</div></section>');
+await save('explore','Products',head('Studio portfolio','Products in development','Explore the problems behind our pilots, prototypes, and research projects.')+productShowcase());
+const assets = '<link rel="stylesheet" href="./showcase.css"><script src="./showcase.js" defer></script>';
+for (const name of ['index.html','studio.html','explore.html']) {
+  const path = resolve(out,name);
+  const html = await readFile(path,'utf8');
+  await writeFile(path,html.replace('<!-- PRODUCT_SHOWCASE -->',productShowcase()).replace('</head>',assets+'</head>'));
+}
