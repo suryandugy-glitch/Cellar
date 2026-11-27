@@ -7,7 +7,7 @@ with sync_playwright() as p:
  page=b.new_page()
  errors=[]
  page.on('pageerror',lambda e:errors.append(str(e)))
- routes=['index','explore','services','downloads','spacefix-downloads','handbook']+[f.stem for f in Path('build/vercel').glob('*-downloads.html')]+[f.stem for f in Path('build/vercel').glob('product-*.html')]+[f.stem for f in Path('build/vercel').glob('service-*.html')]
+ routes=['index','explore','services','downloads','handbook']+[f.stem for f in Path('build/vercel').glob('*-downloads.html')]+[f.stem for f in Path('build/vercel').glob('product-*.html')]+[f.stem for f in Path('build/vercel').glob('service-*.html')]
  for w in [320,390,768,1440]:
   page.set_viewport_size({'width':w,'height':900})
   for route in routes:
@@ -17,11 +17,11 @@ with sync_playwright() as p:
    assert overflow<=1, (w,route,overflow)
  page.goto(url+'explore.html')
  page.get_by_role('button',name='Pilot',exact=True).click()
- assert page.locator('.product-card:visible').count()==2
- page.get_by_role('searchbox').fill('spacefix')
+ assert page.locator('.product-card:visible').count()==1
+ page.get_by_role('searchbox').fill('guard')
  page.locator('.product-card:visible').click()
- page.get_by_role('link',name='SpaceFix downloads').click()
- assert 'v1.0.1/SpaceFix.exe' in page.get_by_role('link',name='Download SpaceFix.exe').get_attribute('href')
+ page.get_by_role('link',name='Source downloads').click()
+ assert 'archive/HEAD.zip' in page.get_by_role('link',name='Download source ZIP').get_attribute('href')
  page.goto(url+'explore.html#crashcheck');page.wait_for_url('**/product-crashcheck.html')
  page.goto(url+'explore.html#docs');page.wait_for_url('**/handbook.html#docs')
 

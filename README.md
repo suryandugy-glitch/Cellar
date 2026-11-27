@@ -46,7 +46,6 @@ This repository was renamed from **Cellar** to **Cellar-Studio**. It still conta
 | Project | The problem it tackles | Status | Explore |
 | --- | --- | --- | --- |
 | **Cellar Guard** | CSV exports silently break downstream imports when columns or contracts change | **Working pilot** — Java checker, CLI and local web workspace | [Live demo](https://cellar-csv.vercel.app/) |
-| **Cellar SpaceFix** | Free space on a crowded drive by copying personal files to a second volume and verifying their contents before recycling originals | Downloadable Java desktop pilot | [Download and instructions](https://cellar-studio-hq.vercel.app/explore.html#spacefix) · [Source](products/spacefix/) |
 | **Deadlock Sentinel** | Circular waits in JVM thread dumps are difficult to diagnose | **Java prototype / research demo** | [Trace explorer](https://cellar-studio-hq.vercel.app/deadlock.html) · [Run locally](products/deadlock-sentinel/README.md) |
 | **BuildClinic** | Build failures are buried in noisy logs | Early-stage standalone tool | [Product brief](https://cellar-studio-hq.vercel.app/explore.html#buildclinic) |
 | **ClauseCraft** | Teams need an explainable first pass over risky document patterns | Prototype, not legal advice | [Product brief](https://cellar-studio-hq.vercel.app/explore.html#clausecraft) |
