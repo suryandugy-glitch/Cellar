@@ -17,7 +17,10 @@ for (const file of files) {
   }
 }
 const home = await readFile(resolve(root, 'index.html'), 'utf8');
-assert.match(home, /Products are coming soon\./);
+assert.match(home, /We build what/);
+assert.match(home, /comes next/);
+assert.match(home, /studio-vision\.css/);
+assert.match(home, /studio-vision\.js/);
 assert.doesNotMatch(home, /See the products|href="\.\/product-/);
 for (const file of ['explore.html', 'downloads.html']) {
   const html = await readFile(resolve(root, file), 'utf8');

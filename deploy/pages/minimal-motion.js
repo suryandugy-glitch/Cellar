@@ -5,7 +5,7 @@
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const headline = document.querySelector('main h1');
-  if (headline) {
+  if (headline && !headline.hasAttribute('data-no-word-split')) {
     let index = 0;
     const wrapWords = element => {
       for (const child of [...element.childNodes]) {

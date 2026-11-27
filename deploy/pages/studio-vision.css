@@ -1,0 +1,176 @@
+/* Cellar Studio / the company before the catalogue.
+   Editorial neo-brutalism, product-neutral graphics and restrained motion. */
+.cellar-home {
+  --vision-ink:#151515;--vision-paper:#f6f5ef;--vision-card:#fffef9;
+  --vision-yellow:#ffdf70;--vision-blue:#cbdcff;--vision-coral:#ffc3b1;
+  --vision-muted:#484842;--vision-stroke:#151515;--vision-shadow:#151515;
+}
+html[data-theme="dark"] .cellar-home {
+  --vision-ink:#f2f0e8;--vision-paper:#18191b;--vision-card:#28292d;
+  --vision-yellow:#c7a75c;--vision-blue:#536b91;--vision-coral:#9f6e66;
+  --vision-muted:#cecbc2;--vision-stroke:#e1dfd7;--vision-shadow:#090a0b;
+}
+.cellar-home .vision-hero {min-height:720px;height:auto;}
+.cellar-home .vision-hero .hero-grid {padding-block:clamp(80px,8vw,120px);}
+.cellar-home .vision-hero .hero-copy h1 {
+  max-width:11.5ch;font-size:clamp(3.35rem,6.15vw,6.6rem);
+  letter-spacing:-.085em;line-height:.99;margin-bottom:30px;
+}
+.cellar-home .vision-hero .hero-copy h1 em {
+  font-style:normal;color:var(--vision-ink);background:linear-gradient(transparent 69%,var(--vision-yellow) 69%);
+  -webkit-box-decoration-break:clone;box-decoration-break:clone;padding-right:.05em;
+}
+.cellar-home .vision-hero .hero-copy h1::selection,.cellar-home .vision-hero .hero-copy h1 em::selection{background:var(--vision-coral)}
+.cellar-home .vision-eyebrow {display:flex;gap:10px;align-items:center;color:var(--vision-muted);text-transform:uppercase;}
+.cellar-home .signal-dot {width:9px;height:9px;flex:none;background:#e78957;border:2px solid var(--vision-stroke);box-shadow:2px 2px 0 var(--vision-shadow);}
+.cellar-home .vision-hero .hero-lead {color:var(--vision-muted);max-width:50ch;}
+.cellar-home .vision-hero .hero-facts {color:var(--vision-muted);}
+.cellar-home .vision-hero .hero-facts span {color:var(--vision-muted);}
+.cellar-home .hero-actions .button {display:inline-flex;align-items:center;justify-content:center;gap:14px;}
+
+/* Original studio-logo composition — no invented product screenshot. */
+.cellar-home .vision-board {
+  position:relative;min-width:0;border:3px solid var(--vision-stroke);background:var(--vision-card);
+  color:var(--vision-ink);box-shadow:11px 11px 0 var(--vision-shadow);overflow:hidden;
+  animation:vision-board-enter .8s .15s cubic-bezier(.2,.8,.2,1) both;
+}
+.cellar-home .vision-board-top,.cellar-home .vision-board-bottom {
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:15px 19px;font:800 .72rem/1.4 var(--neo-mono);letter-spacing:.06em;
+}
+.cellar-home .vision-board-top {border-bottom:3px solid var(--vision-stroke);background:var(--vision-yellow);color:#151515;}
+.cellar-home .vision-board-top span:first-child {display:inline-flex;align-items:center;gap:9px;}
+.cellar-home .vision-board-top i {display:inline-block;width:8px;height:8px;border-radius:50%;background:#151515;animation:vision-pulse 1.8s ease-in-out infinite;}
+.cellar-home .vision-board-bottom {border-top:3px solid var(--vision-stroke);background:var(--vision-card);}
+.cellar-home .vision-board-bottom span:last-child {font-size:24px;line-height:1;}
+.cellar-home .vision-board-stage {
+  position:relative;height:clamp(330px,37vw,470px);overflow:hidden;isolation:isolate;
+  background:linear-gradient(90deg,transparent calc(25% - 1px),#8888882a 25%,transparent calc(25% + 1px)),
+             linear-gradient(0deg,transparent calc(25% - 1px),#8888882a 25%,transparent calc(25% + 1px)),
+             var(--vision-paper);
+  background-size:25% 25%;
+}
+.cellar-home .vision-board-stage::before,.cellar-home .vision-board-stage::after {
+  content:"";position:absolute;inset:13% 20%;border:1px solid var(--vision-stroke);border-radius:50%;opacity:.22;
+}
+.cellar-home .vision-board-stage::after {inset:27% 30%;}
+.cellar-home .vision-ring {position:absolute;top:50%;left:50%;border:3px dashed var(--vision-stroke);border-radius:50%;}
+.cellar-home .vision-ring-outer {width:74%;aspect-ratio:1;transform:translate(-50%,-50%) rotate(0);opacity:.25;animation:vision-spin 42s linear infinite;}
+.cellar-home .vision-ring-inner {width:45%;aspect-ratio:1;transform:translate(-50%,-50%) rotate(0);opacity:.4;border-style:solid;animation:vision-spin 32s linear infinite reverse;}
+.cellar-home .vision-center {
+  position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);
+  display:grid;place-items:center;gap:10px;width:33%;min-width:135px;max-width:200px;aspect-ratio:1;
+  padding:15px;border:3px solid var(--vision-stroke);background:var(--vision-yellow);box-shadow:8px 8px 0 var(--vision-shadow);text-align:center;
+}
+.cellar-home .vision-center img {width:clamp(54px,6vw,90px);height:auto;max-height:86px;object-fit:contain;}
+.cellar-home .vision-center strong {font:900 clamp(.65rem,1vw,.83rem)/1.2 var(--neo-mono);letter-spacing:.02em;color:#151515;}
+.cellar-home .vision-label {
+  position:absolute;z-index:3;padding:8px 10px;border:2px solid var(--vision-stroke);
+  background:var(--vision-card);box-shadow:4px 4px 0 var(--vision-shadow);
+  font:800 clamp(.58rem,.9vw,.72rem)/1.2 var(--neo-mono);letter-spacing:.04em;white-space:nowrap;
+  animation:vision-float 4s ease-in-out infinite;
+}
+.cellar-home .vision-label-one {top:13%;left:8%;background:var(--vision-blue);animation-delay:0s;}
+.cellar-home .vision-label-two {top:37%;right:6%;background:var(--vision-coral);animation-delay:-1.3s;}
+.cellar-home .vision-label-three {bottom:12%;left:9%;background:var(--vision-yellow);animation-delay:-2.5s;color:#151515;}
+.cellar-home .vision-spark {position:absolute;width:10px;height:10px;background:var(--vision-coral);border:2px solid var(--vision-stroke);transform:rotate(45deg);}
+.cellar-home .vision-spark-one {top:19%;right:23%;}.cellar-home .vision-spark-two {bottom:19%;right:17%;background:var(--vision-blue);}.cellar-home .vision-spark-three {bottom:19%;left:32%;background:var(--vision-yellow);}
+
+/* A deliberate bento composition for directions, never fictional product listings. */
+.cellar-home .vision-possibilities {min-height:0;padding:clamp(92px,9vw,146px) 0;background:var(--vision-paper);color:var(--vision-ink);}
+.cellar-home .vision-possibilities .section-heading h2,.cellar-home .vision-method .section-heading h2 {max-width:16ch;color:var(--vision-ink);}
+.cellar-home .vision-possibilities .section-heading h2 em,.cellar-home .vision-method .section-heading h2 em {font-style:normal;text-decoration:underline;text-decoration-thickness:6px;text-decoration-color:var(--vision-yellow);text-underline-offset:8px;}
+.cellar-home .vision-possibilities .section-heading>p,.cellar-home .vision-method .section-heading>p {color:var(--vision-muted);}
+.cellar-home .vision-tiles {display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px;}
+.cellar-home .vision-tile {
+  grid-column:span 5;display:flex;flex-direction:column;min-height:280px;padding:clamp(24px,3vw,38px);
+  border:3px solid var(--vision-stroke);box-shadow:7px 7px 0 var(--vision-shadow);background:var(--vision-card);
+  color:var(--vision-ink);transition:transform .24s ease,box-shadow .24s ease;
+}
+.cellar-home .vision-tile:hover {transform:translate(-3px,-4px);box-shadow:10px 11px 0 var(--vision-shadow);}
+.cellar-home .vision-tile-large {grid-column:span 7;grid-row:span 2;min-height:570px;background:var(--vision-yellow);color:#151515;}
+.cellar-home .vision-tile-blue {background:var(--vision-blue);color:#151515;}
+.cellar-home .vision-tile-coral {background:var(--vision-coral);color:#151515;}
+html[data-theme="dark"] .cellar-home .vision-tile-blue,html[data-theme="dark"] .cellar-home .vision-tile-coral {color:#f7f6f1;}
+.cellar-home .tile-index {font:800 .72rem/1.4 var(--neo-mono);letter-spacing:.06em;}
+.cellar-home .tile-symbol {margin:auto 0 12px;font:900 clamp(4rem,7vw,8rem)/.9 var(--neo-display);letter-spacing:-.06em;}
+.cellar-home .vision-tile-large .tile-symbol {font-size:clamp(8rem,16vw,15rem);line-height:1.06;}
+.cellar-home .vision-tile h3 {margin:0 0 14px;font:900 clamp(2rem,3vw,3.2rem)/1.05 var(--neo-display);letter-spacing:-.067em;max-width:18ch;}
+.cellar-home .vision-tile-large h3 {font-size:clamp(2.7rem,4.3vw,4.8rem);}
+.cellar-home .vision-tile h3 em {font-style:normal;text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:5px;}
+.cellar-home .vision-tile p {font-size:clamp(.95rem,1.12vw,1.08rem);line-height:1.55;max-width:48ch;margin:0 0 22px;color:inherit;}
+.cellar-home .tile-footer {margin-top:auto;display:flex;justify-content:space-between;align-items:center;border-top:2px solid currentColor;padding-top:12px;color:inherit;font:800 .76rem/1.4 var(--neo-mono);text-decoration:none;}
+.cellar-home .tile-footer b {font-size:24px;line-height:1;transition:transform .2s ease;}
+.cellar-home a.tile-footer:hover b {transform:translate(3px,-3px)}
+
+.cellar-home .vision-method {min-height:0;background:var(--vision-card);color:var(--vision-ink);padding:clamp(90px,9vw,145px) 0;}
+.cellar-home .vision-process {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;}
+.cellar-home .vision-process>div {min-width:0;min-height:275px;display:flex;flex-direction:column;padding:clamp(22px,2.5vw,34px);border:3px solid var(--vision-stroke);background:var(--vision-paper);box-shadow:6px 6px 0 var(--vision-shadow);}
+.cellar-home .vision-process>div:nth-child(2) {background:var(--vision-blue);}
+.cellar-home .vision-process>div:nth-child(3) {background:var(--vision-coral);}
+.cellar-home .vision-process>div>span {font:900 .95rem var(--neo-mono);margin-bottom:auto;}
+.cellar-home .vision-process strong {font:900 clamp(1.5rem,2.35vw,2.7rem)/1.08 var(--neo-display);letter-spacing:-.06em;margin:26px 0 12px;}
+.cellar-home .vision-process p {margin:0;line-height:1.55;color:inherit;}
+html[data-theme="dark"] .cellar-home .vision-process>div:nth-child(n+2) {color:#f7f6f1;}
+
+.cellar-home .vision-next {padding:clamp(96px,11vw,170px) 0;background:var(--vision-yellow);color:#151515;border-top:3px solid #151515;border-bottom:3px solid #151515;}
+html[data-theme="dark"] .cellar-home .vision-next {background:#bba26a;}
+.cellar-home .vision-next-inner {max-width:1040px;}
+.cellar-home .vision-next .eyebrow {color:#34312a;}
+.cellar-home .vision-next h2 {font:900 clamp(3rem,7vw,7.5rem)/.97 var(--neo-display);letter-spacing:-.087em;margin:0 0 30px;max-width:14ch;}
+.cellar-home .vision-next h2 em {font-style:normal;color:#524c40;}
+.cellar-home .vision-next p:not(.eyebrow) {max-width:63ch;font-size:clamp(1.1rem,1.6vw,1.4rem);line-height:1.55;margin:0 0 30px;}
+.cellar-home .vision-next .button {display:inline-flex;width:auto;color:#f5f3e9;background:#151515;border-color:#151515;box-shadow:5px 5px 0 #ffffff8c;}
+.cellar-home .vision-next .button:hover {background:#333;color:#fff;}
+.cellar-home .vision-marquee {overflow:hidden;border-bottom:3px solid var(--vision-stroke);background:var(--vision-ink);color:var(--vision-paper);padding:16px 0;}
+.cellar-home .vision-marquee-track {display:flex;width:max-content;gap:28px;font:900 clamp(1.15rem,2vw,1.7rem)/1 var(--neo-display);letter-spacing:-.025em;white-space:nowrap;animation:vision-scroll 24s linear infinite;}
+.cellar-home .vision-marquee-track span {display:flex;gap:28px;align-items:center;}
+.cellar-home .vision-marquee-track b {color:var(--vision-yellow);}
+.cellar-home .closing {min-height:0;}
+
+.reveal-ready .cellar-home [data-reveal] {opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s cubic-bezier(.2,.75,.2,1);}
+.reveal-ready .cellar-home [data-reveal].is-revealed {opacity:1;transform:translateY(0);}
+.reveal-ready .cellar-home [data-reveal-group] > :nth-child(2) {transition-delay:.09s;}
+.reveal-ready .cellar-home [data-reveal-group] > :nth-child(3) {transition-delay:.18s;}
+@keyframes vision-board-enter {from{opacity:0;transform:translateY(22px) rotate(-1deg)}to{opacity:1;transform:none}}
+@keyframes vision-spin {to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes vision-float {0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes vision-pulse {0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes vision-scroll {to{transform:translateX(calc(-50% - 14px))}}
+
+@media(max-width:1023px) {
+  .cellar-home .vision-hero .hero-grid {padding-top:95px;}
+  .cellar-home .vision-hero .hero-copy h1 {max-width:12.3ch;}
+  .cellar-home .vision-board {max-width:800px;}
+  .cellar-home .vision-board-stage {height:min(62vw,450px);min-height:340px;}
+}
+@media(max-width:760px) {
+  .cellar-home .vision-tiles {grid-template-columns:minmax(0,1fr);gap:16px;}
+  .cellar-home .vision-tile,.cellar-home .vision-tile-large {grid-column:auto;grid-row:auto;min-height:290px;}
+  .cellar-home .vision-tile-large {min-height:410px;}
+  .cellar-home .vision-tile-large .tile-symbol {font-size:8rem;}
+  .cellar-home .vision-process {grid-template-columns:minmax(0,1fr);}
+  .cellar-home .vision-process>div {min-height:190px;}
+}
+@media(max-width:639px) {
+  .cellar-home .vision-hero .hero-grid {padding-block:64px 76px;}
+  .cellar-home .vision-hero .hero-copy h1 {font-size:clamp(2.7rem,11.4vw,4.6rem);line-height:1;max-width:12ch;}
+  .cellar-home .vision-eyebrow {font-size:.64rem;line-height:1.6;}
+  .cellar-home .vision-board {width:calc(100% - 8px);box-shadow:7px 7px 0 var(--vision-shadow);}
+  .cellar-home .vision-board-stage {height:300px;min-height:0;}
+  .cellar-home .vision-ring-outer {width:90%;}.cellar-home .vision-ring-inner {width:57%;}
+  .cellar-home .vision-center {min-width:110px;width:38%;padding:9px;}
+  .cellar-home .vision-center img {width:51px;}
+  .cellar-home .vision-center strong {font-size:.55rem;}
+  .cellar-home .vision-label {font-size:.52rem;padding:7px;box-shadow:3px 3px 0 var(--vision-shadow);}
+  .cellar-home .vision-label-one {left:4%;top:11%;}.cellar-home .vision-label-two {right:4%;top:38%;}.cellar-home .vision-label-three {left:5%;bottom:9%;}
+  .cellar-home .vision-board-top,.cellar-home .vision-board-bottom {font-size:.57rem;padding:11px;}
+  .cellar-home .vision-possibilities,.cellar-home .vision-method {padding:90px 0;}
+  .cellar-home .vision-next h2 {font-size:clamp(2.8rem,11vw,4.8rem);}
+  .cellar-home .vision-next .button {width:100%;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .cellar-home :is(.vision-board,.vision-ring,.vision-label,.vision-board-top i,.vision-marquee-track) {animation:none!important;}
+  .reveal-ready .cellar-home [data-reveal] {opacity:1;transform:none;transition:none;}
+  .cellar-home :is(.vision-tile,.tile-footer b) {transition:none;}
+}
