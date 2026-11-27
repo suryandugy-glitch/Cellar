@@ -1,162 +1,121 @@
-<p align="center"><img src="assets/logo.svg" alt="Cellar Studio" width="420"></p>
+<p align="center">
+  <img src="assets/logo-mark.svg" alt="Cellar Studio logo" width="88">
+</p>
 
-<h1 align="center">Cellar Studio</h1>
+<h1 align="center">CELLAR STUDIO</h1>
 
-<p align="center"><strong>Engineering tools for the problems that break software before release.</strong></p>
+<p align="center"><strong>Find the failure before release.</strong></p>
+<p align="center">Developer tools for the fragile boundaries between data, builds, storage, and software systems.</p>
 
 <p align="center">
-  <a href="https://suryandugy-glitch.github.io/Cellar-Studio/">Company website</a> ·
-  <a href="https://suryandugy-glitch.github.io/Cellar-Studio/guard.html">Cellar Guard</a> ·
-  <a href="docs/CELLAR_STUDIO.md">Products and roadmap</a> ·
-  <a href="docs/CORE_GOVERNANCE.md">Core governance</a> ·
+  <a href="https://cellar-studio-hq.vercel.app/">Company website</a> ·
+  <a href="https://cellar-csv.vercel.app/">Cellar Guard</a> ·
+  <a href="https://cellar-studio-hq.vercel.app/explore.html">Product briefs</a> ·
+  <a href="docs/README.md">Documentation</a> ·
   <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
-<p align="center">
-  <img alt="Open source" src="https://img.shields.io/badge/open%20source-products-145746">
-  <img alt="Platform stage" src="https://img.shields.io/badge/platform-directory%20preview-145746">
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-145746">
-</p>
+<p align="center"><sub>Java 21+ · Local-first tooling · Evidence-driven engineering · MIT licensed</sub></p>
 
 ---
 
-## The company
+## What is Cellar Studio?
 
-**Cellar Studio** is the main company repository and public product hub. We build developer tools that detect fragile boundaries in data exports, builds, databases and storage systems.
+**Cellar Studio** is the parent company identity and public home for a growing set of developer-infrastructure tools. Each product tackles one failure mode and aims to answer four questions:
 
-- **Products:** Cellar Guard (the Java CSV checker), BuildClinic, ClauseCraft and other focused tools.
-- **Studio Labs:** PlanCliff and CrashCheck research work.
-- **Studio workspace (planned):** shared projects, findings, permissions and integrations. The current website is a directory, not an authenticated cross-product backend.
+1. **What failed?** Name the broken contract, invariant, or dependency.
+2. **Where is the evidence?** Make the result reproducible and inspectable.
+3. **Who or what is affected?** Explain the impact in practical terms.
+4. **What happens next?** Provide a useful fix, safe migration, or release decision.
 
-**What works now:** the Studio product directory and the existing Cellar Guard Java 21 CLI/web application. Other tools retain their own repositories and development status. Read the [product map](docs/CELLAR_STUDIO.md) and [repository hierarchy](docs/REPOSITORY_HIERARCHY.md) before assuming everything is one runtime.
+The Studio website is a product directory and documentation experience. It is **not** a unified account system or a production backend for every listed project.
 
-## Cellar Guard — the first product
+### The structure today
 
-Cellar Guard catches CSV changes that would break customer imports before shipping. It contains an offline Java checker, local web workspace, contract-based checks, CI integration and optional AI assistance. The full product guide continues below.
+| Layer | Purpose | Current state |
+| --- | --- | --- |
+| **Cellar Studio** | Company home, product directory, project documentation and common visual language | Live website |
+| **Studio products** | Independent tools with their own code, maintainers and release schedules | Mixed maturity; see below |
+| **Studio Labs** | Systems research with testable hypotheses and reproducible experiments | Research and prototypes |
+| **Shared platform** | Common identity, reports, permissions and cross-product workflows | Planned; not deployed |
 
-## Start here
+This repository was renamed from **Cellar** to **Cellar-Studio**. It still contains the complete **Cellar Guard** Java implementation. A separate child repository for Guard is a future migration, not a completed split. Read the [repository hierarchy](docs/REPOSITORY_HIERARCHY.md) before moving code or changing ownership.
 
-**New to Cellar Studio?** Choose the guide that matches what you want to do:
+## Explore the products
 
-| Goal | Where to go |
-| --- | --- |
-| Understand Cellar in five minutes | [Getting started](docs/GETTING_STARTED.md) |
-| Open a browser-based coding workspace | [GitHub Codespaces setup](docs/DEVELOPMENT_ENVIRONMENT.md) |
-| Find code, backend, tests and website files | [Codebase map](docs/CODEBASE_MAP.md) |
-| Find all technical and product documentation | [Documentation index](docs/README.md) |
-| Contribute a fix or feature | [Contributing](CONTRIBUTING.md) |
-| Explore the Cellar Studio company | [Cellar Studio roadmap](docs/CELLAR_STUDIO.md) |
-| See company structure and core governance | [Core governance](docs/CORE_GOVERNANCE.md) |
+| Project | The problem it tackles | Status | Explore |
+| --- | --- | --- | --- |
+| **Cellar Guard** | CSV exports silently break downstream imports when columns or contracts change | **Working pilot** — Java checker, CLI and local web workspace | [Live demo](https://cellar-csv.vercel.app/) |
+| **Deadlock Sentinel** | Circular waits in JVM thread dumps are difficult to diagnose | **Java prototype / research demo** | [Trace explorer](https://cellar-studio-hq.vercel.app/deadlock.html) · [Run locally](products/deadlock-sentinel/README.md) |
+| **BuildClinic** | Build failures are buried in noisy logs | Early-stage standalone tool | [Product brief](https://cellar-studio-hq.vercel.app/explore.html#buildclinic) |
+| **ClauseCraft** | Teams need an explainable first pass over risky document patterns | Prototype, not legal advice | [Product brief](https://cellar-studio-hq.vercel.app/explore.html#clausecraft) |
+| **PlanCliff** | Database query plans can regress when data distributions change | Research | [Research brief](https://cellar-studio-hq.vercel.app/explore.html#plancliff) |
+| **CrashCheck** | SQLite-backed apps can violate assumptions after abrupt termination | Storage research | [Research brief](https://cellar-studio-hq.vercel.app/explore.html#crashcheck) |
+| **Cellar Learn** | Difficult engineering concepts need clearer interactive explanations | Candidate / exploratory | [Product brief](https://cellar-studio-hq.vercel.app/explore.html#learn) |
 
-**Current status:** Cellar Studio is the company website and product hub; Cellar Guard's Java backend and CLI are implemented in this repository until the product is extracted into its own repo. Other products run independently. The public demonstration website is not the full Java backend.
+**Status labels matter:** a product appearing on the Studio website does not mean it has a production API, shared login, hosted backend, or completed integration with other products. Independent repositories retain their own licenses and contributors.
 
-## What is Cellar Guard?
+## Try Cellar Guard
 
-Cellar is **spell-check for the files other software reads.** Your app produces a CSV. Your customers' tools expect certain columns. If someone renames or removes one, nothing looks wrong on your side, but a customer's import fails days later.
-
-Cellar checks the file *before release*, names the customer workflow that would break, and explains the fix in plain language.
+Cellar Guard checks CSV files against declared contracts **before** a release. For example, a customer import expects `order_id`, but a new export renames it to `id`:
 
 ```text
 FAIL  inventory-report  requires order_id
 PASS  finance-summary   satisfies its contract
-Triage: "order_id" was probably renamed to "id". Keep both until the report is updated.
-Verdict: do not ship.                                   (exit code 1)
+Triage: "order_id" may have been renamed to "id".
+Verdict: do not ship.                         (exit code 1)
 ```
 
-**Who is it for?** Small agencies and product teams that send recurring exports, their team leads, and the support staff who get the angry email when an import breaks. You don't need to be a developer to read the results.
+The [public Guard website](https://cellar-csv.vercel.app/) includes **synthetic demonstrations and sample reports**. It does not run the complete Java backend. To upload your own CSV, edit contracts or keep local run history, start the Java application.
 
-## Quick start
+<a id="quick-start"></a>
 
-The public website includes reports for two synthetic exports. To check your own
-CSV or edit the contracts, start the Java app.
+### Run the real application locally
 
-You need **Java 21+**. No other installs, no account, no sign-in.
+Prerequisite: **JDK 21 or newer**. No Maven, Gradle, npm installation, account, or API key is required for the core checker.
+
+**macOS / Linux**
 
 ```sh
 git clone https://github.com/suryandugy-glitch/Cellar-Studio.git
 cd Cellar-Studio
-sh run.sh            # Windows: run.bat
-```
-
-Running `run.sh` from the repo root creates `./data`; it is ignored and must never be committed.
-The launcher automatically compiles and packages `dist/cellar.jar` from source if not present. If you download a prebuilt `cellar.jar` from GitHub Releases instead, always verify its checksum against `SHA256SUMS.txt` before running:
-```sh
-sha256sum -c dist/SHA256SUMS.txt
-# or on Windows PowerShell:
-# Get-FileHash dist\cellar.jar -Algorithm SHA256
-```
-
-Open the address it prints (usually `http://127.0.0.1:8080`; if that port is busy it picks the next free one).
-
-1. Go to **Check** and press **Breaking demo**, then **Run check**.
-2. Read the answer: Inventory fails, Finance passes, and the agents explain why.
-3. Open **Contracts** to see the rules, or press **Scout a contract** to build rules from your own CSV.
-
-## What you get
-
-| | Feature | In plain words |
-|---|---|---|
-| **Checks** | Contract rules | Required columns, types, ranges, allowed values, unique, not-empty, row counts |
-| **Agents** | Triage | Spots renamed columns and proposes a safe migration |
-| | Release gate | Clear *ship* or *block* verdict on every run |
-| | Reporter | Writes the pull request comment for you |
-| | Drift watch | Flags changes since the last passing export |
-| | Scout | Drafts a contract from a sample CSV in one click |
-| | AI agents *(optional)* | A small agent on each page (explain a result, suggest fixes, draft an owner message, explain a contract or comparison, summarize history and the inbox) and a chat assistant. Works with Anthropic or OpenAI keys. Off until you set `CELLAR_AI_KEY` |
-| **Automation** | Live inbox | Drop a `.csv` into `data/inbox/` and it is checked within seconds |
-| | CLI + CI | Same engine on the command line, exit codes `0` ok / `1` blocked / `2` invalid |
-| **Team** | Contract revisions | Stale edits are rejected; **restore** any earlier version in one click |
-| | Import / export | Move contracts as JSON; download reports as Markdown or JSON |
-| | Activity log | Chained log that shows if it was edited |
-| **Comfort** | Dashboard | Checks run, pass rate, and the health of every integration at a glance |
-| | Add integrations without JSON | A simple form: name, owner, columns |
-| | Filter and export | Show only failures; download history as CSV |
-| | Plain-English results | Every finding says what happened and what to do |
-| | Docs, search, themes | In-app docs, `Ctrl K` command palette, light and dark glass UI |
-| **Safety** | No cell values stored | Reports hold column names, counts and row numbers only |
-| | Hardened server | Encrypted storage, size and rate limits, host/origin checks, strict CSP |
-
-> The first five agents are **built-in rules**: offline, fast and private. The **AI agents** are optional and use your own API key. They receive only the contract, column names, counts, rule codes, recent history and inbox results, plus the question you type. **CSV rows are never sent.**
-
-```sh
-CELLAR_AI_KEY=your-key
-CELLAR_AI_PROVIDER=anthropic      # or openai
-CELLAR_AI_MODEL=claude-sonnet-5-5 # optional
-CELLAR_AI_DAILY_LIMIT=200         # requests per day, default 200
 sh run.sh
 ```
 
-## A contract in 10 lines
+**Windows (PowerShell)**
 
-```json
-{
-  "version": 2,
-  "integrations": [
-    {
-      "id": "inventory-report",
-      "owner": "Inventory team",
-      "required": ["order_id", "sku"],
-      "rules": { "order_id": { "notEmpty": true, "unique": true } }
-    }
-  ]
-}
+```powershell
+git clone https://github.com/suryandugy-glitch/Cellar-Studio.git
+cd Cellar-Studio
+.\run.bat
 ```
 
-Full reference: [docs/CONTRACTS.md](docs/CONTRACTS.md).
+The launcher builds `dist/cellar.jar` if needed and starts the local web workspace. Open the address printed in the terminal (usually **http://127.0.0.1:8080**; a free port is selected if 8080 is occupied).
 
-## Command line
+1. Select **Check → Breaking demo → Run check**.
+2. Inspect the inventory failure, finance pass and suggested migration.
+3. Open **Contracts** to edit rules or use **Scout** to draft a contract from a sample.
+
+Local data is stored under the ignored `data/` directory. **Do not commit customer CSVs, API keys or local data files.**
+
+### Use the CLI
+
+After `java Build.java test` or `java Build.java package` has created the JAR:
 
 ```sh
+java -jar dist/cellar.jar export-demo --out build/sales.csv
 java -jar dist/cellar.jar check --csv build/sales.csv --summary --format markdown
-java -jar dist/cellar.jar diff --baseline old.csv --csv new.csv
 java -jar dist/cellar.jar validate
-java -jar dist/cellar.jar export-demo --out build/sales.csv [--demo-break]
 ```
 
-## Use it in CI
+The checker uses exit code **0** for allowed results, **1** for blocked releases and **2** for invalid input or usage errors. See the [contract format](docs/CONTRACTS.md), [CLI and operations guide](docs/OPERATIONS.md), and [API reference](docs/API.md).
+
+### Use it in CI
+
+The same checker can stop a release when a synthetic or generated export violates a contract:
 
 ```yaml
-name: cellar
+name: csv-contract-check
 on: pull_request
 permissions: { contents: read }
 jobs:
@@ -165,92 +124,96 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
-        with: { distribution: temurin, java-version: 21 }
+        with: { distribution: temurin, java-version: '21' }
       - run: java Build.java package
       - run: java -jar dist/cellar.jar export-demo --out build/sales.csv
       - run: java -jar dist/cellar.jar check --csv build/sales.csv --summary --format markdown
 ```
 
-Point the export step at your real exporter using synthetic data.
+Replace the demo export with a **synthetic fixture generated by your own exporter**. The example does not test real production data or post GitHub comments automatically.
 
-## Share it on a server
+### What you get
 
-Local use needs no settings. For a shared workspace, set `CELLAR_DOMAIN`,
-`CELLAR_ACCESS_KEY` and `CELLAR_MASTER_KEY` in the deployment environment.
-Point the domain at your host, then start the Java service and Caddy together.
+- **Validation:** required columns, data types, numeric ranges, allowed values, uniqueness, not-empty rules and row limits.
+- **Change detection:** schema differences, suspected renames, contract revisions, restoration and drift against a passing baseline.
+- **Release workflow:** clear pass/block verdicts, CLI/CI exit codes, downloadable Markdown/JSON reports and an activity history.
+- **Local automation:** inbox monitoring, contract scouting and offline rule-based explanations.
+- **Optional AI assistance:** metadata-based explanations when the operator configures their own provider key. It is off by default; CSV cell values are not sent to the AI provider.
 
-```sh
-docker compose -f deploy/docker-compose.yml up -d --build --wait
-```
+Guard produces findings against the rules you declare; a successful check is **not** a guarantee that every downstream system will accept every value. There is no shared multi-tenant SaaS or SSO in this repository today.
 
-Use one server per data directory and back up the encrypted data volume and
-its original master key separately. See the
-[deployment and restore guide](docs/WEB_SECURITY.md) for the settings and upgrade steps.
+<a id="build-and-test"></a>
 
-## Build and test
+## Develop and verify
 
-```sh
-java Build.java test     # compiles, runs the test suite, packages dist/cellar.jar
-```
+| Work area | Source | Verification |
+| --- | --- | --- |
+| Java checker, CLI and HTTP API | `src/main/java/` | `java Build.java test` |
+| Java tests | `src/test/java/` | `java Build.java test` |
+| Web UI served by Java | `src/main/resources/web/` | Java tests and a manual local browser check |
+| Studio / Guard static pages | `deploy/pages/` | `sh deploy/build-pages.sh` |
+| Vercel packaging and routing | `deploy/build-vercel.mjs`, `vercel.json` | `node deploy/build-vercel.mjs` |
+| Deadlock Sentinel prototype | `products/deadlock-sentinel/` | [Prototype tests](products/deadlock-sentinel/README.md#test) |
+| Architecture and operating docs | `docs/` | [Documentation index](docs/README.md) |
 
-No Maven, Gradle or downloads needed.
-
-Build the static website with `sh deploy/build-pages.sh`. The files are written
-to `build/pages`. In the repository's **Settings → Pages**, select **GitHub
-Actions** as the source. The **Website** workflow publishes after pushes to
-`main` and can also be run manually.
-
-## Deploy the site and connect the workspace
-
-Import this repository into Vercel and keep the repository root as the project
-root. The settings in `vercel.json` build the overview, animated walkthrough,
-setup guide, and full sample reports with Node.js. The build needs no Java installation or npm dependencies.
-
-The public demo works with no environment variables. To run the full workspace
-from Vercel, deploy Java using the [deployment guide](docs/WEB_SECURITY.md),
-then set both origins.
-
-| Where | Variable | Example |
-|---|---|---|
-| Java host | `CELLAR_FRONTEND_ORIGIN` | `https://cellar.example.com` |
-| Vercel | `CELLAR_WORKSPACE_URL` | `https://cellar-api.example.com` |
-
-Restart Java after changing its allowlist and redeploy Vercel after setting
-the API URL. Open **Open workspace** on the Vercel site and enter the shared
-access key. The browser sends uploads directly to the Java API, which stores
-the contracts and run history. Keep the Java keys on the backend host.
-
-Use the exact HTTPS origin your team visits. Vercel's per-deployment preview
-URLs are distinct origins. Set `CELLAR_WORKSPACE_URL` in the deployment
-environment that uses the allowed origin. Optionally set `CELLAR_SITE_URL`
-to override Vercel's production hostname in page metadata.
-
-Run `node deploy/build-vercel.mjs` locally to build the same output in
-`build/vercel`. When sample data or check output changes, refresh the bundled
-reports from the Java checker:
+Run the core tests:
 
 ```sh
+java Build.java test
 sh deploy/build-pages.sh
-cp build/pages/samples/* deploy/pages/samples/
+node deploy/build-vercel.mjs
 ```
 
-## Troubleshooting
+The build outputs (`dist/` and `build/`) are generated artifacts. The GitHub **Backend** and **Website** workflows provide the pull-request checks; see the [contribution guide](CONTRIBUTING.md) for the expected review process.
 
-| Problem | Fix |
-|---|---|
-| "Operation failed" on start | Read the `DETAIL` line under it. Usually Java older than 21 or an unwritable folder; try `--data some-folder` |
-| Port already in use | Cellar tries the next ports, or run with `--port 9090` |
-| Asked for an access key on localhost | `CELLAR_ACCESS_KEY` is set in your environment; unset it |
-| "Column missing" but it is there | Names must match exactly, including capitals and spaces |
+New contributors can use [GitHub Codespaces](docs/DEVELOPMENT_ENVIRONMENT.md) or a local JDK. No genuine customer data is needed to reproduce the examples.
+
+<a id="share-it-on-a-server"></a>
+<a id="deploy-the-site-and-connect-the-workspace"></a>
+
+## Deployment boundaries
+
+| Component | Deployment | Important distinction |
+| --- | --- | --- |
+| [Cellar Studio](https://cellar-studio-hq.vercel.app/) | Vercel static website | Company pages, product briefs and demonstrations |
+| [Cellar Guard](https://cellar-csv.vercel.app/) | Vercel static demonstration, using the same web build | Synthetic examples; not the persistent Java workspace |
+| Guard Java workspace | Local machine or separately provisioned Java host | Real CSV checks, contract editing, history and API |
+
+Vercel uses `vercel.json` and `node deploy/build-vercel.mjs` to build the public pages. The Guard-specific hostname opens `/guard.html`; the Studio hostname opens the company homepage.
+
+A shared Java deployment requires HTTPS, origin restrictions and server-side keys. Configure the Java host first; connect a separate frontend only with the documented origin settings. **Do not place `CELLAR_ACCESS_KEY` or `CELLAR_MASTER_KEY` in public frontend code.** Follow [security and deployment](docs/WEB_SECURITY.md) and [operations](docs/OPERATIONS.md). The optional AI key remains server-side.
 
 ## Honest limits
 
-A working beta for pilots. One shared workspace, no SSO or per-customer workspaces yet, and no independent security audit. A pass means *your declared rules were met*; it does not prove every value is right for every importer.
+- The public website is a static demonstration. Uploading and storing your own CSV requires the Java workspace.
+- Guard is a **working pilot**, not a multi-tenant production SaaS or an independently audited security product.
+- A passing CSV check only proves that the **declared** rules passed. It does not prove the meaning or correctness of every data value.
+- Studio's shared login, organization permissions, unified report backend and cross-product orchestration are **not implemented**.
+- Research products must publish reproducible evidence before they can be described as production-ready.
 
-## Roadmap
+<a id="roadmap"></a>
 
-Scoped API tokens for CI · per-repository workspaces · Slack and email alerts · GitHub App with PR comments · optional AI explanations.
+## Roadmap and governance
 
-## Contributing
+- **Now:** keep Guard verifiable, improve the Studio product experience, and maintain honest documentation and tests.
+- **Next:** versioned report interchange, stronger CI integrations, and reproducible benchmarks for research tools.
+- **Later:** opt-in shared accounts, project-level permissions and cross-product workflows, subject to security review.
 
-Issues and ideas are welcome at [github.com/suryandugy-glitch/Cellar-Studio](https://github.com/suryandugy-glitch/Cellar-Studio). See [CONTRIBUTING.md](CONTRIBUTING.md). Licensed under the [MIT License](LICENSE).
+Company-level decisions and the current core ownership are documented in [core governance](docs/CORE_GOVERNANCE.md). This is a **public repository**: CODEOWNERS and a public governance file do not make internal information private or revoke GitHub access. Keep confidential operations in a separately access-controlled location.
+
+### Documentation
+
+| Start here | Deeper technical references |
+| --- | --- |
+| [Getting started](docs/GETTING_STARTED.md) | [High-level design](docs/HLD.md) · [Low-level design](docs/LLD.md) |
+| [Company roadmap](docs/CELLAR_STUDIO.md) | [Product requirements](docs/PRD.md) · [Repository hierarchy](docs/REPOSITORY_HIERARCHY.md) |
+| [Codebase map](docs/CODEBASE_MAP.md) | [Contracts](docs/CONTRACTS.md) · [API](docs/API.md) |
+| [Contribution guide](CONTRIBUTING.md) | [Security](SECURITY.md) · [Deployment](docs/WEB_SECURITY.md) |
+
+<a id="contributing"></a>
+
+## Contributing and license
+
+Issues, bug reports and focused pull requests are welcome. Include a reproducible synthetic example, describe the affected product, explain tests and limitations, and preserve existing contributors' attribution. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Licensed under the [MIT License](LICENSE). See [CHANGELOG.md](CHANGELOG.md) for release history.
