@@ -54,7 +54,7 @@ for (const page of ['walkthrough.html', 'guide.html', 'workplace.html', 'studio.
 }
 
 const assets = [
-  ...['theme-system.css', 'theme-system.js', 'studio-footer.css', 'cookie-consent.css', 'cookie-consent.js', 'catalog.css', 'catalog-links.js', 'landing.css', 'landing.js', 'product-theme.css', 'product-shell.js', 'detail-shell.css', 'detail-shell.js', 'explore-base.css', 'deadlock-base.css', 'deadlock-interaction.js', 'minimal-brutal.css', 'neo-bento.css', 'minimal-motion.js', 'studio-vision.css', 'studio-vision.js', 'company-pages.css', 'company-pages.js', 'enquiry-form.js', 'verification-schematic.svg', 'walkthrough.js', 'guide.js', 'trace-grid.svg', 'studio.css', 'studio-brutalist.css', 'studio.js'].map(name => ({ source: site + '/' + name, name })),
+  ...['theme-system.css', 'theme-system.js', 'studio-footer.css', 'cookie-consent.css', 'cookie-consent.js', 'catalog.css', 'catalog-links.js', 'showcase.css', 'showcase.js', 'landing.css', 'landing.js', 'product-theme.css', 'product-shell.js', 'detail-shell.css', 'detail-shell.js', 'explore-base.css', 'deadlock-base.css', 'deadlock-interaction.js', 'minimal-brutal.css', 'neo-bento.css', 'minimal-motion.js', 'studio-vision.css', 'studio-vision.js', 'company-pages.css', 'company-pages.js', 'enquiry-form.js', 'verification-schematic.svg', 'walkthrough.js', 'guide.js', 'trace-grid.svg', 'studio.css', 'studio-brutalist.css', 'studio.js'].map(name => ({ source: site + '/' + name, name })),
   ...['app.css', 'app.js', 'logo.svg'].map(name => ({ source: web + '/' + name, name })),
   ...['passing.csv', 'passing.json', 'breaking.csv', 'breaking.json', 'fixed.csv', 'fixed.json']
     .map(file => ({ source: site + '/samples/' + file, name: 'samples/' + file }))

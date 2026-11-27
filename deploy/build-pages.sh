@@ -10,7 +10,6 @@ samples="$site/samples"
 mkdir -p "$samples"
 cp "$web/app.css" "$web/app.js" "$web/logo.svg" "$site/"
 cp deploy/pages/*.html deploy/pages/*.css deploy/pages/*.js deploy/pages/*.svg "$site/"
-node deploy/catalog.mjs "$site"
 # Company homepage at /; preserve the existing CSV product page at /guard.html.
 cp "$site/index.html" "$site/guard.html"
 cp "$site/studio.html" "$site/index.html"
@@ -41,4 +40,5 @@ awk 'BEGIN { FS = "," } { alias = NR == 1 ? "id" : $1; sub(/,/, "," alias ","); 
 java -jar dist/cellar.jar check --config cellar.json \
   --csv "$samples/fixed.csv" --format json > "$samples/fixed.json"
 
+node deploy/catalog.mjs "$site"
 node deploy/theme-inject.mjs "$site"

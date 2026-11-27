@@ -80,12 +80,12 @@ assert.match(consentScript, /data-privacy-allow/);
 assert.match(consentScript, /if \(!preferences\?\.embeds\)/);
 assert.doesNotMatch(consentScript, /gtag\s*\(|facebook\.com\/tr|google-analytics/);
 assert.ok(files.length >= 40, 'all company policy and legacy pages should be published');
-assert.doesNotMatch(home, /See the products|href="\.\/product-/);
-for (const file of ['explore.html', 'downloads.html']) {
-  const html = await readFile(resolve(root, file), 'utf8');
-  assert.match(html, /coming soon/i);
-  assert.doesNotMatch(html, /href="\.\/product-|class="tile product-card"/);
+for (const file of ['index.html','studio.html','explore.html']) {
+  const html = await readFile(resolve(root,file),'utf8');
+  assert.match(html,/class="showcase-rail"/);
+  assert.match(html,/href=".\/product-guard.html"/);
 }
+assert.match(await readFile(resolve(root,'downloads.html'),'utf8'),/coming soon/i);
 const js = await readFile(resolve(root, 'theme-system.js'), 'utf8');
 assert.match(js, /localStorage\.setItem/);
 assert.match(js, /Switch to/);

@@ -86,6 +86,20 @@ with sync_playwright() as playwright:
     page.keyboard.press('Escape')
     assert page.get_by_role('button', name='Open navigation').get_attribute('aria-expanded') == 'false'
 
+    page.goto(BASE + 'explore.html')
+    rail = page.locator('.showcase-rail')
+    rail.scroll_into_view_if_needed()
+    page.mouse.move(0, 0)
+    page.wait_for_function("document.querySelector('.showcase-rail').scrollLeft > 20", timeout=12000)
+    page.get_by_role('button', name='Pause automatic scrolling').click()
+    page.emulate_media(reduced_motion='reduce')
+    page.reload()
+    assert page.get_by_role('button', name='Play automatic scrolling').is_visible()
+    page.get_by_role('button', name='Next products').click()
+    assert rail.evaluate('element => element.scrollLeft') > 0
+    page.get_by_role('button', name='Previous products').click()
+    assert rail.evaluate('element => element.scrollLeft') < 5
+
     assert not errors, errors
     print(f'Checked {len(ROUTES)} routes at four widths, privacy choices, enquiry validation and mobile menu.')
     browser.close()
