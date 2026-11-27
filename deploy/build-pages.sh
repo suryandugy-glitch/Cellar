@@ -14,7 +14,12 @@ cp deploy/pages/*.html deploy/pages/*.css deploy/pages/*.js deploy/pages/*.svg "
 # Company homepage at /; preserve the existing CSV product page at /guard.html.
 cp "$site/index.html" "$site/guard.html"
 cp "$site/studio.html" "$site/index.html"
-sed 's/<html /<html data-preview /' "$web/index.html" > "$site/demo.html"
+awk '
+  /<html / { sub(/<html /, "<html data-preview ") }
+  /<\/head>/ { print "  <link rel=\"stylesheet\" href=\"./neo-bento.css\">" }
+  /<body>/ { sub(/<body>/, "<body class=\"cellar-workspace-demo\">") }
+  { print }
+' "$web/index.html" > "$site/demo.html"
 
 java -jar dist/cellar.jar export-demo --out "$samples/passing.csv"
 java -jar dist/cellar.jar export-demo --out "$samples/breaking.csv" --demo-break
