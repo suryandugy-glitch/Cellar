@@ -1,26 +1,11 @@
 'use strict';
 
 (() => {
-  const themeToggle = document.querySelector('.theme-toggle');
-  function applyTheme(theme) {
-    const selected = theme === 'light' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = selected;
-    try { localStorage.setItem('cellar_theme', selected); } catch { /* Theme still works for this page. */ }
-    const dark = selected === 'dark';
-    if (themeToggle) {
-      themeToggle.setAttribute('aria-label', 'Theme: ' + selected);
-      themeToggle.setAttribute('aria-pressed', String(dark));
-      themeToggle.querySelector('.theme-name').textContent = dark ? 'Dark' : 'Light';
-    }
-    const color = document.querySelector('meta[name="theme-color"]');
-    if (color) color.content = dark ? '#111110' : '#f6f5ef';
-  }
-  let savedTheme = 'dark';
-  try { savedTheme = localStorage.getItem('cellar_theme') || 'dark'; } catch { /* Use dark mode if storage is unavailable. */ }
-  applyTheme(savedTheme);
-  themeToggle?.addEventListener('click', () => {
-    applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
-  });
+  // All public Cellar Studio pages use one accessible, light-only palette.
+  // Do not restore a previously saved dark-mode preference.
+  document.documentElement.dataset.theme = 'light';
+  const color = document.querySelector('meta[name="theme-color"]');
+  if (color) color.content = '#f6f5ef';
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!reduced) {

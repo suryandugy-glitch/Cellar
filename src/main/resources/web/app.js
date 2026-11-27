@@ -114,13 +114,6 @@ function storageWrite(storage, key, value) {
   } catch { /* The active session can continue if browser storage is disabled. */ }
 }
 
-function setTheme(theme) {
-  const selected = theme === 'light' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = selected;
-  storageWrite('localStorage', 'cellar_theme', selected);
-  document.querySelector('meta[name="theme-color"]').content = selected === 'dark' ? '#111713' : '#f4f6f3';
-}
-
 async function api(path, method = 'GET', body) {
   const headers = { Accept: 'application/json' };
   if (state.session?.keyRequired && state.accessKey) headers['X-Access-Key'] = state.accessKey;
@@ -287,7 +280,7 @@ function shell(id, content) {
   const closeMenu = button('Close navigation', () => toggleMenu(false), { style: 'square mobile-menu mobile-close', glyph: 'close' });
   const healthDot = node('span', { class: 'dot', 'aria-hidden': 'true' });
   const healthTitle = node('strong', {}, 'Server ready');
-  const healthDetail = node('small', {}, state.session.version ? 'v' + state.session.version : 'Cellar Java');
+  const healthDetail = node('small', {}, state.session?.version ? 'v' + state.session.version : 'Cellar Java');
   const connection = node('div', { class: 'connection', role: 'status', 'aria-live': 'polite' }, healthDot, healthTitle, healthDetail);
   const docs = sections.find(section => section[0] === 'docs');
   const pick = ids => sections.filter(section => ids.includes(section[0])).map(navItem);
@@ -312,8 +305,7 @@ function shell(id, content) {
     node('div', { class: 'breadcrumb' }, menu, node('span', { class: 'muted crumb-root' }, 'Workspace'), icon('chevron'), node('strong', {}, label)),
     node('div', { class: 'actions' },
       node('button', { class: 'btn', type: 'button', onclick: palette, 'aria-label': 'Search workspace' },
-        icon('search'), node('span', { class: 'search-label' }, 'Search'), node('kbd', { class: 'kbd' }, 'Ctrl K')),
-      themeButton()));
+        icon('search'), node('span', { class: 'search-label' }, 'Search'), node('kbd', { class: 'kbd' }, 'Ctrl K'))));
   function toggleMenu(open) {
     sidebar.classList.toggle('open', open);
     menu.setAttribute('aria-expanded', String(open));
@@ -327,7 +319,7 @@ function shell(id, content) {
   async function refreshHealth() {
     try {
       await api('ready');
-      if (!healthKnown) { healthTitle.textContent = 'Server ready'; healthDetail.textContent = state.session.version ? 'v' + state.session.version : 'Cellar Java'; }
+      if (!healthKnown) { healthTitle.textContent = 'Server ready'; healthDetail.textContent = state.session?.version ? 'v' + state.session.version : 'Cellar Java'; }
       healthDot.classList.remove('down'); healthKnown = true;
     } catch {
       if (healthKnown) { healthTitle.textContent = 'Server unavailable'; healthDetail.textContent = 'Check the Java process'; }
@@ -341,18 +333,6 @@ function shell(id, content) {
   }, 30000);
   return node('div', { class: 'layout' }, sidebar, node('div', {}, top,
     node('main', { class: 'content', id: 'main-content', tabindex: '-1' }, content)));
-}
-
-function themeButton() {
-  const dark = document.documentElement.dataset.theme === 'dark';
-  const label = dark ? 'Switch to light theme' : 'Switch to dark theme';
-  const control = button(label, () => {
-    setTheme(dark ? 'light' : 'dark');
-    const next = themeButton();
-    control.replaceWith(next);
-    next.focus();
-  }, { style: 'square', glyph: dark ? 'sun' : 'moon', title: label });
-  return control;
 }
 
 function illustration() {
@@ -1324,7 +1304,8 @@ if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && window.mat
     });
   }, { passive: true });
 }
-setTheme(storageRead('localStorage', 'cellar_theme') || 'dark');
+document.documentElement.dataset.theme = 'light';
+document.querySelector('meta[name="theme-color"]').content = '#f6f5ef';
 backToTopControl();
 if (preview) render();
 else void connect();
