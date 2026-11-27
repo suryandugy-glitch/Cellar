@@ -12,7 +12,7 @@ The **Cellar Studio** platform is intended to apply that same evidence-first app
 
 ### I just want to see what Cellar does
 
-Open the [Cellar Guard sample demonstration](https://suryandugy-glitch.github.io/Cellar-Studio/guard.html). It uses synthetic sample reports; it is **not** the full Java backend.
+Open the [Cellar Guard sample demonstration](https://cellar-csv.vercel.app/). It uses synthetic sample reports; it is **not** the full Java backend.
 
 ### I want to run the actual application
 
@@ -46,7 +46,7 @@ The first command compiles and runs the Java tests. The second checks the config
 
 ## Where your changes should go
 
-- Java validation, API, web UI bundled with the backend: this **Cellar** repository.
+- Java validation, API and the web UI bundled with the backend: this **Cellar-Studio** repository, until Guard is extracted into its own child repository.
 - Static website and demo pages: this repository's `deploy/` code.
 - Other Cellar Studio products, such as BuildClinic or PlanCliff: **their own repos**.
 - Cross-product strategy, shared interfaces and documentation: `docs/CELLAR_STUDIO.md` and focused issues here, until a dedicated hub exists.
