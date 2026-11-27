@@ -28,7 +28,9 @@ if (workspaceOrigin) {
     'href="./guide.html#quick-start">Workspace setup');
 }
 
-const demo = await readFile(new URL(web + '/index.html', root), 'utf8');
+const demo = (await readFile(new URL(web + '/index.html', root), 'utf8'))
+  .replace('</head>', '  <link rel="stylesheet" href="./neo-bento.css">\n</head>')
+  .replace('<body>', '<body class="cellar-workspace-demo">');
 await rm(output, { recursive: true, force: true });
 await mkdir(new URL('samples/', output), { recursive: true });
 await writeFile(new URL('index.html', output), restrictConnections(studio));
@@ -53,7 +55,7 @@ for (const page of ['walkthrough.html', 'guide.html', 'workplace.html', 'studio.
 
 const assets = [
   { source: site + '/SpaceFix.zip', name: 'SpaceFix.zip' },
-  ...['landing.css', 'landing.js', 'product-theme.css', 'product-shell.js', 'detail-shell.css', 'detail-shell.js', 'minimal-brutal.css', 'minimal-motion.js', 'verification-schematic.svg', 'walkthrough.js', 'guide.js', 'trace-grid.svg', 'studio.css', 'studio-brutalist.css', 'studio.js'].map(name => ({ source: site + '/' + name, name })),
+  ...['landing.css', 'landing.js', 'product-theme.css', 'product-shell.js', 'detail-shell.css', 'detail-shell.js', 'minimal-brutal.css', 'neo-bento.css', 'minimal-motion.js', 'verification-schematic.svg', 'walkthrough.js', 'guide.js', 'trace-grid.svg', 'studio.css', 'studio-brutalist.css', 'studio.js'].map(name => ({ source: site + '/' + name, name })),
   ...['app.css', 'app.js', 'logo.svg'].map(name => ({ source: web + '/' + name, name })),
   ...['passing.csv', 'passing.json', 'breaking.csv', 'breaking.json', 'fixed.csv', 'fixed.json']
     .map(file => ({ source: site + '/samples/' + file, name: 'samples/' + file }))

@@ -13,7 +13,7 @@
       themeToggle.querySelector('.theme-name').textContent = dark ? 'Dark' : 'Light';
     }
     const color = document.querySelector('meta[name="theme-color"]');
-    if (color) color.content = dark ? '#080b12' : '#f5f6fb';
+    if (color) color.content = dark ? '#111110' : '#f6f5ef';
   }
   let savedTheme = 'dark';
   try { savedTheme = localStorage.getItem('cellar_theme') || 'dark'; } catch { /* Use dark mode if storage is unavailable. */ }
