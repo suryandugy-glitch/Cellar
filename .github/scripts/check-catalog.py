@@ -66,7 +66,9 @@ with sync_playwright() as playwright:
     assert 'Nothing has been sent' in page.locator('#enquiry-status').inner_text()
     page.locator('#enquiry-topic').select_option(label='Collaboration idea')
     page.locator('#enquiry-message').fill('A sample project collaboration enquiry.')
-    page.locator('#enquiry-consent').check()
+    # Operate the checkbox through the keyboard to verify keyboard support.
+    page.locator('#enquiry-consent').press('Space')
+    assert page.locator('#enquiry-consent').is_checked()
     page.get_by_role('button', name='Copy enquiry to clipboard').click()
     status = page.locator('#enquiry-status').inner_text()
     assert 'not been sent' in status.lower() or 'nothing has been sent' in status.lower(), status
