@@ -2,13 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const studio = 'https://github.com/suryandugy-glitch/';
-const release = studio + 'Cellar-Studio/releases/download/spacefix-v1.1.0/';
 const products = [
-  { id:'spacefix', name:'Cellar SpaceFix', area:'Desktop storage', status:'Windows utility', kind:'pilot',
-    intro:'Find forgotten space without risking your files.', description:'Private on-device recommendations, SHA-256 duplicate matches, a bold desktop review interface, and byte-verified copies to a second drive.',
-    audience:'Windows users with a full system drive and a second volume for personal files.',
-    workflow:'Scan a personal folder and see explainable size, age and duplicate insights. Choose files manually, copy them to another volume, verify each byte, and separately approve any recycling.',
-    example:['Source','Personal videos on C:','Destination','Archive folder on D:','Check','Original and copy match'], action:['SpaceFix downloads','./spacefix-downloads.html'] },
   { id:'guard', name:'Cellar Guard', area:'Data compatibility', status:'Working pilot', kind:'pilot',
     intro:'Catch a broken CSV export before it ships.', description:'Check an export against the column names and rules that downstream customers rely on.',
     audience:'Teams shipping recurring CSV files to customers or internal reporting systems.',
@@ -63,7 +57,7 @@ for (const p of products) {
   const fields = p.example.map((v,i)=>i%2 ? `<dd>${v}</dd>` : `<dt>${v}</dt>`).join('');
   await save('product-'+p.id,p.name,back('Products','./explore.html')+`<section class="hero"><div>${head(p.area,p.name,p.intro)}<div class="actions">${link(action)}${p.extra?link(p.extra)+link(['Source downloads','./'+p.id+'-downloads.html']):''}</div></div><aside class="spec"><h2>Workflow example</h2><dl>${fields}</dl></aside></section><section class="brief"><h2>Product brief</h2><div><p class="label">${p.status}</p><p class="desc">${p.description}</p><h3>Who it helps</h3><p>${p.audience}</p><h3>How it works</h3><p>${p.workflow}</p>${p.repo?'<p class="note">The source download contains project files for local development.</p>':''}</div></section>`);
 }
-for (const p of products.filter(p=>p.id!=='spacefix')) {
+for (const p of products) {
   const shared = !p.repo;
   const source = studio + (p.repo ?? 'Cellar-Studio') + '/archive/HEAD.zip';
   const instructions = p.id==='guard' ? 'Extract the Studio source archive and run the launcher at its root with Java 21 or newer.'
@@ -71,8 +65,7 @@ for (const p of products.filter(p=>p.id!=='spacefix')) {
     : 'Extract the project archive and open its README for development and setup instructions.';
   await save(p.id+'-downloads',p.name+' downloads',back(p.name,'./product-'+p.id+'.html')+head(p.area,p.name+' downloads','Project source for local development.')+tile('Download source ZIP',source,shared?'Cellar Studio repository · source archive':p.repo+' · source archive')+'<section class="brief"><h2>Getting started</h2><div><p>'+instructions+'</p>'+(p.extra?link(p.extra):'')+'</div></section>');
 }
-await save('downloads','Downloads',head('Distribution','Downloads','Choose a product to see its available files and setup instructions.')+'<div class="tiles">'+products.map(p=>tile(p.name,'./'+p.id+'-downloads.html',p.id==='spacefix'?'Windows x64 · Desktop release':'Project source · ZIP')).join('')+'</div>');
-await save('spacefix-downloads','SpaceFix downloads',back('Cellar SpaceFix','./product-spacefix.html')+head('Windows x64 · Version 1.1.0','SpaceFix downloads','Choose how you want to open SpaceFix. Both Windows executables include Java.')+`<div class="tiles">${tile('Download SpaceFix.exe',release+'SpaceFix.exe','Windows x64 · Java included')}${tile('Download SpaceFix Setup',release+'SpaceFix-Setup.exe','Windows x64 · Java included')}</div><section class="brief"><h2>After downloading</h2><div><h3>Direct launch</h3><p>Open Downloads and double-click SpaceFix.exe. The window opens after its runtime extracts. Choose a personal folder and a second drive to begin.</p><h3>Installed version</h3><p>Run SpaceFix-Setup.exe, complete setup, and open SpaceFix from the Start menu.</p><h3>Java edition</h3><p>For a desktop with Java 21 or newer, extract the archive and run SpaceFix.jar.</p>${link(['Download Java ZIP',release+'SpaceFix.zip'])}</div></section>`);
+await save('downloads','Downloads',head('Distribution','Downloads','Choose a product to see its available files and setup instructions.')+'<div class="tiles">'+products.map(p=>tile(p.name,'./'+p.id+'-downloads.html','Project source · ZIP')).join('')+'</div>');
 await save('services','Services',head('Studio collaboration','Services','Explore the work contributors can take on across Cellar Studio projects.')+'<div class="tiles">'+services.map(([id,name,desc])=>tile(name,'./service-'+id+'.html',desc)).join('')+'</div>');
 for (const [id,name,desc,scope,result] of services) {
   await save('service-'+id,name,back('Services','./services.html')+head('Studio collaboration',name,desc)+`<section class="brief"><h2>Service brief</h2><div><h3>Scope of work</h3><p>${scope}</p><h3>Deliverables</h3><p>${result}</p>${link(['Contribution guide','./handbook.html#contribute'])}</div></section>`);
