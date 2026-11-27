@@ -8,6 +8,17 @@ Choose a folder containing personal documents or media. SpaceFix lists its visib
 
 Close applications that may modify the files during transfer and review. Use this tool for ordinary personal files. Application data, cloud placeholders, alternate streams, filesystem permissions, and system folders are outside its scope. A failed or interrupted copy leaves the originals in place. Inspect any incomplete destination batch before retrying. Closing the app discards its cleanup selection.
 
+## AI Agent
+
+Choose **AI AGENT** and pick a folder (your user folder works well). The agent runs entirely on your computer with no network access and no account. It reads file names, sizes and dates, and hashes files only to prove two are identical. It then proposes what could go, in two groups:
+
+- **SAFE**: leftover temp and crash files, old logs, thumbnail and regenerable caches, and your system Temp folder.
+- **REVIEW**: old installers, large archives, large untouched videos or files, and exact duplicates. These need your decision.
+
+It never lists documents, photos, source code, databases, keys, mail files, Windows, Program Files, AppData, or cloud-synced folders such as OneDrive and Dropbox. It changes nothing on its own. Every removal needs your confirmation, goes to the Recycle Bin so you can restore it, and is skipped if the file changed after the scan. REVIEW items can instead be sent to the copy-and-verify flow above.
+
+The agent is a rule-based engine, not a language model, so it can miss things and it can be wrong about what you still need. Look at the REVIEW list before you confirm.
+
 ## Build and test
 
 From this directory run `sh package.sh` with a Java 21 JDK and Python 3. It tests the transfer engine and writes the website download to deploy/pages/SpaceFix.zip.

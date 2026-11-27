@@ -4,9 +4,20 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.*;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 
@@ -131,9 +142,10 @@ public final class SpaceFix {
 
     static final class Row extends DefaultListCellRenderer {
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean sel, boolean focus) {
-            var item = (Item) value;
             var c = (JLabel) super.getListCellRendererComponent(list, "", index, sel, false);
-            c.setText(String.format("%10s   %s", human(item.size()), item.path()));
+            c.setText(value instanceof Finding f
+                    ? String.format("%-6s %9s   %s   —   %s", f.verdict(), human(f.size()), f.path(), f.reason())
+                    : String.format("%10s   %s", human(((Item) value).size()), ((Item) value).path()));
             c.setFont(mono(Font.BOLD, 13f));
             c.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createMatteBorder(0, 0, 2, 0, INK), BorderFactory.createEmptyBorder(8, 10, 8, 10)));
@@ -182,6 +194,7 @@ public final class SpaceFix {
     final JButton transfer = new Block("2  COPY TO OTHER DRIVE");
     final JButton cleanup = new Block("3  RECYCLE ORIGINALS");
     final JButton open = new Block("OPEN COPIES");
+    final JButton agent = new Block("AI AGENT");
     Path batch;
     List<Item> verified = List.of();
 
@@ -213,6 +226,7 @@ public final class SpaceFix {
         cleanup.setEnabled(ready && !verified.isEmpty() && Desktop.isDesktopSupported()
                 && Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH));
         open.setEnabled(ready && batch != null);
+        agent.setEnabled(ready);
         count.setText(model.size() + " FILES" + (files.getSelectedIndices().length > 0
                 ? "  /  " + files.getSelectedIndices().length + " PICKED" : ""));
         steps[0].light(model.isEmpty());
@@ -303,6 +317,240 @@ public final class SpaceFix {
         });
     }
 
+
+    // ---- Agent: an offline, rule-based analyst. It only reads names, sizes and dates, never file contents
+    // (except hashing to prove duplicates), and it can only propose. Nothing moves without a confirmation,
+    // and everything it removes goes to the Recycle Bin, where it can be restored. ----
+    enum Verdict { SAFE, REVIEW }
+    record Finding(Path path, long size, long modified, Verdict verdict, String reason) {}
+    record Report(List<Finding> findings, long scanned) {}
+
+    static final long DAY = 86_400_000L, MB = 1_048_576L;
+    /** Folders the agent never enters: operating system, programs, app data, credentials, cloud-synced folders. */
+    static final Set<String> OFF_LIMITS = Set.of("windows", "program files", "program files (x86)", "programdata",
+            "$recycle.bin", "system volume information", "appdata", "library", "system", "applications", "bin", "sbin",
+            "usr", "etc", "var", "proc", "sys", "dev", ".git", ".ssh", ".gnupg", "onedrive", "dropbox",
+            "google drive", "icloud drive", "iclouddrive");
+    /** Anything that looks like the user's own work is never flagged, whatever its age. */
+    static final Set<String> KEEP_EXT = Set.of("doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf", "txt", "md", "odt",
+            "ods", "odp", "rtf", "csv", "json", "xml", "jpg", "jpeg", "png", "gif", "heic", "raw", "cr2", "nef", "psd",
+            "ai", "svg", "kdbx", "key", "pem", "pfx", "wallet", "sql", "db", "sqlite", "mdb", "accdb", "one", "dwg",
+            "pst", "ost", "java", "py", "js", "ts", "c", "cpp", "h", "cs", "go", "rs", "html", "css");
+    static final Set<String> JUNK_EXT = Set.of("tmp", "dmp", "chk");
+    static final Set<String> CACHE_DIRS = Set.of("cache", "caches", "code cache", "gpucache", "__pycache__", ".cache",
+            "shadercache");
+    static final Set<String> INSTALLER_EXT = Set.of("exe", "msi", "msix", "dmg", "pkg", "iso", "deb", "rpm");
+    static final Set<String> ARCHIVE_EXT = Set.of("zip", "rar", "7z", "tar", "gz", "tgz");
+    static final Set<String> MEDIA_EXT = Set.of("mp4", "mkv", "mov", "avi", "wmv", "webm", "wav", "flac");
+
+    static Finding classify(Path rel, Path file, long size, long modified, long now, boolean systemTemp) {
+        String name = file.getFileName().toString().toLowerCase(Locale.ROOT);
+        String ext = name.lastIndexOf('.') < 0 ? "" : name.substring(name.lastIndexOf('.') + 1);
+        long days = Math.max(0, (now - modified) / DAY);
+        if (systemTemp)
+            return days >= 3 ? new Finding(file, size, modified, Verdict.SAFE, "Temp file untouched for " + days + " days") : null;
+        if (KEEP_EXT.contains(ext)) return null;
+        if (name.equals("thumbs.db") || name.equals(".ds_store"))
+            return new Finding(file, size, modified, Verdict.SAFE, "Thumbnail cache Windows or macOS rebuilds");
+        if (JUNK_EXT.contains(ext) && days >= 3)
+            return new Finding(file, size, modified, Verdict.SAFE, "Leftover temporary or crash file, " + days + " days old");
+        if (ext.equals("log") && days >= 30)
+            return new Finding(file, size, modified, Verdict.SAFE, "Log file untouched for " + days + " days");
+        var parent = rel.getParent();
+        if (parent != null && days >= 7)
+            for (Path part : parent)
+                if (CACHE_DIRS.contains(part.toString().toLowerCase(Locale.ROOT)))
+                    return new Finding(file, size, modified, Verdict.SAFE, "Regenerable cache");
+        if (days < 14) return null;
+        if (INSTALLER_EXT.contains(ext) && days >= 60)
+            return new Finding(file, size, modified, Verdict.REVIEW, "Installer, " + days + " days old. Likely already used");
+        if (ARCHIVE_EXT.contains(ext) && size >= 50 * MB && days >= 90)
+            return new Finding(file, size, modified, Verdict.REVIEW, "Large archive untouched for " + days + " days");
+        if (MEDIA_EXT.contains(ext) && size >= 500 * MB && days >= 90)
+            return new Finding(file, size, modified, Verdict.REVIEW, "Large video or audio untouched for " + days + " days");
+        if (size >= 500 * MB && days >= 180)
+            return new Finding(file, size, modified, Verdict.REVIEW, "Large file untouched for " + days + " days");
+        return null;
+    }
+
+    static void walk(Path top, boolean systemTemp, long now, List<Finding> out, Map<Long, List<Path>> bySize, long[] scanned)
+            throws IOException {
+        Files.walkFileTree(top, new SimpleFileVisitor<>() {
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes a) {
+                boolean blocked = !systemTemp && !dir.equals(top)
+                        && OFF_LIMITS.contains(dir.getFileName().toString().toLowerCase(Locale.ROOT));
+                return blocked ? FileVisitResult.SKIP_SUBTREE : FileVisitResult.CONTINUE;
+            }
+            public FileVisitResult visitFile(Path file, BasicFileAttributes a) {
+                if (!a.isRegularFile()) return FileVisitResult.CONTINUE;
+                if (++scanned[0] > 500_000) return FileVisitResult.TERMINATE;
+                var f = classify(top.relativize(file), file, a.size(), a.lastModifiedTime().toMillis(), now, systemTemp);
+                if (f != null) out.add(f);
+                if (!systemTemp && a.size() >= MB) bySize.computeIfAbsent(a.size(), k -> new ArrayList<>()).add(file);
+                return FileVisitResult.CONTINUE;
+            }
+            public FileVisitResult visitFileFailed(Path file, IOException e) { return FileVisitResult.CONTINUE; }
+        });
+    }
+
+    static long mtime(Path p) {
+        try { return Files.getLastModifiedTime(p).toMillis(); } catch (IOException e) { return Long.MAX_VALUE; }
+    }
+
+    static String sha256(Path file) throws IOException {
+        try (InputStream in = Files.newInputStream(file)) {
+            var digest = MessageDigest.getInstance("SHA-256");
+            var buffer = new byte[1 << 20];
+            for (int n; (n = in.read(buffer)) > 0; ) digest.update(buffer, 0, n);
+            return HexFormat.of().formatHex(digest.digest());
+        } catch (NoSuchAlgorithmException e) { throw new IllegalStateException(e); }
+    }
+
+    /** Reads {@code root} (and the user's system temp folder if given) and proposes what could go. Deletes nothing. */
+    static Report analyze(Path root, Path tempRoot) throws IOException {
+        if (root.getParent() == null) throw new IOException("Choose a personal folder inside the drive.");
+        long now = System.currentTimeMillis();
+        var found = new ArrayList<Finding>();
+        var bySize = new HashMap<Long, List<Path>>();
+        long[] scanned = {0};
+        walk(root, false, now, found, bySize, scanned);
+        if (tempRoot != null && !root.startsWith(tempRoot) && !tempRoot.startsWith(root))
+            walk(tempRoot, true, now, found, bySize, scanned);
+        var flagged = new HashSet<Path>();
+        found.forEach(f -> flagged.add(f.path()));
+        long hashed = 0;
+        for (var group : bySize.values()) {
+            if (group.size() < 2) continue;
+            if (hashed > 8192 * MB) break;
+            var byHash = new HashMap<String, List<Path>>();
+            for (Path p : group) {
+                try { byHash.computeIfAbsent(sha256(p), k -> new ArrayList<>()).add(p); hashed += Files.size(p); }
+                catch (IOException skipped) {}
+            }
+            for (var same : byHash.values()) {
+                if (same.size() < 2) continue;
+                same.sort(Comparator.comparingLong(SpaceFix::mtime).thenComparingInt(p -> p.toString().length()));
+                Path keep = same.getFirst();
+                for (Path dup : same.subList(1, same.size())) {
+                    try {
+                        if (flagged.contains(dup) || Files.isSameFile(keep, dup)) continue;
+                        found.add(new Finding(dup, Files.size(dup), mtime(dup), Verdict.REVIEW, "Identical copy of " + keep));
+                    } catch (IOException skipped) {}
+                }
+            }
+        }
+        found.sort(Comparator.comparingLong(Finding::size).reversed());
+        return new Report(found.size() > 3000 ? List.copyOf(found.subList(0, 3000)) : List.copyOf(found), scanned[0]);
+    }
+
+    /** Moves files to the Recycle Bin, skipping any that changed since the scan. Returns {moved, skipped}. */
+    static int[] recycle(List<Finding> picked) {
+        int moved = 0, skipped = 0;
+        for (var f : picked) {
+            try {
+                var a = Files.readAttributes(f.path(), BasicFileAttributes.class, NOFOLLOW_LINKS);
+                if (!a.isRegularFile() || a.size() != f.size() || a.lastModifiedTime().toMillis() != f.modified()
+                        || !Desktop.getDesktop().moveToTrash(f.path().toFile())) { skipped++; continue; }
+                moved++;
+            } catch (IOException | RuntimeException e) { skipped++; }
+        }
+        return new int[]{moved, skipped};
+    }
+
+    static long total(Collection<Finding> list, Verdict v) {
+        return list.stream().filter(f -> f.verdict() == v).mapToLong(Finding::size).sum();
+    }
+
+    void agent() {
+        Path root = folder("Choose a folder for the agent to analyse (try your user folder)");
+        if (root == null) return;
+        Path temp;
+        try { temp = Path.of(System.getProperty("java.io.tmpdir")).toRealPath(); } catch (Exception e) { temp = null; }
+        Path tempRoot = temp;
+        work("AGENT IS READING NAMES, SIZES AND DATES. NOTHING IS CHANGED.", () -> analyze(root.toRealPath(), tempRoot), report -> {
+            if (report.findings().isEmpty()) {
+                status.setText("AGENT LOOKED AT " + report.scanned() + " FILES AND FOUND NOTHING WORTH REMOVING.");
+                JOptionPane.showMessageDialog(frame, "The agent found nothing it considers safe or worth reviewing.", "SpaceFix agent", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            status.setText("AGENT REPORT READY: " + report.findings().size() + " SUGGESTIONS.");
+            agentDialog(report).setVisible(true);
+        });
+    }
+
+    JDialog agentDialog(Report report) {
+        var dialog = new JDialog(frame, "SPACEFIX AGENT", true);
+        var model = new DefaultListModel<Finding>();
+        model.addAll(report.findings());
+        var list = new JList<>(model);
+        list.setCellRenderer(new Row());
+        var summary = new JLabel();
+        Runnable refresh = () -> {
+            var current = Collections.list(model.elements());
+            summary.setText("<html>AGENT READ " + String.format("%,d", report.scanned()) + " FILES.<br>SAFE TO RECYCLE: <b>"
+                    + human(total(current, Verdict.SAFE)) + "</b>  ·  NEEDS YOUR REVIEW: <b>"
+                    + human(total(current, Verdict.REVIEW)) + "</b><br>DOCUMENTS, PHOTOS, CODE, SYSTEM, APP DATA AND CLOUD FOLDERS ARE NEVER LISTED.</html>");
+        };
+        refresh.run();
+        boolean trash = Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH);
+        var safe = new Block("RECYCLE ALL SAFE");
+        var picked = new Block("RECYCLE PICKED");
+        var toCopy = new Block("SEND PICKED TO COPY FLOW");
+        var close = new Block("CLOSE");
+        safe.setEnabled(trash);
+        picked.setEnabled(trash);
+
+        java.util.function.BiConsumer<List<Finding>, String> run = (items, warning) -> {
+            if (items.isEmpty()) return;
+            var size = items.stream().mapToLong(Finding::size).sum();
+            if (JOptionPane.showConfirmDialog(dialog, "MOVE " + items.size() + " FILES (" + human(size) + ") TO THE RECYCLE BIN?\n"
+                    + warning + "\nYou can restore them from the Recycle Bin.", "Confirm", JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) return;
+            int[] result = recycle(items);
+            for (var f : items) if (!Files.exists(f.path())) model.removeElement(f);
+            refresh.run();
+            status.setText(result[0] + " FILES RECYCLED" + (result[1] > 0 ? ", " + result[1] + " SKIPPED (CHANGED OR UNAVAILABLE)." : ".")
+                    + " EMPTY THE RECYCLE BIN TO RECLAIM SPACE.");
+        };
+        safe.addActionListener(e -> run.accept(Collections.list(model.elements()).stream()
+                .filter(f -> f.verdict() == Verdict.SAFE).toList(), "These are temp files, caches and old logs."));
+        picked.addActionListener(e -> {
+            var items = List.copyOf(list.getSelectedValuesList());
+            boolean review = items.stream().anyMatch(f -> f.verdict() == Verdict.REVIEW);
+            run.accept(items, review ? "SOME PICKS ARE 'REVIEW' ITEMS. Only continue if you are sure you no longer need them." : "");
+        });
+        toCopy.addActionListener(e -> {
+            var items = list.getSelectedValuesList();
+            if (items.isEmpty()) { JOptionPane.showMessageDialog(dialog, "Pick one or more files first."); return; }
+            this.model.clear();
+            this.verified = List.of();
+            this.batch = null;
+            items.forEach(f -> this.model.addElement(new Item(f.path(), f.size())));
+            status.setText(items.size() + " FILES LOADED. SELECT THEM, THEN COPY TO ANOTHER DRIVE AND VERIFY BEFORE RECYCLING.");
+            buttons(true);
+            dialog.dispose();
+        });
+        close.addActionListener(e -> dialog.dispose());
+
+        var root = new JPanel(new BorderLayout(0, 14));
+        root.setBackground(PAPER);
+        root.setBorder(BorderFactory.createEmptyBorder(18, 20, 16, 20));
+        var head = new Slab(YELLOW, new BorderLayout());
+        summary.setFont(mono(Font.BOLD, 12f));
+        head.add(summary, BorderLayout.CENTER);
+        root.add(head, BorderLayout.NORTH);
+        var scroll = new JScrollPane(list);
+        scroll.setBorder(BorderFactory.createLineBorder(INK, 3));
+        root.add(scroll, BorderLayout.CENTER);
+        var buttons = new JPanel(new FlowLayout(FlowLayout.LEADING, 14, 0));
+        buttons.setOpaque(false);
+        buttons.add(safe); buttons.add(picked); buttons.add(toCopy); buttons.add(close);
+        root.add(buttons, BorderLayout.SOUTH);
+        dialog.setContentPane(root);
+        dialog.setSize(1000, 620);
+        dialog.setLocationRelativeTo(frame);
+        return dialog;
+    }
+
     void show() {
         style();
         files.setCellRenderer(new Row());
@@ -342,7 +590,7 @@ public final class SpaceFix {
 
         var actions = new JPanel(new FlowLayout(FlowLayout.LEADING, 14, 0));
         actions.setOpaque(false);
-        actions.add(choose); actions.add(transfer); actions.add(open); actions.add(cleanup);
+        actions.add(choose); actions.add(transfer); actions.add(open); actions.add(cleanup); actions.add(agent);
         status.setFont(mono(Font.BOLD, 12f));
         status.setForeground(YELLOW);
         status.setOpaque(true);
@@ -357,6 +605,7 @@ public final class SpaceFix {
         choose.addActionListener(e -> scanFolder());
         transfer.addActionListener(e -> transfer());
         cleanup.addActionListener(e -> cleanup());
+        agent.addActionListener(e -> agent());
         open.addActionListener(e -> {
             try { Desktop.getDesktop().open(batch.toFile()); }
             catch (Exception ex) { JOptionPane.showMessageDialog(frame, "Open this folder: " + batch); }
