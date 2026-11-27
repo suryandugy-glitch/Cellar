@@ -2,7 +2,7 @@ name: SpaceFix Windows installer
 on:
   push:
     branches: [main]
-    paths: ['products/spacefix/*.java', '.github/workflows/spacefix-windows.yml']
+    paths: ['products/spacefix/*.java', 'products/spacefix/portable.nsi', '.github/workflows/spacefix-windows.yml']
   workflow_dispatch:
 permissions:
   contents: write
@@ -11,7 +11,7 @@ jobs:
   package:
     runs-on: windows-2022
     env:
-      VERSION: '1.0.0'
+      VERSION: '1.0.1'
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v5
@@ -27,7 +27,7 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           javac --release 21 -cp classes -d tests products/spacefix/SpaceFixTest.java
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          java -cp 'classes;tests' SpaceFixTest fixture
+          java -cp 'classes;tests' SpaceFixTest fixture $env:LOCALAPPDATA
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           jar --create --file input/SpaceFix.jar --main-class SpaceFix -C classes .
       - name: Bundle the runtime and smoke-test the native launcher
@@ -44,7 +44,21 @@ jobs:
           if ($env:WIX) { $env:Path = "$env:WIX\bin;$env:Path" }
           jpackage --type exe --app-image images/SpaceFix --name SpaceFix --app-version $env:VERSION --vendor "Cellar Studio" --win-per-user-install --win-menu --win-menu-group "Cellar Studio" --win-shortcut --dest installer
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          Move-Item "installer/SpaceFix-$env:VERSION.exe" installer/SpaceFix.exe
+          Move-Item "installer/SpaceFix-$env:VERSION.exe" installer/SpaceFix-Setup.exe
+          $setup = Start-Process installer/SpaceFix-Setup.exe -ArgumentList '/quiet','/norestart' -PassThru
+          if (!$setup.WaitForExit(120000) -or $setup.ExitCode -ne 0) { throw "Installer failed" }
+          $installed = Join-Path $env:LOCALAPPDATA 'SpaceFix/SpaceFix.exe'
+          $check = Start-Process $installed -ArgumentList '--smoke-test' -PassThru
+          if (!$check.WaitForExit(60000) -or $check.ExitCode -ne 0) { throw "Installed app failed" }
+      - name: Build and run the single-file Windows download
+        shell: pwsh
+        run: |
+          $compiler = "${env:ProgramFiles(x86)}\NSIS\makensis.exe"
+          if (!(Test-Path $compiler)) { choco install nsis -y --no-progress }
+          & $compiler /NOCD products/spacefix/portable.nsi
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $check = Start-Process installer/SpaceFix.exe -ArgumentList '--smoke-test' -PassThru
+          if (!$check.WaitForExit(90000) -or $check.ExitCode -ne 0) { throw "Portable app failed" }
           Get-FileHash installer/SpaceFix.exe
       - name: Publish the verified build
         shell: pwsh
@@ -52,7 +66,7 @@ jobs:
           $tag = "spacefix-v$env:VERSION"
           gh release view $tag *> $null
           if ($LASTEXITCODE -eq 0) {
-            gh release upload $tag installer/SpaceFix.exe --clobber
+            gh release upload $tag installer/SpaceFix.exe installer/SpaceFix-Setup.exe --clobber
           } else {
-            gh release create $tag installer/SpaceFix.exe --target $env:GITHUB_SHA --title "SpaceFix $env:VERSION for Windows x64" --notes "Windows installer with a bundled Java runtime." --latest=false
+            gh release create $tag installer/SpaceFix.exe installer/SpaceFix-Setup.exe --target $env:GITHUB_SHA --title "SpaceFix $env:VERSION for Windows x64" --notes "Windows installer with a bundled Java runtime." --latest=false
           }
