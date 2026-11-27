@@ -9,6 +9,7 @@ site=build/pages
 samples="$site/samples"
 mkdir -p "$samples"
 cp "$web/app.css" "$web/app.js" "$web/logo.svg" "$site/"
+cp deploy/pages/SpaceFix.zip "$site/"
 cp deploy/pages/*.html deploy/pages/*.css deploy/pages/*.js deploy/pages/*.svg "$site/"
 # Company homepage at /; preserve the existing CSV product page at /guard.html.
 cp "$site/index.html" "$site/guard.html"
