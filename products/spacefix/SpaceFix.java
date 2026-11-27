@@ -1,212 +1,93 @@
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.time.Instant;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 
+/** SpaceFix never modifies an original unless the user separately confirms recycling. */
 public final class SpaceFix {
-    record Item(Path path, long size) {
-        public String toString() { return String.format("%,d bytes    %s", size, path); }
+    private SpaceFix() {}
+
+    record Item(Path root, Path path, long size, Instant modified, String type,
+                int score, boolean duplicate, String insight) {
+        String relativeName() { return root.relativize(path).toString(); }
+        boolean suggested() { return score >= 60; }
+        public String toString() { return relativeName(); }
     }
 
     static List<Item> scan(Path directory) throws IOException {
-        if (directory.getParent() == null) throw new IOException("Choose a personal folder inside the drive.");
-        var items = new ArrayList<Item>();
-        // One folder at a time keeps the scan bounded and avoids traversing junctions.
-        try (var children = Files.newDirectoryStream(directory)) {
-            for (Path path : children) {
-                var attrs = Files.readAttributes(path, BasicFileAttributes.class, NOFOLLOW_LINKS);
-                if (attrs.isRegularFile() && !Files.isHidden(path)) items.add(new Item(path, attrs.size()));
-            }
-        }
-        items.sort(Comparator.comparingLong(Item::size).reversed());
-        return items;
+        return SmartScanner.scan(directory);
     }
 
     static void verify(Path original, Path copy) throws IOException {
         if (!Files.isRegularFile(original, NOFOLLOW_LINKS) || !Files.isRegularFile(copy, NOFOLLOW_LINKS)
                 || Files.isSameFile(original, copy) || Files.mismatch(original, copy) != -1)
-            throw new IOException("Verification failed for " + original);
+            throw new IOException("Contents do not match: " + original);
     }
 
     static Path copy(Item item, Path batch) throws IOException {
-        Path target = batch.resolve(item.path().getFileName());
-        if (!Files.isRegularFile(item.path(), NOFOLLOW_LINKS))
-            throw new IOException("Source changed: " + item.path());
-        Files.copy(item.path(), target, NOFOLLOW_LINKS, StandardCopyOption.COPY_ATTRIBUTES);
-        verify(item.path(), target);
+        Path original = item.path();
+        Path target = batch.resolve(item.root().relativize(original)).normalize();
+        if (!target.startsWith(batch.normalize()) || !Files.isRegularFile(original, NOFOLLOW_LINKS))
+            throw new IOException("Source is no longer a regular personal file: " + original);
+        var before = Files.readAttributes(original, BasicFileAttributes.class, NOFOLLOW_LINKS);
+        if (before.size() != item.size() || !before.lastModifiedTime().toInstant().equals(item.modified()))
+            throw new IOException("Source changed after scanning: " + original);
+        Files.createDirectories(target.getParent());
+        Files.copy(original, target, NOFOLLOW_LINKS, StandardCopyOption.COPY_ATTRIBUTES);
+        var after = Files.readAttributes(original, BasicFileAttributes.class, NOFOLLOW_LINKS);
+        if (before.size() != after.size() || !before.lastModifiedTime().equals(after.lastModifiedTime()))
+            throw new IOException("Source changed during copying: " + original);
+        verify(original, target);
         return target;
     }
 
-    final JFrame frame = new JFrame("Cellar SpaceFix");
-    final DefaultListModel<Item> model = new DefaultListModel<>();
-    final JList<Item> files = new JList<>(model);
-    final JLabel status = new JLabel("Choose a personal folder, such as Downloads or Videos.");
-    final JButton choose = new JButton("Choose source folder");
-    final JButton transfer = new JButton("Copy selected to another drive…");
-    final JButton cleanup = new JButton("Review verified originals…");
-    final JButton open = new JButton("Open copies");
-    Path batch;
-    List<Item> verified = List.of();
-
-    interface Job<T> { T run() throws Exception; }
-    <T> void work(String message, Job<T> job, java.util.function.Consumer<T> done) {
-        status.setText(message);
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        buttons(false);
-        new SwingWorker<T, Void>() {
-            protected T doInBackground() throws Exception { return job.run(); }
-            protected void done() {
-                try { done.accept(get()); }
-                catch (Exception e) {
-                    Throwable cause = e.getCause() == null ? e : e.getCause();
-                    status.setText("Operation stopped. Review the folders before retrying.");
-                    JOptionPane.showMessageDialog(frame, cause.toString(), "SpaceFix", JOptionPane.ERROR_MESSAGE);
-                } finally {
-                    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                    buttons(true);
-                }
-            }
-        }.execute();
-    }
-
-    void buttons(boolean ready) {
-        choose.setEnabled(ready);
-        files.setEnabled(ready);
-        transfer.setEnabled(ready && !files.isSelectionEmpty());
-        cleanup.setEnabled(ready && !verified.isEmpty() && Desktop.isDesktopSupported()
-                && Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH));
-        open.setEnabled(ready && batch != null);
-    }
-
-    Path folder(String title) {
-        var dialog = new JFileChooser();
-        dialog.setDialogTitle(title);
-        dialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        return dialog.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION
-                ? dialog.getSelectedFile().toPath().toAbsolutePath() : null;
-    }
-
-    void scanFolder() {
-        Path source = folder("Choose a personal folder");
-        if (source == null) return;
-        work("Reading file sizes…", () -> scan(source.toRealPath()), items -> {
-            verified = List.of();
-            batch = null;
-            model.clear();
-            model.addAll(items);
-            status.setText(items.isEmpty() ? "No visible files here. Choose a folder containing your files."
-                    : items.size() + " files in " + source + " — select files to copy.");
-        });
-    }
-
-    void transfer() {
-        var selected = List.copyOf(files.getSelectedValuesList());
-        Path destination = folder("Choose a folder on another drive");
-        if (selected.isEmpty() || destination == null) return;
-        long bytes = selected.stream().mapToLong(Item::size).sum();
-        if (JOptionPane.showConfirmDialog(frame, String.format("Copy %d selected files (%,d bytes) to %s?",
-                selected.size(), bytes, destination), "Confirm copy", JOptionPane.OK_CANCEL_OPTION)
-                != JOptionPane.OK_OPTION) return;
-        verified = List.of();
-        batch = null;
-        work("Copying files and comparing their contents…", () -> {
-            return transferBatch(selected, destination, bytes);
-        }, dir -> {
-            batch = dir;
-            verified = selected;
-            status.setText("Verified " + selected.size() + " copies. Open copies to inspect them before cleanup.");
-        });
-    }
-
     static Path transferBatch(List<Item> selected, Path destination, long bytes) throws IOException {
+        if (selected.isEmpty()) throw new IOException("Select at least one file.");
         Path dest = destination.toRealPath();
-        var store = Files.getFileStore(dest);
-        if (store.equals(Files.getFileStore(selected.getFirst().path())))
-            throw new IOException("Choose a different drive to free space on the source.");
-        if (store.getUsableSpace() < bytes) throw new IOException("Destination has insufficient free space.");
-        Path dir = Files.createTempDirectory(dest, "SpaceFix-");
+        if (!Files.isDirectory(dest, NOFOLLOW_LINKS)) throw new IOException("Destination is not a folder.");
+        var destinationStore = Files.getFileStore(dest);
+        Path root = selected.getFirst().root();
+        if (destinationStore.equals(Files.getFileStore(root)))
+            throw new IOException("Choose another physical volume to free space on this drive.");
+        if (selected.stream().anyMatch(item -> !root.equals(item.root())))
+            throw new IOException("All selected files must come from the current scan.");
+        long required = selected.stream().mapToLong(Item::size).sum();
+        if (required != bytes || required > destinationStore.getUsableSpace())
+            throw new IOException("Destination does not have enough free space.");
+        Path batch = Files.createTempDirectory(dest, "SpaceFix-verified-");
         try {
-            for (Item item : selected) copy(item, dir);
+            for (Item item : selected) copy(item, batch);
         } catch (IOException ex) {
-            throw new IOException("Incomplete batch in " + dir + ". Originals retained. " + ex.getMessage(), ex);
+            throw new IOException("Incomplete copies remain in " + batch
+                    + ". All originals are untouched. " + ex.getMessage(), ex);
         }
-        return dir;
+        return batch;
     }
 
-    void cleanup() {
-        var items = verified;
-        var list = new JList<>(items.toArray(Item[]::new));
-        var message = new Object[]{"Move these originals to the Recycle Bin?", new JScrollPane(list),
-                "Close apps editing these files first. Empty the bin separately to reclaim space."};
-        if (JOptionPane.showConfirmDialog(frame, message, "Review originals", JOptionPane.OK_CANCEL_OPTION)
-                != JOptionPane.OK_OPTION) return;
-        Path dir = batch;
-        verified = List.of();
-        work("Rechecking each copy before recycling its original…", () -> {
-            int count = 0;
-            for (Item item : items) {
-                try {
-                    verify(item.path(), dir.resolve(item.path().getFileName()));
-                    if (!Desktop.getDesktop().moveToTrash(item.path().toFile()))
-                        throw new IOException("Recycle Bin unavailable for " + item.path());
-                    count++;
-                } catch (IOException | RuntimeException e) {
-                    throw new IOException(count + " originals recycled. Stopped at " + item.path() + ". " + e.getMessage(), e);
-                }
-            }
-            return count;
-        }, count -> {
-            items.forEach(model::removeElement);
-            status.setText(count + " originals recycled. Empty the Recycle Bin when ready to reclaim space.");
-        });
+    static boolean canRecycle() {
+        return Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH);
     }
 
-    void show() {
-        var panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
-        var top = new JPanel(new BorderLayout());
-        top.add(choose, BorderLayout.WEST);
-        top.add(new JLabel("   Files in this folder, largest first"), BorderLayout.CENTER);
-        panel.add(top, BorderLayout.NORTH);
-        panel.add(new JScrollPane(files), BorderLayout.CENTER);
-        var actions = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        actions.add(transfer); actions.add(open); actions.add(cleanup);
-        var bottom = new JPanel(new BorderLayout());
-        bottom.add(actions, BorderLayout.NORTH); bottom.add(status, BorderLayout.SOUTH);
-        panel.add(bottom, BorderLayout.SOUTH);
-        choose.addActionListener(e -> scanFolder());
-        transfer.addActionListener(e -> transfer());
-        cleanup.addActionListener(e -> cleanup());
-        open.addActionListener(e -> {
-            try { Desktop.getDesktop().open(batch.toFile()); }
-            catch (Exception ex) { JOptionPane.showMessageDialog(frame, "Open this folder: " + batch); }
-        });
-        files.addListSelectionListener(e -> { if (choose.isEnabled()) buttons(true); });
-        frame.setContentPane(panel);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(850, 500);
-        frame.setLocationByPlatform(true);
-        buttons(true);
-        frame.setVisible(true);
-    }
     public static void main(String[] args) throws Exception {
-        if (args.length == 1 && args[0].equals("--smoke-test")) {
+        if (args.length == 1 && "--smoke-test".equals(args[0])) {
             SwingUtilities.invokeAndWait(() -> {
-                SpaceFix app = new SpaceFix();
+                var app = new SpaceFixWindow();
                 try {
                     app.show();
-                    if (!app.frame.isShowing()) throw new IllegalStateException("Window failed to open");
+                    if (!app.frame.isShowing() || !app.frame.getTitle().contains("SpaceFix"))
+                        throw new IllegalStateException("SpaceFix window did not open");
                 } finally {
                     app.frame.dispose();
                 }
             });
-            return;
+        } else if (args.length == 0) {
+            SwingUtilities.invokeLater(() -> new SpaceFixWindow().show());
+        } else {
+            throw new IllegalArgumentException("Unknown option. Launch SpaceFix without arguments.");
         }
-        SwingUtilities.invokeLater(() -> new SpaceFix().show());
     }
 }

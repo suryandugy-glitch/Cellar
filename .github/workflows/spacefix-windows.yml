@@ -11,7 +11,7 @@ jobs:
   package:
     runs-on: windows-2022
     env:
-      VERSION: '1.0.1'
+      VERSION: '1.1.0'
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v5
@@ -23,7 +23,7 @@ jobs:
         shell: pwsh
         run: |
           mkdir classes,tests,fixture,input,images,installer
-          javac --release 21 -encoding UTF-8 -d classes products/spacefix/SpaceFix.java
+          javac --release 21 -encoding UTF-8 -d classes products/spacefix/SpaceFix.java products/spacefix/SmartScanner.java products/spacefix/SpaceFixWindow.java
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           javac --release 21 -cp classes -d tests products/spacefix/SpaceFixTest.java
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
@@ -60,13 +60,19 @@ jobs:
           $check = Start-Process installer/SpaceFix.exe -ArgumentList '--smoke-test' -PassThru
           if (!$check.WaitForExit(90000) -or $check.ExitCode -ne 0) { throw "Portable app failed" }
           Get-FileHash installer/SpaceFix.exe
+      - name: Package the portable Java edition
+        shell: pwsh
+        run: |
+          Copy-Item products/spacefix/Start-SpaceFix.cmd installer/Start-SpaceFix.cmd
+          Copy-Item products/spacefix/README.md installer/README.md
+          Compress-Archive -Path input/SpaceFix.jar,installer/Start-SpaceFix.cmd,installer/README.md -DestinationPath installer/SpaceFix.zip -CompressionLevel Optimal
       - name: Publish the verified build
         shell: pwsh
         run: |
           $tag = "spacefix-v$env:VERSION"
           gh release view $tag *> $null
           if ($LASTEXITCODE -eq 0) {
-            gh release upload $tag installer/SpaceFix.exe installer/SpaceFix-Setup.exe --clobber
+            gh release upload $tag installer/SpaceFix.exe installer/SpaceFix-Setup.exe installer/SpaceFix.zip --clobber
           } else {
-            gh release create $tag installer/SpaceFix.exe installer/SpaceFix-Setup.exe --target $env:GITHUB_SHA --title "SpaceFix $env:VERSION for Windows x64" --notes "Windows installer with a bundled Java runtime." --latest=false
+            gh release create $tag installer/SpaceFix.exe installer/SpaceFix-Setup.exe installer/SpaceFix.zip --target $env:GITHUB_SHA --title "SpaceFix $env:VERSION for Windows x64" --notes "Offline smart storage review, verified duplicate checks, and a new neo-brutalist interface. Windows executables bundle Java; originals are never removed without a separate confirmation." --latest=false
           }
