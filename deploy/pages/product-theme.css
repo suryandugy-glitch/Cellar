@@ -188,9 +188,7 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid 
   .header-inner { width:calc(100% - 32px); }
   .brand { font-size:.95rem; }
   .brand img { width:29px; height:29px; }
-  .header-actions .button:not(.theme-toggle) { display:none; }
-  .theme-toggle { min-width:44px; width:44px; padding:0; }
-  .theme-name { display:none; }
+  .header-actions .button { display:none; }
   .site-nav { left:0;right:0; }
   .hero { padding:2.2rem 0 3rem; }
   .hero-inner { padding-block:20px 40px; }
