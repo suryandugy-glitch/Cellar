@@ -6,12 +6,12 @@
   <meta name="site-kind" content="software">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f6f5ef">
-  <meta name="description" content="Cellar Studio builds developer tools for catching compatibility failures, deadlocks and database regressions before release.">
+  <meta name="description" content="Cellar Studio is an independent software engineering and systems research studio. Explore our process, services, and documentation.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Cellar Studio — Developer reliability tools">
-  <meta property="og:description" content="Explore Java-based tools, usable demonstrations and systems research from Cellar Studio.">
+  <meta property="og:description" content="Explore practical engineering, research and technical documentation from Cellar Studio.">
   <meta name="twitter:card" content="summary_large_image">
-  <title>Cellar Studio — Developer reliability tools</title>
+  <title>Cellar Studio — Software engineering & research</title>
   <link rel="canonical" href="https://cellar-studio-hq.vercel.app/">
   <link rel="icon" href="./logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./studio.css">
@@ -28,15 +28,15 @@
       <a class="skip" href="#main">Skip to content</a>
       <a class="brand" href="./" aria-label="Cellar Studio home"><img src="./logo.svg" width="32" height="32" alt=""><span>CELLAR <b>STUDIO</b></span></a>
       <nav class="desktop-nav" aria-label="Main navigation">
-        <a href="./explore.html">Products</a><a href="./services.html">Services</a><a href="./downloads.html">Downloads</a><a href="./handbook.html#docs">Docs</a><a href="./handbook.html#contribute">Company</a>
+        <a href="./services.html">Services</a><a href="#method">Our process</a><a href="./handbook.html#docs">Docs</a><a href="./handbook.html#contribute">Company</a>
       </nav>
       <div class="header-actions">
-        <a class="button button-primary header-cta" href="./explore.html">See the products <span aria-hidden="true">↗</span></a>
+        <a class="button button-primary header-cta" href="./services.html">Our services</a>
         <button class="menu-toggle" type="button" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open navigation"><span></span><span></span></button>
       </div>
     </div>
     <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation" hidden>
-      <a href="./explore.html">Products</a><a href="./services.html">Services</a><a href="./downloads.html">Downloads</a><a href="./handbook.html#docs">Documentation</a><a href="./handbook.html#contribute">Company</a><a href="./guard.html">Cellar Guard</a>
+      <a href="./services.html">Services</a><a href="#method">Our process</a><a href="./handbook.html#docs">Documentation</a><a href="./handbook.html#roadmap">Roadmap</a><a href="./handbook.html#contribute">Company</a>
     </nav>
   </header>
   <main id="main">
@@ -45,14 +45,14 @@
         <div class="hero-copy">
           <p class="eyebrow">Developer infrastructure / Java 21</p>
           <h1>Find the failure <span>before release.</span></h1>
-          <p class="hero-lead">Cellar Studio builds developer tools that test fragile software boundaries. Start with CSV compatibility checks, then see our systems research.</p>
+          <p class="hero-lead">Cellar Studio investigates difficult software problems through reproducible experiments, clear documentation and careful engineering. Our public product collection is being prepared.</p>
           <div class="hero-actions">
-            <a href="./explore.html" class="button button-primary">See the products <span aria-hidden="true">↗</span></a>
-            <a href="./guard.html" class="button button-secondary">Try Cellar Guard</a>
+            <a href="#method" class="button button-primary">Explore our process</a>
+            <a href="./services.html" class="button button-secondary">Studio services</a>
           </div>
-          <div class="hero-facts"><span>Java 21 foundation</span><span>8 project directions</span><span>Working Guard pilot</span></div>
+          <div class="hero-facts"><span>Systems thinking</span><span>Repeatable research</span><span>Engineering-first</span></div>
         </div>
-        <div class="app-frame" aria-label="Actual Cellar Guard sample compatibility report" data-visual>
+        <div class="app-frame" aria-label="Illustrative software compatibility report using synthetic data" data-visual>
           <div class="window-head"><div class="window-mark"><span></span><span></span><span></span></div><strong>inventory-report / release check</strong><span class="window-id">CSV/01</span></div>
           <div class="window-body">
             <div class="frame-label">Contract comparison <span>RUN 001</span></div>
@@ -68,11 +68,14 @@
       </div>
     </section>
 
-    <section class="portfolio section" id="products"><div class="wrap"><div class="section-heading"><h2>Explore the studio.</h2></div><div class="studio-choices">
-      <a href="./explore.html"><strong>Products ↗</strong><span>Browse tools, prototypes, and research briefs.</span></a>
-      <a href="./downloads.html"><strong>Downloads ↗</strong><span>Get desktop releases and setup instructions.</span></a>
-      <a href="./services.html"><strong>Services ↗</strong><span>Explore engineering, verification, and documentation.</span></a>
-    </div></div></section>
+    <section class="portfolio section" id="products" aria-labelledby="product-hold-title"><div class="wrap">
+      <div class="section-heading"><div><p class="eyebrow">Studio roadmap</p><h2 id="product-hold-title">Products are coming soon.</h2></div><p>We are refining the catalogue before opening it to the public. New software releases will appear here when they are ready to be introduced.</p></div>
+      <div class="studio-choices">
+        <a href="./services.html"><strong>Engineering services</strong><span>See how we approach implementation, technical verification and design.</span></a>
+        <a href="./handbook.html#roadmap"><strong>Research roadmap</strong><span>Read our process for exploring and validating difficult software problems.</span></a>
+        <a href="./handbook.html#docs"><strong>Documentation</strong><span>Understand the systems, boundaries and decisions behind our work.</span></a>
+      </div>
+    </div></section>
     <section class="method section" id="method" data-moment="evidence">
       <div class="wrap">
         <div class="section-heading"><div><p class="eyebrow">Engineering method</p><h2>A tool is only useful when it shows its evidence.</h2></div><p>Our common approach: reproduce the failure, explain the affected boundary, and give the engineer a result they can verify.</p></div>
@@ -84,7 +87,7 @@
     </section>
   </main>
   <footer class="closing">
-    <div class="wrap footer-top"><div><p class="eyebrow">Cellar Studio</p><h2>Read the work behind the tools.</h2><p>Java-based CSV checks and systems research. See each project's status, technical direction, and documentation on its own product page.</p><a class="button button-primary" href="./handbook.html#docs">Read the documentation <span aria-hidden="true">↗</span></a></div><div class="footer-index"><div><strong>Products</strong><a href="./guard.html">Cellar Guard</a><a href="./deadlock.html">Deadlock Sentinel</a><a href="./explore.html">Product directory</a></div><div><strong>Studio</strong><a href="./handbook.html#contribute">Contributing</a><a href="./handbook.html#roadmap">Research roadmap</a><a href="./handbook.html#docs">Documentation</a></div></div></div>
+    <div class="wrap footer-top"><div><p class="eyebrow">Cellar Studio</p><h2>Engineering with evidence.</h2><p>Our public product catalogue is in preparation. Explore the studio's technical approach, research process and collaboration areas.</p><a class="button button-primary" href="./handbook.html#docs">Read the documentation</a></div><div class="footer-index"><div><strong>Work with us</strong><a href="./services.html">Services</a><a href="./handbook.html#roadmap">Research</a><a href="./handbook.html#contribute">Contribute</a></div><div><strong>Studio</strong><a href="./handbook.html#contribute">Company</a><a href="./handbook.html#docs">Documentation</a><a href="#products">Coming soon</a></div></div></div>
     <div class="wrap footer-bottom"><span>Cellar Studio © 2026</span><span>Software engineering and research</span></div>
   </footer>
 </body>

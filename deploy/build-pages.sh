@@ -40,3 +40,5 @@ awk 'BEGIN { FS = "," } { alias = NR == 1 ? "id" : $1; sub(/,/, "," alias ","); 
   "$samples/passing.csv" > "$samples/fixed.csv"
 java -jar dist/cellar.jar check --config cellar.json \
   --csv "$samples/fixed.csv" --format json > "$samples/fixed.json"
+
+node deploy/theme-inject.mjs "$site"

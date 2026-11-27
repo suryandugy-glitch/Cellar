@@ -1,0 +1,88 @@
+/* Cellar Studio theme layer: applies last to both generated and authored pages. */
+:root[data-theme="light"] {
+  color-scheme:light;
+  --theme-page:#f6f5ef;--theme-panel:#fffef9;--theme-ink:#111110;--theme-muted:#45443f;
+  --theme-line:#111110;--theme-shadow:#111110;
+}
+:root[data-theme="dark"] {
+  color-scheme:dark;
+  --theme-page:#18191b;--theme-panel:#252629;--theme-ink:#f2f0e8;--theme-muted:#d0cec6;
+  --theme-line:#d6d3ca;--theme-shadow:#08090a;
+  --neo-ink:#e9e7de;--neo-paper:#18191b;--neo-white:#242528;--neo-muted:#cfcdc5;
+  --neo-grey:#37383b;--neo-yellow:#5b4b29;--neo-blue:#273d5b;--neo-coral:#583736;
+  --neo-stroke:3px solid var(--neo-ink);--neo-shadow:7px 7px 0 #090a0b;
+  --bg:#18191b;--surface:#252629;--surface-2:#333437;--panel:#252629;
+  --line:#99978f;--ink:#f2f0e8;--muted:#cecbc2;--subtle:#ada99f;
+  --accent:#8195b9;--accent-ink:#10151e;--paper:#18191b;--wash:#2b2c30;
+  --rule:2px solid var(--theme-line);--teal:#abb8d3;--teal-dark:#d9e3f3;
+  --night:#202226;--mint:#687a9e;--pink:#926860;--green:#b5c6e1;
+}
+
+/* A persistent switch independent of the many page-specific navigation shells. */
+.studio-theme-toggle {
+  position:fixed;right:clamp(12px,2vw,26px);bottom:clamp(12px,2vw,26px);z-index:1000;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;min-width:124px;min-height:48px;
+  padding:9px 16px;border:2px solid var(--theme-line);border-radius:0;
+  background:var(--theme-panel);color:var(--theme-ink);box-shadow:4px 4px 0 var(--theme-shadow);
+  font:800 13px/1.2 'DM Sans',Inter,system-ui,sans-serif;letter-spacing:.09em;
+  cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.studio-theme-toggle:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--theme-shadow)}
+.studio-theme-toggle:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--theme-shadow)}
+.studio-theme-toggle:focus-visible{outline:3px solid #d7782f;outline-offset:4px}
+.studio-theme-toggle .theme-icon{font:800 24px/1 system-ui,sans-serif}
+@media(max-width:640px){.studio-theme-toggle{min-width:96px;min-height:46px;padding:8px 12px;gap:7px}.studio-theme-toggle .theme-icon{font-size:20px}}
+@media(prefers-reduced-motion:reduce){.studio-theme-toggle{transition:none}}
+
+/* Shared dark surfaces. Keep outlined neo-brutalist cards, never invert imagery. */
+html[data-theme="dark"] body {background:var(--theme-page);color:var(--theme-ink)}
+html[data-theme="dark"] body :is(input,textarea,select){color:var(--theme-ink);background:var(--theme-panel);border-color:var(--theme-line)}
+html[data-theme="dark"] :is(.studio-choices span,.hero-lead,.lede,.lead,.desc,.section-head p,.section-heading>p,.doc p,.card p,.brief p,.footer,.note,.meta){color:var(--theme-muted)}
+html[data-theme="dark"] :is(a,button,input,textarea,select,summary):focus-visible{outline:3px solid #ffcd70;outline-offset:4px}
+html[data-theme="dark"] :is(.tag,.status,.label,.eyebrow){color:#d2d8e5}
+
+/* Studio homepage. */
+html[data-theme="dark"] .cellar-home :is(.site-header,.mobile-menu:not([hidden])){background:#222326;border-color:var(--theme-line)}
+html[data-theme="dark"] .cellar-home .hero{background:linear-gradient(90deg,#ffffff0d 1px,transparent 1px) 0 0/22% 100%,var(--theme-page)}
+html[data-theme="dark"] .cellar-home :is(.portfolio,.method){background:#202124;color:var(--theme-ink)}
+html[data-theme="dark"] .cellar-home .closing{background:#2e2c27;color:var(--theme-ink)}
+html[data-theme="dark"] .cellar-home .closing :is(p,.footer-index a,.eyebrow,.footer-bottom){color:var(--theme-muted)}
+html[data-theme="dark"] .cellar-home :is(.hero-copy .eyebrow,.hero-lead,.method-steps p,.method .eyebrow,.method-steps span){color:var(--theme-muted)}
+html[data-theme="dark"] .cellar-home .studio-choices a{background:var(--theme-panel);color:var(--theme-ink);border-color:var(--theme-line);box-shadow:5px 5px 0 var(--theme-shadow)}
+html[data-theme="dark"] .cellar-home .studio-choices a:hover{background:#343a45}
+html[data-theme="dark"] .cellar-home .evidence-visual{background:var(--theme-panel);border-color:var(--theme-line);box-shadow:6px 6px 0 var(--theme-shadow)}
+html[data-theme="dark"] .cellar-home .button-primary{background:#dad8ce;color:#171819;border-color:#dad8ce;box-shadow:4px 4px 0 #050607}
+html[data-theme="dark"] .cellar-home .button-secondary{color:var(--theme-ink);border-color:var(--theme-line)}
+html[data-theme="dark"] .cellar-home .hero-copy h1>span:not(.minimal-word){background:#4b4650;color:#f2f0e8;box-shadow:5px 5px 0 #090a0b}
+
+/* Directory, service, handbook, research and generated product briefs. */
+html[data-theme="dark"] :is(.studio-detail,.studio-explore,.studio-deadlock) :is(nav,.nav-inner,header,.card,.doc,.step,.trace,.illustration,.diagram,.policy){background-color:var(--theme-panel);color:var(--theme-ink);border-color:var(--theme-line)}
+html[data-theme="dark"] :is(.studio-detail,.studio-deadlock,.studio-explore) :is(.card p,.doc p,.step p,.section-head p,.meta,.lede){color:var(--theme-muted)}
+html[data-theme="dark"] :is(.studio-explore,.studio-deadlock) :is(.tag,.tags span){background:var(--theme-panel);color:var(--theme-ink);border-color:var(--theme-line)}
+html[data-theme="dark"] :is(.studio-explore,.studio-deadlock) :is(.card a,.brand,.brand span,.nav-links a,header nav a){color:var(--theme-ink)}
+html[data-theme="dark"] .studio-explore .diagram div{background:#35363a;color:var(--theme-ink);border-color:var(--theme-line)}
+html[data-theme="dark"] .studio-explore .diagram div:nth-child(2){background:var(--neo-blue)}
+html[data-theme="dark"] .studio-explore .diagram div:nth-child(3){background:var(--neo-coral)}
+html[data-theme="dark"] .studio-detail pre{background:#111215;color:#e9e5d9;border-color:var(--theme-line)}
+html[data-theme="dark"] .studio-detail :is(.nav-links.is-open,header nav.is-open){background:#222326;color:var(--theme-ink)}
+
+/* Generated catalog and download/brief pages. */
+html[data-theme="dark"] :is(.bar,.bar>div,footer){background:var(--theme-page);color:var(--theme-ink);border-color:var(--theme-line)}
+html[data-theme="dark"] :is(.tile,.brief,.spec,.index-grid .tile,.directory-tools input,.segments button){background:var(--theme-panel);color:var(--theme-ink);border-color:var(--theme-line)}
+html[data-theme="dark"] :is(.tile span,.brief p,.heading .lead,.spec dt,.label,footer a){color:var(--theme-muted)}
+html[data-theme="dark"] .tile:hover{background:#303b4c}
+html[data-theme="dark"] .segments button[aria-pressed="true"]{background:#445473;color:#fff}
+
+/* Guard, walkthrough, workspace and information pages. */
+html[data-theme="dark"] .cellar-product :is(.site-header,.site-nav,.feature-card,.step,.policy-card,.result,.stage,.terminal,.release-preview,.scenarios,.preview-content){background:#252629;color:var(--theme-ink);border-color:var(--theme-line)}
+html[data-theme="dark"] .cellar-product :is(.hero,.features,.feature-section,.details-section,.policy-intro){background:var(--theme-page);color:var(--theme-ink)}
+html[data-theme="dark"] .cellar-product :is(.feature-card p,.policy-card p,.hero .lede,.details-section p){color:var(--theme-muted)}
+html[data-theme="dark"] .cellar-product :is(.button-primary,.run,#fix){background:#d3d2cc;color:#111214;border-color:#d3d2cc}
+html[data-theme="dark"] .cellar-product :is(.preview-file,.preview-top,.preview-results,.preview-verdict,.preview-diff,.preview-triage){color:var(--theme-ink);border-color:var(--theme-line)}
+html[data-theme="dark"] .cellar-workspace-demo :is(.sidebar,.panel,.card,.workspace-panel,.workspace-header){background:#242528;color:var(--theme-ink);border-color:var(--theme-line)}
+html[data-theme="dark"] .cellar-workspace-demo :is(.nav-link,.nav-label,.panel-description,.muted){color:var(--theme-muted)}
+
+/* Avoid clipped controls and wide code blocks on narrow viewports. */
+:is(.cellar-home,.studio-detail,.studio-explore,.studio-deadlock,.cellar-product) :is(h1,h2,h3,p,a,pre,code){overflow-wrap:anywhere}
+pre{max-width:100%;overflow:auto}
+@media(max-width:640px){.cellar-home .studio-choices{grid-template-columns:minmax(0,1fr)}.bar>div{flex-wrap:wrap}}
