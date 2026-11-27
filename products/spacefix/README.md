@@ -1,6 +1,8 @@
 # Cellar SpaceFix
 
-Download the ZIP from the Studio product directory. Extract it and double-click Start-SpaceFix.cmd on a Windows desktop with Java 21 or newer. On another desktop with Java 21+, run `java -jar SpaceFix.jar`.
+Download [SpaceFix.exe for Windows x64](https://github.com/suryandugy-glitch/Cellar-Studio/releases/download/spacefix-v1.0.0/SpaceFix.exe), run the per-user installer, and open SpaceFix from the Start menu. The installer includes its Java runtime.
+
+For the optional portable Java ZIP: Extract it and double-click Start-SpaceFix.cmd on a Windows desktop with Java 21 or newer. On another desktop with Java 21+, run `java -jar SpaceFix.jar`.
 
 Choose a folder containing personal documents or media. SpaceFix lists its visible regular files, largest first. Use Ctrl or Shift to select multiple entries. Choose a folder on a different volume to create a new batch of copies. SpaceFix compares the main contents of each file byte for byte. Open the copies and check them before reviewing the originals for recycling. Windows reclaims space after you empty the Recycle Bin. On systems without Java desktop recycling support, review the originals in your file manager.
 
