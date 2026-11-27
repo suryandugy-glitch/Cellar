@@ -140,6 +140,11 @@ html[data-theme="dark"] .cellar-home .vision-next {background:#bba26a;}
 @keyframes vision-pulse {0%,100%{opacity:1}50%{opacity:.35}}
 @keyframes vision-scroll {to{transform:translateX(calc(-50% - 14px))}}
 
+@media(min-width:1024px) and (max-width:1180px) {
+  .cellar-home .desktop-nav {gap:16px;}
+  .cellar-home .desktop-nav a {font-size:12px;}
+  .cellar-home .header-cta {padding-inline:12px;font-size:13px;}
+}
 @media(max-width:1023px) {
   .cellar-home .vision-hero .hero-grid {padding-top:95px;}
   .cellar-home .vision-hero .hero-copy h1 {max-width:12.3ch;}

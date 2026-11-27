@@ -1,0 +1,23 @@
+/* Accessible, non-blocking privacy choices. No pre-checked optional category. */
+.studio-cookie-banner,.studio-privacy-dialog{
+  --pc-bg:#fffef9;--pc-ink:#151515;--pc-muted:#41413c;--pc-line:#151515;--pc-accent:#ffdf70;
+  color:var(--pc-ink)!important;background:var(--pc-bg)!important;border:3px solid var(--pc-line);
+  box-shadow:7px 7px 0 #121212;font:400 15px/1.55 'DM Sans',Inter,system-ui,sans-serif;
+}
+html[data-theme="dark"] :is(.studio-cookie-banner,.studio-privacy-dialog){--pc-bg:#252629;--pc-ink:#f2f0e8;--pc-muted:#d4d0c8;--pc-line:#d9d7cf;--pc-accent:#c7aa69}
+.studio-cookie-banner{position:fixed;z-index:1500;left:clamp(12px,2vw,28px);bottom:clamp(17px,2vw,30px);width:min(420px,calc(100% - 24px));padding:24px}
+.studio-cookie-banner h2,.studio-privacy-dialog h2{font:800 1.5rem/1.1 'Space Grotesk',system-ui,sans-serif;letter-spacing:-.055em;margin:0 0 11px}
+.studio-cookie-banner p,.studio-privacy-dialog p{font-size:.9rem;line-height:1.55;color:var(--pc-muted)!important;margin:0 0 20px}
+.studio-cookie-actions,.studio-privacy-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.studio-cookie-actions :is(button,a),.studio-privacy-actions button{appearance:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 12px;border:2px solid var(--pc-line);border-radius:0;background:var(--pc-accent);color:#151515!important;font:800 .8rem/1.25 'DM Sans',system-ui,sans-serif;cursor:pointer;text-decoration:none!important;box-shadow:3px 3px 0 #141414}
+.studio-cookie-actions [data-privacy-essential],.studio-privacy-actions .studio-privacy-secondary{background:var(--pc-bg);color:var(--pc-ink)!important}
+.studio-cookie-actions a{background:transparent!important;color:var(--pc-ink)!important;border:0;box-shadow:none;text-decoration:underline!important;text-underline-offset:4px}
+.studio-cookie-actions :is(button,a):hover,.studio-privacy-actions button:hover{transform:translate(-1px,-1px)}
+.studio-cookie-banner :is(button,a):focus-visible,.studio-privacy-dialog :is(input,button):focus-visible{outline:3px solid #de7c31;outline-offset:4px}
+.studio-privacy-dialog{width:min(520px,calc(100% - 32px));max-height:min(85vh,700px);padding:clamp(22px,4vw,35px);margin:auto;overflow:auto}
+.studio-privacy-dialog::backdrop{background:#000a}
+.studio-privacy-check{display:grid;grid-template-columns:25px 1fr;gap:12px;align-items:start;padding:15px;border:2px solid var(--pc-line);font-weight:700;line-height:1.4;cursor:pointer}
+.studio-privacy-check input{width:23px;height:23px;margin:0;accent-color:var(--pc-accent)}
+.studio-privacy-dialog .studio-privacy-note{margin:20px 0}
+@media(max-width:640px){.studio-cookie-banner{bottom:78px;padding:18px;width:calc(100% - 24px)}.studio-cookie-actions{display:grid;grid-template-columns:1fr 1fr}.studio-cookie-actions a{grid-column:1/-1}.studio-cookie-actions button{min-width:0}.studio-privacy-actions{display:grid;grid-template-columns:1fr 1fr}}
+@media(prefers-reduced-motion:reduce){.studio-cookie-actions :is(button,a),.studio-privacy-actions button{transition:none;transform:none!important}}

@@ -41,7 +41,7 @@ if (workspaceOrigin) {
     .replace('<title>', '<meta name="robots" content="noindex">\n  <title>');
   await writeFile(new URL('workspace.html', output), restrictConnections(workspace, workspaceOrigin));
 }
-for (const page of ['walkthrough.html', 'guide.html', 'workplace.html', 'studio.html', 'handbook.html', 'deadlock.html']) {
+for (const page of ['walkthrough.html', 'guide.html', 'workplace.html', 'studio.html', 'handbook.html', 'deadlock.html', 'about.html', 'licenses.html', 'certifications.html', 'privacy.html', 'terms.html', 'policies.html', 'cookie-policy.html', 'refund-policy.html', 'business.html', 'contact.html']) {
   const html = await readFile(new URL(site + '/' + page, root), 'utf8');
   await writeFile(new URL(page, output), restrictConnections(html));
   if (page === 'guide.html' && !workspaceOrigin) {
@@ -54,7 +54,7 @@ for (const page of ['walkthrough.html', 'guide.html', 'workplace.html', 'studio.
 }
 
 const assets = [
-  ...['theme-system.css', 'theme-system.js', 'catalog.css', 'catalog-links.js', 'landing.css', 'landing.js', 'product-theme.css', 'product-shell.js', 'detail-shell.css', 'detail-shell.js', 'explore-base.css', 'deadlock-base.css', 'deadlock-interaction.js', 'minimal-brutal.css', 'neo-bento.css', 'minimal-motion.js', 'studio-vision.css', 'studio-vision.js', 'verification-schematic.svg', 'walkthrough.js', 'guide.js', 'trace-grid.svg', 'studio.css', 'studio-brutalist.css', 'studio.js'].map(name => ({ source: site + '/' + name, name })),
+  ...['theme-system.css', 'theme-system.js', 'studio-footer.css', 'cookie-consent.css', 'cookie-consent.js', 'catalog.css', 'catalog-links.js', 'landing.css', 'landing.js', 'product-theme.css', 'product-shell.js', 'detail-shell.css', 'detail-shell.js', 'explore-base.css', 'deadlock-base.css', 'deadlock-interaction.js', 'minimal-brutal.css', 'neo-bento.css', 'minimal-motion.js', 'studio-vision.css', 'studio-vision.js', 'company-pages.css', 'company-pages.js', 'enquiry-form.js', 'verification-schematic.svg', 'walkthrough.js', 'guide.js', 'trace-grid.svg', 'studio.css', 'studio-brutalist.css', 'studio.js'].map(name => ({ source: site + '/' + name, name })),
   ...['app.css', 'app.js', 'logo.svg'].map(name => ({ source: web + '/' + name, name })),
   ...['passing.csv', 'passing.json', 'breaking.csv', 'breaking.json', 'fixed.csv', 'fixed.json']
     .map(file => ({ source: site + '/samples/' + file, name: 'samples/' + file }))

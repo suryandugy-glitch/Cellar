@@ -8,7 +8,13 @@ assert.ok(files.length >= 20, 'expected all company, guide, and legacy pages');
 for (const file of files) {
   const html = await readFile(resolve(root, file), 'utf8');
   assert.equal(html.split('theme-system.css').length - 1, 1, `${file}: missing/duplicate theme CSS`);
+  assert.equal(html.split('studio-footer.css').length - 1, 1, `${file}: missing/duplicate footer CSS`);
+  assert.equal(html.split('cookie-consent.css').length - 1, 1, `${file}: missing/duplicate consent CSS`);
   assert.equal(html.split('theme-system.js').length - 1, 1, `${file}: missing/duplicate theme JS`);
+  assert.equal(html.split('cookie-consent.js').length - 1, 1, `${file}: missing/duplicate consent JS`);
+  for (const image of html.matchAll(/<img\b[^>]*>/gi)) {
+    assert.match(image[0], /\balt\s*=/i, `${file}: image missing alt attribute`);
+  }
   for (const match of html.matchAll(/(?:href|src)="\.\/([^"#?]+)(?:[?#][^"]*)?"/g)) {
     const target = match[1];
     await access(resolve(root, target)).catch(() => {
@@ -21,6 +27,59 @@ assert.match(home, /We build what/);
 assert.match(home, /comes next/);
 assert.match(home, /studio-vision\.css/);
 assert.match(home, /studio-vision\.js/);
+for (const page of ['about.html', 'licenses.html', 'certifications.html', 'privacy.html', 'terms.html', 'policies.html', 'cookie-policy.html', 'refund-policy.html', 'business.html', 'contact.html']) {
+  assert.match(home, new RegExp(`href="\\./${page}"`), `home: missing ${page}`);
+  const html = await readFile(resolve(root, page), 'utf8');
+  assert.match(html, /company-pages\.css/);
+  assert.match(html, /company-pages\.js/);
+  assert.match(html, /studio-site-footer/);
+  assert.doesNotMatch(html, /STUDIO_FOOTER/);
+}
+for (const page of ['about.html', 'licenses.html', 'certifications.html']) {
+  const html = await readFile(resolve(root, page), 'utf8');
+  assert.match(html, /aria-current="page"/);
+}
+for (const file of ['index.html', 'services.html', 'handbook.html']) {
+  const html = await readFile(resolve(root, file), 'utf8');
+  assert.equal(html.split('studio-site-footer').length - 1, 1, `${file}: expected one shared footer`);
+  assert.match(html, /aria-label="Footer sitemap"/);
+}
+const about = await readFile(resolve(root, 'about.html'), 'utf8');
+assert.match(about, /Suryandu Ganguly/);
+assert.match(about, /Gunjan Roy/);
+assert.match(about, /haven't selected or announced a first flagship product/);
+const licenses = await readFile(resolve(root, 'licenses.html'), 'utf8');
+assert.match(licenses, /Copyright \(c\) 2026 Cellar contributors/);
+assert.match(licenses, /THE SOFTWARE IS PROVIDED "AS IS"/);
+const credentials = await readFile(resolve(root, 'certifications.html'), 'utf8');
+assert.match(credentials, /No verified company certifications currently listed/);
+assert.doesNotMatch(credentials, /ISO 27001 certified|SOC 2 certified/i);
+const privacy = await readFile(resolve(root, 'privacy.html'), 'utf8');
+assert.match(privacy, /cellar-privacy-preferences/);
+assert.match(privacy, /does not submit that text to Cellar Studio/);
+const cookies = await readFile(resolve(root, 'cookie-policy.html'), 'utf8');
+assert.match(cookies, /data-open-privacy-settings/);
+assert.match(cookies, /Google Fonts and Vercel hosting/);
+const refund = await readFile(resolve(root, 'refund-policy.html'), 'utf8');
+assert.match(refund, /does not operate a paid checkout/);
+const business = await readFile(resolve(root, 'business.html'), 'utf8');
+assert.match(business, /Not publicly verified or announced/);
+const contact = await readFile(resolve(root, 'contact.html'), 'utf8');
+assert.match(contact, /id="enquiry-consent"[^>]*required/);
+assert.match(contact, /id="enquiry-status" role="status" aria-live="polite"/);
+assert.match(contact, /Copy enquiry to clipboard/);
+assert.match(contact, /Clear form/);
+assert.doesNotMatch(contact, /type="submit">Send/);
+const formScript = await readFile(resolve(root, 'enquiry-form.js'), 'utf8');
+assert.match(formScript, /navigator\.clipboard\.writeText/);
+assert.doesNotMatch(formScript, /\bfetch\s*\(|XMLHttpRequest|sendBeacon|\.submit\s*\(/);
+const consentScript = await readFile(resolve(root, 'cookie-consent.js'), 'utf8');
+assert.match(consentScript, /cellar-privacy-preferences/);
+assert.match(consentScript, /data-privacy-essential/);
+assert.match(consentScript, /data-privacy-allow/);
+assert.match(consentScript, /if \(!preferences\?\.embeds\)/);
+assert.doesNotMatch(consentScript, /gtag\s*\(|facebook\.com\/tr|google-analytics/);
+assert.ok(files.length >= 40, 'all company policy and legacy pages should be published');
 assert.doesNotMatch(home, /See the products|href="\.\/product-/);
 for (const file of ['explore.html', 'downloads.html']) {
   const html = await readFile(resolve(root, file), 'utf8');
