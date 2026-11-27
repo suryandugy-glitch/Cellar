@@ -74,16 +74,22 @@ public final class SpaceFix {
 
     public static void main(String[] args) throws Exception {
         if (args.length == 1 && "--smoke-test".equals(args[0])) {
-            SwingUtilities.invokeAndWait(() -> {
-                var app = new SpaceFixWindow();
-                try {
-                    app.show();
-                    if (!app.frame.isShowing() || !app.frame.getTitle().contains("SpaceFix"))
-                        throw new IllegalStateException("SpaceFix window did not open");
-                } finally {
-                    app.frame.dispose();
-                }
-            });
+            try {
+                SwingUtilities.invokeAndWait(() -> {
+                    var app = new SpaceFixWindow();
+                    try {
+                        app.show();
+                        if (!app.frame.isShowing() || !app.frame.getTitle().contains("SpaceFix"))
+                            throw new IllegalStateException("SpaceFix window did not open");
+                    } finally {
+                        app.frame.dispose();
+                    }
+                });
+            } catch (Throwable failure) {
+                // Fail fast: a live AWT thread would otherwise keep the process (and CI) hanging.
+                failure.printStackTrace();
+                System.exit(1);
+            }
             // The GUI was verified; force the smoke-test process to finish even if
             // Windows keeps an AWT helper/event thread alive after disposal.
             System.exit(0);

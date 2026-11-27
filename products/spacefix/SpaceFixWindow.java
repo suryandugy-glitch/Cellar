@@ -34,6 +34,8 @@ final class SpaceFixWindow {
     static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
     final JFrame frame = new JFrame("Cellar SpaceFix | Smart Storage Review");
+    // Must be initialised before the table model and sorter below, which read it during construction.
+    List<SpaceFix.Item> items = List.of();
     final FileTableModel model = new FileTableModel();
     final JTable table = new JTable(model);
     final TableRowSorter<FileTableModel> sorter = new TableRowSorter<>(model);
@@ -51,7 +53,6 @@ final class SpaceFixWindow {
     final JButton open = button("OPEN COPIES", WHITE);
     final JButton cleanup = button("REVIEW RECYCLE", CORAL);
     final JProgressBar progress = new JProgressBar();
-    List<SpaceFix.Item> items = List.of();
     List<SpaceFix.Item> verified = List.of();
     Path source;
     Path batch;
