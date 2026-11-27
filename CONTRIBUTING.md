@@ -1,11 +1,11 @@
-# Contributing to Cellar
+# Contributing to Cellar Studio
 
-Thank you for helping. **This repository contains Cellar Guard, the CSV contract checker.** Other proposed Cellar Studio tools currently have separate repositories.
+Thank you for helping. **Cellar Studio is the parent company repository and currently contains Cellar Guard's Java CSV checker.** Other Studio products may live in separate repositories with their own maintainers.
 
 ## Your first contribution
 
 1. Read [Getting started](docs/GETTING_STARTED.md) and the [codebase map](docs/CODEBASE_MAP.md).
-2. Open [GitHub Codespaces](https://github.com/codespaces/new?repo=suryandugy-glitch%2FCellar) or install a JDK 21+ locally.
+2. Open [GitHub Codespaces](https://github.com/codespaces/new?repo=suryandugy-glitch%2FCellar-Studio) or install a JDK 21+ locally.
 3. Run `java Build.java test` in the repository root.
 4. Pick a focused issue; ask in its comments if the scope is unclear.
 5. Create a `feat/<short-name>`, `fix/<short-name>`, or `docs/<short-name>` branch from `main`.
