@@ -1,10 +1,11 @@
-<p align="center">
-  <img src="assets/logo-mark.svg" alt="Cellar Studio logo" width="88">
-</p>
+<p align="center"><img src="assets/logo-mark.svg" alt="Cellar Studio original C mark" width="64"></p>
 
 <h1 align="center">CELLAR STUDIO</h1>
 
-<p align="center"><strong>Find the failure before release.</strong></p>
+<p align="center"><strong>ENGINEERING TOOLS / BUILT FOR THE BREAKING POINTS</strong></p>
+
+<p align="center"><img src="assets/readme-hero.svg" alt="Find the failure before release. A neo-brutalist release gate blocks a contract-breaking CSV export." width="100%"></p>
+
 <p align="center">Developer tools for the fragile boundaries between data, builds, storage, and software systems.</p>
 
 <p align="center">
@@ -15,7 +16,13 @@
   <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
-<p align="center"><sub>Java 21+ · Local-first tooling · Evidence-driven engineering · MIT licensed</sub></p>
+<p align="center"><sub>JAVA 21+ &nbsp; / &nbsp; LOCAL-FIRST &nbsp; / &nbsp; EVIDENCE-DRIVEN &nbsp; / &nbsp; MIT LICENSED</sub></p>
+
+---
+
+| **01 / DISCOVER** | **02 / RUN THE TOOL** | **03 / BUILD WITH US** |
+| :--- | :--- | :--- |
+| [Explore the product lineup](#explore-the-products) | [Start Cellar Guard locally](#quick-start) | [Develop & verify](#build-and-test) |
 
 ---
 
@@ -58,6 +65,8 @@ This repository was renamed from **Cellar** to **Cellar-Studio**. It still conta
 ## Try Cellar Guard
 
 Cellar Guard checks CSV files against declared contracts **before** a release. For example, a customer import expects `order_id`, but a new export renames it to `id`:
+
+<p align="center"><img src="assets/readme-flow.svg" alt="Cellar Guard's sample release flow: CSV export to declared contract to a blocking verdict with evidence." width="100%"></p>
 
 ```text
 FAIL  inventory-report  requires order_id
@@ -183,7 +192,7 @@ Vercel uses `vercel.json` and `node deploy/build-vercel.mjs` to build the public
 
 A shared Java deployment requires HTTPS, origin restrictions and server-side keys. Configure the Java host first; connect a separate frontend only with the documented origin settings. **Do not place `CELLAR_ACCESS_KEY` or `CELLAR_MASTER_KEY` in public frontend code.** Follow [security and deployment](docs/WEB_SECURITY.md) and [operations](docs/OPERATIONS.md). The optional AI key remains server-side.
 
-## Honest limits
+## No hype. Honest limits.
 
 - The public website is a static demonstration. Uploading and storing your own CSV requires the Java workspace.
 - Guard is a **working pilot**, not a multi-tenant production SaaS or an independently audited security product.
