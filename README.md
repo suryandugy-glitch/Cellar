@@ -48,7 +48,7 @@ Use the browser checker for one-off checks on mobile or desktop. The Java 21+ ap
 
 1. Open the [CSV checker](https://cellar-csv.vercel.app/guard-app.html) on your phone or computer.
 2. Try **Load breaking example**. The report identifies the missing `order_id` column. Try the passing example next.
-3. For your own export, **Choose CSV file** or paste CSV text. **Choose JSON contract** or edit the example contract to describe what the receiving system needs.
+3. Under **Import rules**, enter one required column per line, choose the delimiter, and tap **Use these rules**. Then select a CSV or paste its text. Open **Import or edit JSON** if you already have a contract or need advanced rules.
 4. File selection validates the JSON immediately and runs the check when both inputs are ready. After pasting or editing text, select **Check export**. Use **Download report** to save the findings.
 
 Use **Validate contract** to check edited JSON without a CSV. To start from a known-good file, open **Create a starter contract from a known-good CSV** and download its header rules.

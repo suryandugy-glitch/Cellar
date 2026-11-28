@@ -13,12 +13,16 @@ const validate = document.querySelector('#validate-contract');
 const saveContract = document.querySelector('#download-contract');
 const draft = document.querySelector('#draft-contract');
 const draftDelimiter = document.querySelector('#draft-delimiter');
+const fillRules = document.querySelector('#fill-rules');
+const builder = document.querySelector('#builder-columns');
+const builderDelimiter = document.querySelector('#builder-delimiter');
 let worker;
 let report;
 let revision = 0;
 
 const input = key => fields[key].file.files[0] || fields[key].text.value;
 const hasInput = key => Boolean(fields[key].file.files.length || fields[key].text.value.trim());
+const delimiterValue = select => select.value === 'tab' ? '\t' : select.value;
 
 function stop() {
   worker?.terminate();
@@ -26,6 +30,7 @@ function stop() {
   run.disabled = false;
   validate.disabled = false;
   draft.disabled = false;
+  fillRules.disabled = false;
   cancel.hidden = true;
   form.removeAttribute('aria-busy');
 }
@@ -66,7 +71,7 @@ for (const [key, { file, text, note }] of Object.entries(fields)) {
       startCheck(hasInput('csv') ? 'check' : 'validate', true);
     } else {
       note.textContent = 'Selected ' + selected.name + '.';
-      status.textContent = 'CSV selected. Choose a JSON contract to run the check.';
+      status.textContent = 'CSV selected. Use your import rules or choose a JSON contract to run the check.';
     }
   });
   text.addEventListener('input', () => {
@@ -162,9 +167,9 @@ function saveJson(source, filename) {
 function startCheck(action, focus = false) {
   if (worker) return;
   revision++;
-  const task = action === 'check' && !hasInput('csv') ? 'validate' : action;
+  const task = action === 'fill' ? 'draft' : action === 'check' && !hasInput('csv') ? 'validate' : action;
   if (task !== 'draft' && !hasInput('contract')) {
-    status.textContent = 'Choose a JSON contract or paste its rules.';
+    status.textContent = 'Enter the required columns and select Use these rules, or import a JSON contract.';
     return;
   }
   if (task === 'draft' && !hasInput('csv')) {
@@ -199,6 +204,15 @@ function startCheck(action, focus = false) {
         return;
       }
       if (data.draft) {
+        if (action === 'fill') {
+          const generated = JSON.parse(data.draft);
+          builder.value = generated.integrations[0].required.join('\n');
+          builderDelimiter.value = generated.delimiter === '\t' ? 'tab' : generated.delimiter;
+          builder.removeAttribute('aria-invalid');
+          status.textContent = 'Review the required columns and select Use these rules to apply them.';
+          builder.focus();
+          return;
+        }
         saveJson(data.draft, 'cellar-guard-starter-contract.json');
         status.textContent = 'Starter contract downloaded. Review it, then choose it to run a check.';
         return;
@@ -226,9 +240,9 @@ function startCheck(action, focus = false) {
     run.disabled = true;
     validate.disabled = true;
     draft.disabled = true;
+    fillRules.disabled = true;
     cancel.hidden = false;
-    const delimiter = draftDelimiter.value === 'tab' ? '\t' : draftDelimiter.value;
-    active.postMessage({ task, contract: input('contract'), csv: input('csv'), delimiter });
+    active.postMessage({ task, contract: input('contract'), csv: input('csv'), delimiter: delimiterValue(draftDelimiter) });
   } catch {
     stop();
     status.textContent = 'The checker needs a browser that supports web workers.';
@@ -242,7 +256,7 @@ getSample('./samples/contract.json').then(text => {
   fields.contract.text.value = text;
   fields.contract.note.textContent = 'Example contract loaded.';
 }).catch(() => {
-  if (!revision) status.textContent = 'Choose a contract file or paste your contract JSON to begin.';
+  if (!revision) status.textContent = 'Enter the required columns or import a JSON contract to begin.';
 });
 
 form.addEventListener('submit', event => {
@@ -252,6 +266,28 @@ form.addEventListener('submit', event => {
 run.disabled = false;
 validate.addEventListener('click', () => startCheck('validate'));
 draft.addEventListener('click', () => startCheck('draft'));
+fillRules.addEventListener('click', () => startCheck('fill'));
+
+builder.addEventListener('input', () => builder.removeAttribute('aria-invalid'));
+document.querySelector('#apply-rules').addEventListener('click', () => {
+  const required = builder.value.split(/\r?\n/).filter(column => column.trim());
+  if (!required.length) {
+    builder.setAttribute('aria-invalid', 'true');
+    status.textContent = 'Enter at least one required column.';
+    builder.focus();
+    return;
+  }
+  changed('contract');
+  fields.contract.file.value = '';
+  fields.contract.text.value = JSON.stringify({
+    version: 2,
+    delimiter: delimiterValue(builderDelimiter),
+    validateRows: true,
+    integrations: [{ id: 'customer-import', required }],
+  }, null, 2);
+  fields.contract.note.textContent = 'Validating your import rules…';
+  startCheck('check', true);
+});
 
 cancel.addEventListener('click', () => {
   stop();
@@ -267,7 +303,10 @@ document.querySelector('#clear-inputs').addEventListener('click', () => {
     file.value = '';
     note.textContent = '';
   }
-  status.textContent = 'Inputs cleared. Choose files or load an example.';
+  builder.value = '';
+  builderDelimiter.value = ',';
+  builder.removeAttribute('aria-invalid');
+  status.textContent = 'Inputs cleared. Enter your import rules or load an example.';
 });
 
 saveContract.addEventListener('click', () => {

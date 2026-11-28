@@ -147,6 +147,7 @@ with sync_playwright() as playwright:
     for width in (390, 1440):
         page.set_viewport_size({'width': width, 'height': 900})
         page.goto(BASE + 'guard-app.html')
+        page.get_by_text('Import or edit JSON', exact=True).click()
         contract = page.locator('#contract-file')
         contract.set_input_files({
             'name': 'invalid.json', 'mimeType': 'application/json', 'buffer': b'{"integrations": []}',
@@ -197,8 +198,31 @@ with sync_playwright() as playwright:
             'name': 'first.csv', 'mimeType': 'text/csv',
             'buffer': b'order_id,sku,total_cents,currency\nO-1,SKU1,100,INR\n',
         })
-        page.get_by_text('CSV selected. Choose a JSON contract to run the check.', exact=True).wait_for()
+        page.get_by_text('CSV selected. Use your import rules or choose a JSON contract to run the check.', exact=True).wait_for()
         contract.set_input_files({'name': 'contract.json', 'mimeType': 'application/json', 'buffer': example})
+        page.get_by_role('heading', name='Ready to ship').wait_for()
+
+        # Complete a check entirely through the built-in rules builder.
+        page.goto(BASE + 'guard-app.html')
+        apply = page.get_by_role('button', name='Use these rules')
+        apply.click()
+        page.get_by_text('Enter at least one required column.', exact=True).wait_for()
+        page.get_by_label('Required columns', exact=True).fill('order_id\nsku')
+        page.get_by_label('Contract delimiter').select_option(';')
+        apply.click()
+        page.get_by_text('Contract valid. Choose a CSV or load an example to run a check.', exact=True).wait_for()
+        page.get_by_label('CSV text', exact=True).fill('id;sku\n1;sample\n')
+        page.get_by_role('button', name='Check export').click()
+        page.get_by_role('heading', name='Release blocked').wait_for()
+        assert page.get_by_text('order_id · record 1', exact=True).is_visible()
+
+        page.get_by_label('CSV text', exact=True).fill('order_id;sku\n1;sample\n')
+        page.get_by_text('Create a starter contract from a known-good CSV', exact=True).click()
+        page.get_by_label('CSV delimiter', exact=True).select_option(';')
+        page.get_by_role('button', name='Fill required columns').click()
+        page.get_by_text('Review the required columns and select Use these rules to apply them.', exact=True).wait_for()
+        assert page.get_by_label('Required columns', exact=True).input_value() == 'order_id\nsku'
+        apply.click()
         page.get_by_role('heading', name='Ready to ship').wait_for()
 
         page.get_by_role('button', name='Switch to dark mode').click()
