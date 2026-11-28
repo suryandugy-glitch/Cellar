@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { findHelp, helpSources, siteGuide } from '../deploy/pages/assistant-search.js';
 
 const MODEL = 'openai/gpt-4.1-nano';
@@ -13,7 +14,7 @@ function json(value, status = 200) {
 
 async function getIndex() {
   if (!index) {
-    index = readFile(new URL('../build/vercel/' + INDEX, import.meta.url), 'utf8').then(JSON.parse)
+    index = readFile(resolve('build/vercel', INDEX), 'utf8').then(JSON.parse)
       .catch(async () => {
         const response = await fetch(SITE + '/' + INDEX, { signal: AbortSignal.timeout(3000) });
         if (!response.ok) throw new Error('Cannot load site guide.');
@@ -59,6 +60,13 @@ async function readQuestion(request) {
   }
 }
 
+export default {
+  fetch(request) {
+    if (request.method === 'POST') return POST(request);
+    return new Response(null, { status: 405, headers: { Allow: 'POST' } });
+  },
+};
+
 export async function POST(request) {
   const origin = request.headers.get('origin');
   const allowed = [SITE, process.env.VERCEL_URL && 'https://' + process.env.VERCEL_URL];
@@ -74,11 +82,19 @@ export async function POST(request) {
 
   let matches;
   try { matches = findHelp(await getIndex(), question, page, previous); }
-  catch { return json({ error: 'The site guide could not load.' }, 503); }
+  catch {
+    console.warn('Cellar assistant site index unavailable.');
+    return json({ error: 'The site guide could not load.' }, 503);
+  }
   const sources = helpSources(matches);
   const guide = () => json({ mode: 'guide', answer: siteGuide(matches), sources });
-  const token = process.env.VERCEL_OIDC_TOKEN;
-  if (!token || !withinLimit(request)) return guide();
+  if (!withinLimit(request)) return guide();
+  const context = globalThis[Symbol.for('@vercel/request-context')]?.get?.();
+  const token = context?.headers?.['x-vercel-oidc-token'] || process.env.VERCEL_OIDC_TOKEN;
+  if (!token) {
+    console.warn('Cellar assistant gateway token unavailable.');
+    return guide();
+  }
 
   try {
     const response = await fetch('https://ai-gateway.vercel.sh/v1/chat/completions', {
@@ -98,11 +114,16 @@ export async function POST(request) {
         ],
       }),
     });
-    if (!response.ok) return guide();
+    if (!response.ok) {
+      console.warn('Cellar assistant gateway HTTP status:', response.status);
+      return guide();
+    }
     const result = await response.json();
     const answer = result.choices?.[0]?.message?.content?.trim();
+    if (!answer) console.warn('Cellar assistant gateway returned no answer.');
     return answer ? json({ mode: 'ai', answer, sources }) : guide();
   } catch {
+    console.warn('Cellar assistant gateway request failed.');
     return guide();
   }
 }
