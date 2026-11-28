@@ -11,7 +11,7 @@ public final class Main {
     public static int run(String[] args) {
         Map<String,String> options=new LinkedHashMap<>();String command=args.length==0?"web":args[0];
         try {
-            if(command.equals("--version")){System.out.println("Cellar "+VERSION);return 0;}
+            if(command.equals("--version")){System.out.println("Cellar Guard "+VERSION);return 0;}
             if(command.equals("--help")||command.equals("help")){help();return 0;}
             Set<String> flags=Set.of("--advisory","--summary","--record","--demo-break");
             Set<String> allowed=switch(command){
@@ -61,7 +61,7 @@ public final class Main {
                     }
                     server.start();Runtime.getRuntime().addShutdownHook(new Thread(server::close));
                     String scheme=wc.tls()?"https":"http";
-                    System.out.println("Cellar Web "+VERSION+" listening on "+scheme+"://"+wc.bindHost()+":"+server.port()+(wc.publicOrigin()!=null?"  (public: "+wc.publicOrigin()+")":""));
+                    System.out.println("Cellar Guard "+VERSION+" listening on "+scheme+"://"+wc.bindHost()+":"+server.port()+(wc.publicOrigin()!=null?"  (public: "+wc.publicOrigin()+")":""));
                     System.out.println(wc.accessKey()==null?"Open the address in your browser. No sign-in needed (localhost only).":"Access key required (CELLAR_ACCESS_KEY).");
                     new CountDownLatch(1).await();return 0;
                 }
@@ -108,7 +108,7 @@ public final class Main {
         catch(Exception e){System.err.println("WARNING: Cannot write GitHub job summary.");}
     }
     private static void help(){System.out.println("""
-        Cellar Web — Java CSV compatibility platform
+        Cellar Guard — Java CSV compatibility checker
         java -jar dist/cellar.jar <command> [options]
           web [--port N]             Start the web app (default; no sign-in on localhost)
           audit-verify               Verify the tamper-evident audit chain (needs the master key)

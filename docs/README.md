@@ -1,47 +1,19 @@
-# Cellar documentation — start here
+# Cellar Guard documentation
 
-**New to the repository?** Read [Getting started](GETTING_STARTED.md) first. You do not need to understand the entire backend to contribute.
+Cellar Studio maintains one product in this repository: **Cellar Guard**, a Java 21+ CSV compatibility checker. The [technical manual](CELLAR_GUARD_MANUAL.md) is the best starting point.
 
-## What lives here?
-
-There are **two related but distinct things**:
-
-1. **Cellar (the working product):** a Java 21 CSV contract checker with a local web workspace, CLI, tests and public demonstration website. This repository contains its code.
-2. **Cellar Studio (the primary company platform):** a product directory today, with a roadmap for connecting developer tools under one identity. The other products are **not implemented inside this repository**. See [Cellar Studio](CELLAR_STUDIO.md).
-
-The main README describes Cellar Guard's current behavior; the ecosystem roadmap describes planned work. A planned feature is not a shipped feature.
-
-## Find the right document
-
-| I want to… | Read |
+| Task | Reference |
 | --- | --- |
-| Understand Cellar in plain language | [Getting started](GETTING_STARTED.md) |
-| Open GitHub Codespaces and run it | [Development environment](DEVELOPMENT_ENVIRONMENT.md) |
-| Find source folders, test files and commands | [Codebase map](CODEBASE_MAP.md) |
-| Join the team or open a useful PR | [Contributing](../CONTRIBUTING.md) |
-| Understand Cellar Studio's products and priorities | [Cellar Studio roadmap](CELLAR_STUDIO.md) |
-| See company structure, core roles and governance | [Core governance](CORE_GOVERNANCE.md) |
-| Understand the main Studio repo vs child Cellar repo | [Repository hierarchy and migration](REPOSITORY_HIERARCHY.md) |
-| Follow agreed standards across projects | [Ecosystem repository standards](ECOSYSTEM_REPO_STANDARDS.md) |
-| Understand why the product exists | [Product requirements](PRD.md) |
-| See the overall backend architecture | [High-level design](HLD.md) |
-| See implementation details | [Low-level design](LLD.md) |
-| Work with CSV contract JSON | [Contracts](CONTRACTS.md) |
-| Use or integrate the HTTP API | [API reference](API.md) |
-| Deploy or secure the service | [Web security and deployment](WEB_SECURITY.md) |
-| Run and operate the application | [Operations](OPERATIONS.md) |
+| Install, validate CSVs and connect GitHub PR checks | [Cellar Guard manual](CELLAR_GUARD_MANUAL.md) |
+| Get started with a synthetic demonstration | [Getting started](GETTING_STARTED.md) |
+| Define required headers, row rules and integrations | [Contracts](CONTRACTS.md) |
+| Integrate the Java HTTP API | [API reference](API.md) |
+| Secure a shared Java workspace | [Web security](WEB_SECURITY.md) |
+| Run, back up and operate the workspace | [Operations](OPERATIONS.md) |
+| Understand architecture and source folders | [High-level design](HLD.md), [Low-level design](LLD.md), [Codebase map](CODEBASE_MAP.md) |
+| Develop and contribute | [Development environment](DEVELOPMENT_ENVIRONMENT.md), [Contributing](../CONTRIBUTING.md) |
 | Report a vulnerability | [Security policy](../SECURITY.md) |
-| Review current known limitations | [Main README — Honest limits](../README.md#honest-limits) |
-| Find existing release changes | [Changelog](../CHANGELOG.md) |
 
-Advanced references also exist for [migration](MIGRATION.md), [key rotation](KEY_ROTATION.md), [pilot templates](PILOT_TEMPLATES.md), [resources](RESOURCES.md), [startup playbook](STARTUP_PLAYBOOK.md), and [test report](TEST_REPORT.md).
+Some older planning documents remain in Git history or documentation for engineering context. They are **not** live products and are not part of the public product catalogue.
 
-## A normal first contribution
-
-1. Read [Getting started](GETTING_STARTED.md).
-2. Run `java Build.java test` in the repo root.
-3. Pick one issue; reproduce the problem with synthetic data.
-4. Make a focused change and add or update a test.
-5. Open a pull request; describe what changed, how you tested it, and any limitations.
-
-**Important:** Never commit API keys, real customer CSVs, personal documents or generated `data/` files.
+The main website is [Studio HQ](https://cellar-csv.vercel.app/) and the only product page is [Cellar Guard](https://cellar-csv.vercel.app/guard.html). The website uses synthetic examples; actual checking happens in the Java CLI or self-hosted workspace.

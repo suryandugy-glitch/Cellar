@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <meta name="description" content="Cellar Guard manual: build the Java CSV contract checker and run it on every pull request.">
+  <title>Cellar Guard manual | Java CLI and pull request setup</title>
+  <link rel="icon" href="./logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./company-pages.css">
+  <style>.company-panel pre{max-width:100%;overflow-x:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:clamp(.72rem,2vw,.95rem);line-height:1.65}.company-panel code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.company-panel pre+p{margin-top:18px}.company-panel{min-height:0}</style>
+  <script src="./company-pages.js" defer></script>
+</head>
+<body class="company-page">
+  <a class="company-skip" href="#main">Skip to main content</a>
+  <header class="company-header">
+    <div class="company-wrap company-nav-row">
+      <a class="company-brand" href="./" aria-label="Cellar Studio home"><img src="./logo.svg" width="35" height="35" alt=""><span>CELLAR <strong>STUDIO</strong></span></a>
+      <nav class="company-nav" id="company-nav" aria-label="Company navigation">
+        <a href="./guard.html">Cellar Guard</a><a href="./manual.html" aria-current="page">Manual</a><a href="./walkthrough.html">Examples</a><a href="./about.html">About</a>
+      </nav>
+      <button class="company-menu-toggle" type="button" aria-expanded="false" aria-controls="company-nav" aria-label="Open navigation"><span></span><span></span></button>
+    </div>
+  </header>
+  <main id="main">
+    <section class="company-hero company-wrap company-hero-short">
+      <div class="company-hero-copy">
+        <p class="company-kicker">Cellar Guard / User manual</p>
+        <h1>Protect CSV imports. <em>On every PR.</em></h1>
+        <p class="company-lede">Catch CSV export changes that would break a customer’s import, before you ship. The checker runs with Java 21 or newer; the website shows synthetic examples.</p>
+        <div class="company-hero-actions"><a class="company-button" href="#pr">Set up the PR gate</a><a class="company-button company-button-outline" href="https://github.com/suryandugy-glitch/Cellar-Studio/blob/main/docs/CELLAR_GUARD_MANUAL.md">Full technical manual</a></div>
+      </div>
+    </section>
+    <section class="company-section company-section-tint" id="install"><div class="company-wrap">
+      <div class="company-section-heading"><p class="company-kicker">01 / Install</p><h2>Build the <em>Java checker.</em></h2><p>Use a JDK (not only a JRE). Run these commands from the repository root.</p></div>
+      <div class="company-panel company-panel-yellow">
+        <pre><code>git clone https://github.com/suryandugy-glitch/Cellar-Studio.git
+cd Cellar-Studio
+java Build.java test
+java Build.java package
+java -jar dist/cellar.jar validate --config cellar.json</code></pre>
+        <p>To open the local web workspace, use <code>sh run.sh</code> (Windows: <code>run.bat</code>). Do not upload private customer CSV files to the public demo site.</p>
+      </div>
+    </div></section>
+    <section class="company-section" id="check"><div class="company-wrap">
+      <div class="company-section-heading"><p class="company-kicker">02 / Check</p><h2>A contract is the <em>import promise.</em></h2><p>Define required columns and row rules in <code>cellar.json</code>, then point the checker at the CSV produced by the code you plan to ship.</p></div>
+      <div class="company-panel company-panel-blue">
+        <pre><code>java -jar dist/cellar.jar check \
+  --config cellar.json \
+  --csv examples/sales.csv \
+  --format markdown --summary</code></pre>
+        <p><strong>Exit 0:</strong> declared rules passed. <strong>Exit 1:</strong> blocking incompatibility. <strong>Exit 2:</strong> the check could not run, so nothing was verified. The sample CSV is for demonstration only.</p>
+      </div>
+    </div></section>
+    <section class="company-section company-section-tint" id="pr"><div class="company-wrap">
+      <div class="company-section-heading"><p class="company-kicker">03 / Pull requests</p><h2>Run the check <em>before merge.</em></h2><p>The repository includes <code>.github/workflows/guard-pr.yml</code>. GitHub Actions executes it on every pull request to <code>main</code>.</p></div>
+      <div class="company-bento company-bento-three">
+        <article class="company-panel"><span class="company-panel-label">Step 1</span><h3>Generate the export.</h3><p>Replace the workflow’s example CSV path with a representative CSV generated from the proposed application code.</p></article>
+        <article class="company-panel"><span class="company-panel-label">Step 2</span><h3>Review contracts.</h3><p>Commit consumer expectations under version control. A checker cannot infer hidden customer requirements.</p></article>
+        <article class="company-panel"><span class="company-panel-label">Step 3</span><h3>Require the check.</h3><p>In repository branch protection, require the <strong>Cellar Guard / csv-compatibility</strong> check before merging.</p></article>
+      </div>
+      <p class="company-small-note">The included workflow checks the tracked synthetic CSV until you wire it to your application’s export command. For the complete configuration, report formats, troubleshooting and security boundaries, see the <a href="https://github.com/suryandugy-glitch/Cellar-Studio/blob/main/docs/CELLAR_GUARD_MANUAL.md">technical manual</a>.</p>
+    </div></section>
+    <section class="company-callout company-wrap"><p class="company-kicker">Try a failure safely</p><h2>A renamed header can <em>break an import.</em></h2><div class="company-link-row"><a class="company-button" href="./walkthrough.html">Explore synthetic checks</a><a class="company-text-link" href="./guard.html">Back to Cellar Guard</a></div></section>
+  </main>
+  <!-- STUDIO_FOOTER -->
+</body>
+</html>

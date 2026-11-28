@@ -2,7 +2,7 @@
 
 For a first-time explanation, read [Getting started](GETTING_STARTED.md) and the [documentation index](README.md).
 
-This repository is the **Cellar Guard Java 21 product** and the planning home for the proposed Cellar Studio ecosystem. It is **not** yet a monorepo for every Cellar Studio product; linked products retain their own source and release cycles.
+This repository contains **Cellar Guard**, the only Cellar Studio product, written in Java 21+, together with its public Studio HQ pages and documentation.
 
 ## Open a ready-to-code environment in GitHub
 
@@ -27,20 +27,19 @@ The same dev container can be opened in VS Code with the Dev Containers extensio
 
 The `data/`, `build/`, and `dist/` paths hold local/generated files and should not be committed. Never put actual customer CSV data or API keys in commits or issue attachments.
 
-## Work on the ecosystem
+## Work on Cellar Guard
 
-1. Read [Cellar Studio product map](CELLAR_STUDIO.md) and [repo standards](ECOSYSTEM_REPO_STANDARDS.md).
-2. Create a focused issue with a user problem, acceptance criteria, tests and target product.
+1. Read the [Cellar Guard manual](CELLAR_GUARD_MANUAL.md) and [contracts reference](CONTRACTS.md).
+2. Create a focused issue with a customer import problem, acceptance criteria and tests.
 3. Create a `feat/<short-name>` or `fix/<short-name>` branch from updated `main`.
-4. Keep Cellar Guard changes in this repository; change other products in their own repositories. Common contracts and design assets can be specified here before adopting them elsewhere.
-5. Run `java Build.java test`, inspect the local UI if relevant, and open a pull request. Existing `.github/workflows/backend.yml` checks the Java backend.
+4. Keep Java, UI, docs and CI changes scoped to Cellar Guard.
+5. Run `java Build.java test`, inspect the local UI if relevant, and open a pull request. The `.github/workflows/guard-pr.yml` workflow runs a CSV compatibility check on PRs.
 
 ## Proposed next work
 
-- A public Cellar Studio hub with transparent product-maturity labels and working demos.
-- A versioned, privacy-conscious common findings schema and sample evidence fixtures.
-- Reusable accessible color, typography and motion tokens for product sites.
-- A local-first release-readiness view that combines actual output from Guard and BuildClinic.
+- Add representative export generators for more consuming applications.
+- Improve CI annotations, contract change review and sample fixtures.
+- Keep Guard's documentation and Java checker reproducible and accessible.
 
 These are backlog candidates, **not** existing shipped capabilities. Do not claim full-stack authentication, data synchronization or integrations until implemented and tested.
 

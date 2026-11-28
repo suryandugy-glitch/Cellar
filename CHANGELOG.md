@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased — Cellar Guard focus
+
+- Made **Cellar Guard** the only product presented by the Studio site; removed legacy product listings, unrelated product pages, prototype source and associated workflows from this repository.
+- Added a Java 21 pull-request CSV compatibility workflow with passing and deliberately breaking synthetic fixtures.
+- Added a dedicated [Guard user manual](docs/CELLAR_GUARD_MANUAL.md) and [public manual page](https://cellar-csv.vercel.app/manual.html).
+- Updated CLI output branding to Cellar Guard without changing the existing `dist/cellar.jar` command or check exit codes.
+- Retained Studio HQ at the primary website root; the Guard demonstration remains at `/guard.html`.
+
+The CI fixture is a demonstration until a consuming application generates its candidate CSV from pull-request code.
+
 ## 3.0.0-web.1
 - Replaced the Swing desktop UI and loopback API with a browser application served by the same JAR.
 - Added accounts (owner, maintainer, viewer), PBKDF2 password hashing, lockout and login throttling.

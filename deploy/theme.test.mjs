@@ -11,7 +11,7 @@ assert.ok(redirects.some(route => route.source === '/' && route.destination === 
   route.has?.some(check => check.type === 'host' && check.value === 'cellar-studio-hq.vercel.app')),
   'legacy studio domain must lead to the CSV domain');
 const files = (await readdir(root)).filter(file => file.endsWith('.html'));
-assert.ok(files.length >= 20, 'expected all company, guide, and legacy pages');
+assert.ok(files.length >= 18, 'expected Guard, manual, sample, and company pages');
 for (const file of files) {
   const html = await readFile(resolve(root, file), 'utf8');
   assert.equal(html.split('theme-system.css').length - 1, 1, `${file}: missing/duplicate theme CSS`);
@@ -35,6 +35,8 @@ assert.match(home, /comes next/);
 assert.match(home, /studio-vision\.css/);
 assert.match(home, /studio-vision\.js/);
 assert.match(home, /id="possibilities"/);
+assert.match(home, /Cellar Guard/);
+assert.match(home, /href="\.\/manual\.html"/);
 assert.match(home, /rel="canonical" href="https:\/\/cellar-csv\.vercel\.app\/"/);
 const guard = await readFile(resolve(root, 'guard.html'), 'utf8');
 assert.match(guard, /href="\.\/#possibilities"/);
@@ -60,7 +62,7 @@ for (const page of ['about.html', 'licenses.html', 'certifications.html']) {
   const html = await readFile(resolve(root, page), 'utf8');
   assert.match(html, /aria-current="page"/);
 }
-for (const file of ['index.html', 'services.html', 'handbook.html']) {
+for (const file of ['index.html', 'manual.html', 'handbook.html']) {
   const html = await readFile(resolve(root, file), 'utf8');
   assert.equal(html.split('studio-site-footer').length - 1, 1, `${file}: expected one shared footer`);
   assert.match(html, /aria-label="Footer sitemap"/);
@@ -68,7 +70,7 @@ for (const file of ['index.html', 'services.html', 'handbook.html']) {
 const about = await readFile(resolve(root, 'about.html'), 'utf8');
 assert.match(about, /Suryandu Ganguly/);
 assert.match(about, /Gunjan Roy/);
-assert.match(about, /haven't selected or announced a first flagship product/);
+assert.match(about, /first focused product is Cellar Guard/);
 const licenses = await readFile(resolve(root, 'licenses.html'), 'utf8');
 assert.match(licenses, /Copyright \(c\) 2026 Cellar contributors/);
 assert.match(licenses, /THE SOFTWARE IS PROVIDED "AS IS"/);
@@ -100,14 +102,14 @@ assert.match(consentScript, /data-privacy-essential/);
 assert.match(consentScript, /data-privacy-allow/);
 assert.match(consentScript, /if \(!preferences\?\.embeds\)/);
 assert.doesNotMatch(consentScript, /gtag\s*\(|facebook\.com\/tr|google-analytics/);
-assert.ok(files.length >= 40, 'all company policy and legacy pages should be published');
-for (const file of ['index.html','studio.html','explore.html']) {
-  const html = await readFile(resolve(root,file),'utf8');
-  assert.match(html,/class="showcase-rail"/);
-  assert.match(html,/href=".\/product-guard.html"/);
+for (const retired of ['explore.html','services.html','downloads.html','product-guard.html','product-deadlock.html','product-buildclinic.html','product-clausecraft.html','product-plancliff.html','product-crashcheck.html','product-learn.html','deadlock.html','deadlock-downloads.html']) {
+  assert.ok(!files.includes(retired), `${retired}: retired catalogue or unrelated product page must not be published`);
 }
-assert.match(await readFile(resolve(root,'downloads.html'),'utf8'),/coming soon/i);
+const manual = await readFile(resolve(root,'manual.html'),'utf8');
+assert.match(manual, /id="pr"/);
+assert.match(manual, /csv-compatibility/);
+assert.match(manual, /Cellar Guard/);
 const js = await readFile(resolve(root, 'theme-system.js'), 'utf8');
 assert.match(js, /localStorage\.setItem/);
 assert.match(js, /Switch to/);
-console.log(`${files.length} published HTML pages pass theme, navigation and product-hold checks.`);
+console.log(`${files.length} Guard-only HTML pages pass theme and navigation checks.`);

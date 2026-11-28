@@ -45,8 +45,8 @@ Generated output such as `build/`, `dist/` and local `data/` is not source code.
 
 - This repository can build a local **Java** server and a separate public demonstration website.
 - The public website is not automatically the complete authenticated Java workspace.
-- Cloud backend hosting requires an explicit compatible Java host and configured origins. See [README deployment section](../README.md#deploy-the-site-and-connect-the-workspace).
+- Cloud backend hosting requires an explicit compatible Java host and configured origins. See [web security and deployment](WEB_SECURITY.md).
 
-## Where to propose ecosystem work
+## Where to propose Cellar Guard work
 
-See [Cellar Studio](CELLAR_STUDIO.md). Open a GitHub issue with the user problem, affected product, actual evidence, intended scope, acceptance criteria and tests. Do not silently rename or migrate other contributors' repositories.
+See the [Cellar Guard manual](CELLAR_GUARD_MANUAL.md). Open a GitHub issue with the user problem, actual evidence, intended scope, acceptance criteria and tests. Keep other teams' repositories and contributor credit outside the Guard-only scope.

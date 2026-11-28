@@ -6,7 +6,7 @@ public final class Reports {
     private Reports() {}
     public static String text(Map<String,Object> report) {
         if(!report.containsKey("results"))return Json.write(report)+"\n";
-        StringBuilder b=new StringBuilder("Cellar "+Main.VERSION+" | "+report.get("scope")+"\n");
+        StringBuilder b=new StringBuilder("Cellar Guard "+Main.VERSION+" | "+report.get("scope")+"\n");
         for(Object obj:(List<?>)report.get("results")) {
             Map<String,Object> r=Json.object(obj);String status=Boolean.TRUE.equals(r.get("passed"))?"PASS":r.get("severity").equals("warning")?"WARN":"FAIL";
             b.append(status).append("  ").append(r.get("integration")).append(" | owner: ").append(r.get("owner")).append('\n');

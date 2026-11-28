@@ -1,9 +1,4 @@
-"""Browser smoke checks for Cellar Studio's current public site.
-
-The first flagship product is not announced. Do not assert retired product
-filters or redirect visitors to individual source repository pages.
-"""
-from pathlib import Path
+"""Browser smoke checks for Studio HQ and its only product, Cellar Guard."""
 import os
 
 from playwright.sync_api import sync_playwright
@@ -14,13 +9,7 @@ COMPANY_PAGES = [
     'about', 'licenses', 'certifications', 'privacy', 'terms', 'policies',
     'cookie-policy', 'refund-policy', 'business', 'contact',
 ]
-ROUTES = (
-    ['index', 'explore', 'services', 'downloads', 'handbook']
-    + COMPANY_PAGES
-    + [f.stem for f in Path('build/vercel').glob('*-downloads.html')]
-    + [f.stem for f in Path('build/vercel').glob('product-*.html')]
-    + [f.stem for f in Path('build/vercel').glob('service-*.html')]
-)
+ROUTES = ['index', 'guard', 'manual', 'guide', 'walkthrough', 'handbook'] + COMPANY_PAGES
 
 
 with sync_playwright() as playwright:
@@ -86,19 +75,12 @@ with sync_playwright() as playwright:
     page.keyboard.press('Escape')
     assert page.get_by_role('button', name='Open navigation').get_attribute('aria-expanded') == 'false'
 
-    page.goto(BASE + 'explore.html')
-    rail = page.locator('.showcase-rail')
-    rail.scroll_into_view_if_needed()
-    page.mouse.move(0, 0)
-    page.wait_for_function("document.querySelector('.showcase-rail').scrollLeft > 20", timeout=12000)
-    page.get_by_role('button', name='Pause automatic scrolling').click()
-    page.emulate_media(reduced_motion='reduce')
-    page.reload()
-    assert page.get_by_role('button', name='Play automatic scrolling').is_visible()
-    page.get_by_role('button', name='Next products').click()
-    assert rail.evaluate('element => element.scrollLeft') > 0
-    page.get_by_role('button', name='Previous products').click()
-    assert rail.evaluate('element => element.scrollLeft') < 5
+    # The homepage must promote one product and link to its public manual.
+    page.goto(BASE + 'index.html')
+    assert page.get_by_role('link', name='Meet Cellar Guard').count() == 1
+    assert page.get_by_role('link', name='Read the manual').count() == 1
+    page.goto(BASE + 'manual.html')
+    assert page.locator('#pr').count() == 1
 
     assert not errors, errors
     print(f'Checked {len(ROUTES)} routes at four widths, privacy choices, enquiry validation and mobile menu.')

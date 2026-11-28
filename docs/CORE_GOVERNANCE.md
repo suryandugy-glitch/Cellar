@@ -1,4 +1,4 @@
-# Cellar Studio — core governance and product structure
+# Cellar Studio — core governance and Cellar Guard ownership
 
 This document defines **decision ownership**, not access control. The Cellar GitHub repository is public. Anyone can read this file, and the `.github/CODEOWNERS` file requests reviews but does **not** enforce authorization unless appropriate GitHub branch rules are enabled.
 
@@ -13,36 +13,32 @@ This document defines **decision ownership**, not access control. The Cellar Git
 
 ## Repository ownership
 
-**Cellar Studio is the main company repository (`Cellar-Studio`); Cellar Guard is currently a product codebase within it, intended for a separate child repository later.** See the [repository hierarchy plan](REPOSITORY_HIERARCHY.md). Listing a product under Studio does not transfer its repository permissions.
+**`Cellar-Studio` is the main repository for Cellar Studio and its only published product, Cellar Guard.** The Java source, product manual, static website and pull-request checker live together here.
 
 ## Company structure
 
 ```text
-Cellar Studio — company and main developer platform
+Cellar Studio — company and Java product
 │
 ├── Core governance (Suryandu + Gunjan)
-│   ├── Brand and product portfolio
+│   ├── Brand and Cellar Guard product direction
 │   ├── Architecture and security standards
 │   ├── Release readiness and roadmap
 │   └── Collaboration and access policy
 │
-├── Products
-│   ├── Cellar Guard — CSV compatibility checker (working pilot)
-│   ├── BuildClinic — build-log diagnostics (standalone tool)
-│   └── ClauseCraft — document-pattern review (prototype)
+├── Cellar Guard (working Java pilot)
+│   ├── CLI contract validation and release gates
+│   ├── Local web workspace and API
+│   ├── Pull-request CI and test fixtures
+│   └── Product manual and documentation
 │
-├── Studio Labs
-│   ├── PlanCliff — query-plan regression research
-│   └── CrashCheck — storage crash-consistency research
-│
-└── Shared platform (planned, not yet deployed)
-    ├── Project registry and cross-product navigation
-    ├── Versioned findings/reports
-    ├── Team roles and access control
-    └── Auditable release decisions
+└── Studio HQ (static public website)
+    ├── Guard product demonstration
+    ├── Java setup and manual
+    └── Company information and legal policies
 ```
 
-Each project retains its own repository, licensing obligations and existing contributors. A product's listing here does not transfer ownership or give Studio access to its credentials.
+Separate repositories, if any, keep their own licensing obligations and existing contributors. They are not advertised as Cellar Studio products.
 
 ## Decisions reserved for the core team
 

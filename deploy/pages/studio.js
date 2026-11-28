@@ -1,37 +1,5 @@
 (() => {
   'use strict';
-  const search = document.querySelector('#product-search');
-  const filters = [...document.querySelectorAll('[data-filter]')];
-  const cards = [...document.querySelectorAll('.product-card')];
-  const count = document.querySelector('#result-count');
-  const empty = document.querySelector('#empty-state');
-  let activeFilter = 'all';
-
-  function updateDirectory() {
-    if (!search) return;
-    const term = search.value.trim().toLocaleLowerCase();
-    let visible = 0;
-    for (const card of cards) {
-      const typeMatches = activeFilter === 'all' || card.dataset.kind === activeFilter;
-      const textMatches = !term || (card.dataset.search || '').includes(term) ||
-        card.textContent.toLocaleLowerCase().includes(term);
-      card.hidden = !(typeMatches && textMatches);
-      if (!card.hidden) visible++;
-    }
-    count.textContent = visible === 1 ? '1 project' : visible + ' projects';
-    empty.hidden = visible !== 0;
-  }
-
-  for (const button of filters) {
-    button.addEventListener('click', () => {
-      activeFilter = button.dataset.filter;
-      for (const option of filters) option.setAttribute('aria-pressed', String(option === button));
-      updateDirectory();
-    });
-  }
-  search?.addEventListener('input', updateDirectory);
-  updateDirectory();
-
   const toggle = document.querySelector('.menu-toggle');
   const mobileMenu = document.querySelector('#mobile-menu');
   if (!toggle || !mobileMenu) return;
@@ -50,8 +18,6 @@
   });
   document.addEventListener('keydown', event => {
     const focused = document.activeElement;
-    const typing = focused instanceof HTMLElement &&
-      (focused.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(focused.tagName));
     if (event.key === 'Escape' && !mobileMenu.hidden) {
       setMenu(false, true);
     } else if (event.key === 'Tab' && !mobileMenu.hidden) {
@@ -62,16 +28,6 @@
       } else if (!event.shiftKey && focused === links[links.length - 1]) {
         event.preventDefault();
         toggle.focus();
-      }
-    } else if (search && event.key === '/' && !typing && !event.ctrlKey && !event.altKey && !event.metaKey) {
-      event.preventDefault();
-      search.focus();
-    } else if (event.key === 'Escape' && focused === search) {
-      if (search.value) {
-        search.value = '';
-        updateDirectory();
-      } else {
-        search.blur();
       }
     }
   });

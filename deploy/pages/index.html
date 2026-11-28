@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f6f5ef">
-  <title>Cellar | Catch breaking CSV changes before release</title>
-  <meta name="description" content="Check CSV exports against the contracts your customers depend on. See what broke, who is affected, and whether the release can ship.">
+  <title>Cellar Guard | Catch customer-breaking CSV changes on pull requests</title>
+  <meta name="description" content="Catch CSV export changes that would break a customer's import, before you ship. Cellar Guard is a Java CSV contract checker that runs on every pull request.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Cellar | Catch breaking CSV changes before release">
-  <meta property="og:description" content="Check CSV exports against the contracts your customers depend on. See what broke, who is affected, and whether the release can ship.">
+  <meta property="og:title" content="Cellar Guard — Java CSV compatibility checks">
+  <meta property="og:description" content="Catch CSV export changes that would break a customer's import, before you ship. Runs on every pull request.">
   <link rel="canonical" href="https://suryandugy-glitch.github.io/Cellar-Studio/guard.html">
   <link rel="icon" href="./logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./landing.css">
@@ -42,9 +42,9 @@
         <a href="#quick-start">Quick start</a>
         <a href="./guide.html">CI / Deploy</a>
         <a href="./handbook.html#docs">API</a>
-        <a href="./handbook.html#roadmap">Roadmap</a>
+        <a href="./manual.html">Manual</a>
       </nav>
-      <div class="header-actions"><a class="button button-outline repo-button" href="./services.html"><span>Services</span></a><a class="button button-primary" href="./guide.html#quick-start">Open workspace <span aria-hidden="true">↗</span></a></div>
+      <div class="header-actions"><a class="button button-outline repo-button" href="./manual.html#pr"><span>PR integration</span></a><a class="button button-primary" href="./guide.html#quick-start">Run locally <span aria-hidden="true">↗</span></a></div>
     </div>
   </header>
   <main id="main">
@@ -52,13 +52,13 @@
       <div class="wrap hero-inner">
         <div class="hero-copy">
           <p class="eyebrow">CSV compatibility checks</p>
-          <h1 id="hero-title">Catch the CSV change that breaks a customer’s import, <span>before it ships.</span></h1>
-          <p class="lede">Validate your data contracts, detect breaking changes, and protect every customer integration before release.</p>
+          <h1 id="hero-title">Catch CSV export changes that would break a customer’s import, <span>before you ship.</span></h1>
+          <p class="lede">Cellar Guard validates consumer contracts in Java 21+. Run it on every pull request to catch missing columns and invalid values before release.</p>
           <div class="hero-actions">
             <a href="./walkthrough.html" class="button button-primary"><svg class="icon" aria-hidden="true"><use href="#play"/></svg> Explore sample checks</a>
-            <a class="button button-outline" href="./guide.html#quick-start">Read the quick start</a>
+            <a class="button button-outline" href="./manual.html">Read the manual</a>
           </div>
-          <p class="hero-meta"><span>Open source</span><span>Java 21+</span><span>Runs locally or in CI</span></p>
+          <p class="hero-meta"><span>Open source</span><span>Java 21+</span><span>Pull request checks</span></p>
         </div>
         <aside class="release-preview" aria-labelledby="preview-title">
           <div class="preview-top">
@@ -127,7 +127,7 @@
           <h2 id="quick-start-title">Check your own export.</h2>
           <p>Run Cellar locally or add it to your pull request checks.</p>
         </div>
-        <a class="button button-outline" href="./guide.html#quick-start">Open the setup guide</a>
+        <a class="button button-outline" href="./manual.html#pr">Open the PR setup manual</a>
       </div>
     </section>
   </main>
@@ -138,7 +138,7 @@
         <a href="./walkthrough.html">Full sample reports</a>
         <a href="./guide.html">CI and deployment guide</a>
         <a href="./workplace.html">Workplace policy</a>
-        <a href="./handbook.html#docs">API reference</a>
+        <a href="./manual.html">User manual</a>
         <a href="./handbook.html#contribute">Contribute</a>
         <a href="./handbook.html#policies">Policies</a>
       </nav>

@@ -1,18 +1,18 @@
-# Getting started with Cellar
+# Getting started with Cellar Guard
 
 ## In one minute: what are we building?
 
 Suppose your application sends a CSV file to a customer each week. The customer expects a column called `order_id`. Someone changes the export to `id`. The CSV still opens, but the customer's import breaks.
 
-**Cellar checks the export against agreed rules before it ships.** It reports which integration would break, explains the evidence and gives a release verdict.
+**Cellar Guard checks the export against agreed rules before it ships.** It reports which integration would break, explains the evidence and gives a release verdict.
 
-The **Cellar Studio** platform is intended to apply that same evidence-first approach to other developer problems, such as build logs and database performance. Those products have their own repositories and different stages of maturity. They do not all run here.
+Cellar Guard is the **only product** presented by Cellar Studio. It is implemented in Java 21+ and can run on every pull request once connected to the application's freshly generated export.
 
 ## Choose your path
 
 ### I just want to see what Cellar does
 
-Open the [Cellar Guard sample demonstration](https://cellar-csv.vercel.app/). It uses synthetic sample reports; it is **not** the full Java backend.
+Open the [Cellar Guard sample demonstration](https://cellar-csv.vercel.app/guard.html). It uses synthetic sample reports; it is **not** the full Java backend.
 
 ### I want to run the actual application
 
@@ -46,16 +46,16 @@ The first command compiles and runs the Java tests. The second checks the config
 
 ## Where your changes should go
 
-- Java validation, API and the web UI bundled with the backend: this **Cellar-Studio** repository, until Guard is extracted into its own child repository.
-- Static website and demo pages: this repository's `deploy/` code.
-- Other Cellar Studio products, such as BuildClinic or PlanCliff: **their own repos**.
-- Cross-product strategy, shared interfaces and documentation: `docs/CELLAR_STUDIO.md` and focused issues here, until a dedicated hub exists.
+- Java validation, API and the web UI bundled with Cellar Guard: `src/main/` and `src/test/`.
+- The only product pages, website manual and company information: `deploy/pages/`.
+- Pull request compatibility gate: `.github/workflows/guard-pr.yml`.
+- Product user manual: [Cellar Guard manual](CELLAR_GUARD_MANUAL.md).
 
 See the [codebase map](CODEBASE_MAP.md) and [development guide](DEVELOPMENT_ENVIRONMENT.md) for more.
 
 ## Common questions
 
-**Is this the entire Cellar Studio platform?** Not yet. It is the existing Guard product plus the ecosystem's initial planning documents.
+**Does Cellar Studio have other products?** No. Cellar Guard is the sole product currently published here.
 
 **Does the Vercel website run the Java backend automatically?** No. The static/demo site and the Java workspace are different deployments. For a remote workspace, follow [web deployment guidance](WEB_SECURITY.md).
 

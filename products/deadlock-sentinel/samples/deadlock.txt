@@ -1,8 +1,0 @@
-"worker-A" #11 prio=5
-   java.lang.Thread.State: BLOCKED
-    - waiting to lock <0x002> (a java.lang.Object)
-    - locked <0x001> (a java.lang.Object)
-"worker-B" #12 prio=5
-   java.lang.Thread.State: BLOCKED
-    - waiting to lock <0x001> (a java.lang.Object)
-    - locked <0x002> (a java.lang.Object)

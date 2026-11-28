@@ -1,0 +1,45 @@
+name: Cellar Guard
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  csv-compatibility:
+    name: csv-compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Test and package Cellar Guard
+        run: java Build.java test
+      - name: Validate the consumer contract
+        run: java -jar dist/cellar.jar validate --config cellar.json
+      # Replace this fixture with a CSV generated from the PR's proposed code.
+      # e.g. ./gradlew exportCsv && export GUARD_CSV=build/exports/orders.csv
+      - name: Check proposed CSV export
+        env:
+          GUARD_CSV: examples/sales.csv
+        run: |
+          test -f "$GUARD_CSV" || { echo "::error::CSV export missing: $GUARD_CSV"; exit 2; }
+          java -jar dist/cellar.jar check \
+            --config cellar.json \
+            --csv "$GUARD_CSV" \
+            --format markdown --summary
+      - name: Verify the release gate rejects a breaking CSV
+        run: |
+          code=0
+          java -jar dist/cellar.jar check \
+            --config cellar.json --csv examples/breaking-header.csv || code=$?
+          if [ "$code" -ne 1 ]; then
+            echo "::error::Expected Cellar Guard to block the incompatible test export (exit 1); got $code"
+            exit 1
+          fi
