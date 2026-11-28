@@ -1,21 +1,36 @@
 <p align="center"><img src="assets/logo.svg" alt="Cellar Studio" width="100"></p>
 
-<h1 align="center">Cellar Guard</h1>
+<h1 align="center">Cellar Studio</h1>
 
-<p align="center"><strong>Catch CSV export changes that would break a customer’s import, before you ship.</strong></p>
-<p align="center">A Java 21+ contract checker designed to run on every pull request.</p>
+<p align="center"><strong>We build what comes next.</strong></p>
+<p align="center">An independent software studio building useful developer tools. Our first product is Cellar Guard; more are coming soon.</p>
 
 <p align="center">
-  <a href="https://cellar-csv.vercel.app/">Cellar Studio</a> ·
+  <a href="https://cellar-csv.vercel.app/">Cellar Studio (Home)</a> ·
+  <a href="https://cellar-csv.vercel.app/products.html">Products</a> ·
+  <a href="https://cellar-csv.vercel.app/about.html">About</a> ·
   <a href="https://cellar-csv.vercel.app/guard.html">Cellar Guard</a> ·
   <a href="https://cellar-csv.vercel.app/manual.html">Online manual</a> ·
   <a href="docs/CELLAR_GUARD_MANUAL.md">Technical manual</a> ·
   <a href="https://cellar-csv.vercel.app/walkthrough.html">Example reports</a>
 </p>
 
-## One product: Cellar Guard
+## Cellar Studio
 
-Cellar Studio maintains **Cellar Guard** as its only product in this repository. Guard checks proposed CSV exports against consumer-defined contracts. For example, renaming `order_id` to `id` can break an import even when the new file looks valid in a spreadsheet.
+[Cellar Studio](https://cellar-csv.vercel.app/) is the main company identity and homepage. Products, team information, documentation and policy pages live beneath that identity. The studio works on practical software problems with careful engineering and reproducible evidence.
+
+## Products
+
+| Product | Status | Details |
+| --- | --- | --- |
+| **Cellar Guard** | Working Java 21+ pilot | [Product page](https://cellar-csv.vercel.app/guard.html) and [manual](docs/CELLAR_GUARD_MANUAL.md) |
+| **More products** | Coming soon | No additional names, releases or download dates have been announced |
+
+### Cellar Guard
+
+**Catch CSV export changes that would break a customer’s import, before you ship. Runs on every pull request.**
+
+Cellar Guard is the only implemented product in this repository. It checks proposed CSV exports against consumer-defined contracts. For example, renaming `order_id` to `id` can break an import even when the new file looks valid in a spreadsheet.
 
 ```text
 Consumer expects: order_id, sku, total_cents, currency
@@ -26,6 +41,17 @@ Release gate: BLOCK (exit 1)
 ```
 
 This is a **working Java pilot** with a local web workspace, CLI, tests, and an example GitHub Actions workflow. It is not a hosted SaaS. The public Studio homepage and product page are static, synthetic demonstrations; they do not run checks on uploaded customer files.
+
+## About the team
+
+| Team member | Role |
+| --- | --- |
+| **Suryandu Ganguly** | Founder & CTO |
+| **Gunjan Roy** | Backend |
+| **Disha Chakraborty** | CEO |
+| **Debangana Debnath** | Operation Coordinator |
+
+Additional contributors support engineering, design, testing, documentation and operations behind the scenes. The [About page](https://cellar-csv.vercel.app/about.html#people) introduces the team. These labels describe project roles, not independently verified legal appointments.
 
 ### What it checks
 
@@ -92,7 +118,7 @@ Open the URL printed by the Java process, normally `http://127.0.0.1:8080`. The 
 | `deploy/pages/` | Studio homepage, Guard presentation, manual and company/legal pages |
 | `deploy/build-vercel.mjs` | Static Vercel site builder |
 
-The primary website remains **[Cellar Studio](https://cellar-csv.vercel.app/)**. The only product is **[Cellar Guard](https://cellar-csv.vercel.app/guard.html)**. Old product catalogue pages and unrelated product implementations have been removed from this source tree; the repository history retains previous revisions.
+The primary website remains **[Cellar Studio](https://cellar-csv.vercel.app/)**. Its [Products page](https://cellar-csv.vercel.app/products.html) lists the implemented **[Cellar Guard](https://cellar-csv.vercel.app/guard.html)** and a coming-soon placeholder. Retired product catalogue pages and unrelated implementations remain absent from the current source tree; Git history retains previous revisions.
 
 ## Development and limitations
 

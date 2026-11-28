@@ -6,10 +6,21 @@ This document defines **decision ownership**, not access control. The Cellar Git
 
 | GitHub user | Core responsibility | Scope |
 | --- | --- | --- |
-| [Suryandu Ganguly (`@suryandugy-glitch`)](https://github.com/suryandugy-glitch) | Founder / platform lead | Company direction, brand, product approval, release decisions |
-| [Gunjan Roy (`@roy-gunjan743`)](https://github.com/roy-gunjan743) | Core engineering lead | Architecture review, reliability, technical delivery and engineering standards |
+| [Suryandu Ganguly (`@suryandugy-glitch`)](https://github.com/suryandugy-glitch) | Founder & CTO | Technology direction, brand, product approval, release decisions |
+| [Gunjan Roy (`@roy-gunjan743`)](https://github.com/roy-gunjan743) | Backend | Backend architecture, reliability, technical delivery and engineering standards |
 
-**Only these two users are named as the current Cellar Studio core team.** This is a governance designation, not a claim that other collaborators have lost their GitHub permissions. Gunjan currently has write access to this repository as of this documentation update.
+**These two users are named for repository-level technical governance.** This is not the full company team or a claim that other collaborators have lost their GitHub permissions. Gunjan's previously documented repository access should be verified in GitHub settings when permissions matter.
+
+## Public team roles
+
+| Team member | Cellar Studio role |
+| --- | --- |
+| Suryandu Ganguly | Founder & CTO |
+| Gunjan Roy | Backend |
+| Disha Chakraborty | CEO |
+| Debangana Debnath | Operation Coordinator |
+
+Other contributors also support work behind the scenes; publish names and responsibilities when the team provides them. These are public project-team labels and do not independently establish legal officer appointments or GitHub privileges.
 
 ## Repository ownership
 
@@ -20,11 +31,15 @@ This document defines **decision ownership**, not access control. The Cellar Git
 ```text
 Cellar Studio — company and Java product
 │
-├── Core governance (Suryandu + Gunjan)
+├── Technical repository governance (Suryandu + Gunjan)
 │   ├── Brand and Cellar Guard product direction
 │   ├── Architecture and security standards
 │   ├── Release readiness and roadmap
 │   └── Collaboration and access policy
+│
+├── Studio operations (Disha + Debangana + contributors)
+│   ├── Company coordination
+│   └── Day-to-day operations
 │
 ├── Cellar Guard (working Java pilot)
 │   ├── CLI contract validation and release gates

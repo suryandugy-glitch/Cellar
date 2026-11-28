@@ -9,7 +9,7 @@ COMPANY_PAGES = [
     'about', 'licenses', 'certifications', 'privacy', 'terms', 'policies',
     'cookie-policy', 'refund-policy', 'business', 'contact',
 ]
-ROUTES = ['index', 'guard', 'manual', 'guide', 'walkthrough', 'handbook'] + COMPANY_PAGES
+ROUTES = ['index', 'products', 'guard', 'manual', 'guide', 'walkthrough', 'handbook'] + COMPANY_PAGES
 
 
 with sync_playwright() as playwright:
@@ -77,8 +77,10 @@ with sync_playwright() as playwright:
 
     # The homepage must promote one product and link to its public manual.
     page.goto(BASE + 'index.html')
-    assert page.get_by_role('link', name='Meet Cellar Guard').count() == 1
-    assert page.get_by_role('link', name='Read the manual').count() == 1
+    assert page.get_by_role('link', name='Explore our products').count() == 1
+    assert page.get_by_role('link', name='Meet the team').count() == 1
+    page.goto(BASE + 'products.html')
+    assert page.locator('#coming-soon').count() == 1
     page.goto(BASE + 'manual.html')
     assert page.locator('#pr').count() == 1
 

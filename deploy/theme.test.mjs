@@ -36,10 +36,19 @@ assert.match(home, /studio-vision\.css/);
 assert.match(home, /studio-vision\.js/);
 assert.match(home, /id="possibilities"/);
 assert.match(home, /Cellar Guard/);
-assert.match(home, /href="\.\/manual\.html"/);
+assert.match(home, /href="\.\/products\.html"/);
+assert.match(home, /More products.*coming soon/i);
+assert.match(home, /href="\.\/about\.html"/);
 assert.match(home, /rel="canonical" href="https:\/\/cellar-csv\.vercel\.app\/"/);
 const guard = await readFile(resolve(root, 'guard.html'), 'utf8');
-assert.match(guard, /href="\.\/#possibilities"/);
+assert.match(guard, /href="\.\/products\.html"/);
+assert.match(guard, /href="\.\/"[^>]*>Cellar Studio<\/a>/);
+const products = await readFile(resolve(root,'products.html'),'utf8');
+assert.match(products, /id="guard"/);
+assert.match(products, /id="coming-soon"/);
+assert.match(products, /href="\.\/guard\.html"/);
+assert.match(products, /More products coming soon/);
+assert.doesNotMatch(products, /SpaceFix/);
 const studio = await readFile(resolve(root, 'studio.html'), 'utf8');
 assert.match(studio, /href="https:\/\/cellar-csv\.vercel\.app\/"/);
 assert.match(studio, /href="\.\/guard\.html"/);
@@ -56,13 +65,13 @@ for (const page of ['about.html', 'licenses.html', 'certifications.html', 'priva
   assert.match(html, /company-pages\.js/);
   assert.match(html, /studio-site-footer/);
   assert.doesNotMatch(html, /STUDIO_FOOTER/);
-  assert.match(html, /href="\.\/#possibilities"/, `${page}: studio navigation`);
+  assert.match(html, /href="\.\/products\.html"/, `${page}: product navigation`);
 }
 for (const page of ['about.html', 'licenses.html', 'certifications.html']) {
   const html = await readFile(resolve(root, page), 'utf8');
   assert.match(html, /aria-current="page"/);
 }
-for (const file of ['index.html', 'manual.html', 'handbook.html']) {
+for (const file of ['index.html', 'products.html', 'manual.html', 'handbook.html']) {
   const html = await readFile(resolve(root, file), 'utf8');
   assert.equal(html.split('studio-site-footer').length - 1, 1, `${file}: expected one shared footer`);
   assert.match(html, /aria-label="Footer sitemap"/);
@@ -70,6 +79,11 @@ for (const file of ['index.html', 'manual.html', 'handbook.html']) {
 const about = await readFile(resolve(root, 'about.html'), 'utf8');
 assert.match(about, /Suryandu Ganguly/);
 assert.match(about, /Gunjan Roy/);
+assert.match(about, /Disha Chakraborty/);
+assert.match(about, /Debangana Debnath/);
+assert.match(about, /Founder &amp; CTO/);
+assert.match(about, /Operation Coordinator/);
+assert.match(about, /behind the scenes/);
 assert.match(about, /first focused product is Cellar Guard/);
 const licenses = await readFile(resolve(root, 'licenses.html'), 'utf8');
 assert.match(licenses, /Copyright \(c\) 2026 Cellar contributors/);

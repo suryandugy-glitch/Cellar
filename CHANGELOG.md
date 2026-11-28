@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — Studio-first navigation and team
+
+- Restored **Cellar Studio** as the primary site and README identity, with a dedicated Products page and Cellar Guard as a product underneath it.
+- Added an honest "More products coming soon" placeholder; no unannounced application downloads are advertised.
+- Updated the About page to list Suryandu Ganguly (Founder & CTO), Gunjan Roy (Backend), Disha Chakraborty (CEO), Debangana Debnath (Operation Coordinator), and contributors working behind the scenes.
+- Kept the Guard claim tied to a real generated export in each application PR; the sample workflow remains synthetic until wired to that app.
+
 ## Unreleased — Cellar Guard focus
 
 - Made **Cellar Guard** the only product presented by the Studio site; removed legacy product listings, unrelated product pages, prototype source and associated workflows from this repository.
