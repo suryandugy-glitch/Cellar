@@ -1,20 +1,41 @@
-import { checkExport } from './guard-engine.js';
+import { checkCompiledContract, compileContract, draftHeaderContract } from './guard-engine.js';
+
+async function read(input, label, limit) {
+  if (typeof input === 'string') return input;
+  if (input.size > limit * 1024 * 1024) throw new Error(label + ' exceeds the ' + limit + ' MiB limit.');
+  if (!input.size) throw new Error(label + ' file is empty.');
+  const bytes = await input.arrayBuffer();
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    throw new Error(label + ' file must be valid UTF-8.');
+  }
+}
 
 self.addEventListener('message', async ({ data }) => {
+  const { task, contract, csv, delimiter } = data;
+  let field = 'csv';
+  let details;
   try {
-    const { contract, csv } = data;
-    const decode = new TextDecoder('utf-8', { fatal: true });
-    const read = async (input, label) => {
-      if (typeof input === 'string') return input;
-      const limit = label === 'CSV' ? 8 : 1;
-      if (input.size > limit * 1024 * 1024) throw new Error(label + ' exceeds the ' + limit + ' MiB limit.');
-      if (!input.size) throw new Error(label + ' file is empty.');
-      try { return decode.decode(await input.arrayBuffer()); }
-      catch { throw new Error(label + ' file must be valid UTF-8.'); }
+    if (task === 'draft') {
+      self.postMessage({ draft: draftHeaderContract(await read(csv, 'CSV', 8), delimiter) });
+      return;
+    }
+    field = 'contract';
+    const source = await read(contract, 'Contract', 1);
+    const compiled = compileContract(source);
+    details = {
+      source: typeof contract === 'string' ? null : source,
+      count: compiled.integrations.length,
     };
-    const [contractText, csvText] = await Promise.all([read(contract, 'Contract'), read(csv, 'CSV')]);
-    self.postMessage({ report: checkExport(contractText, csvText) });
+    if (task === 'validate') {
+      self.postMessage({ details });
+      return;
+    }
+    field = 'csv';
+    const report = checkCompiledContract(compiled, await read(csv, 'CSV', 8));
+    self.postMessage({ details, report });
   } catch (error) {
-    self.postMessage({ error: error.message });
+    self.postMessage({ details, field, error: error.message });
   }
 });

@@ -9,14 +9,23 @@ const fields = Object.fromEntries(['contract', 'csv'].map(key => [key, {
   text: document.querySelector('#' + key + '-text'),
   note: document.querySelector('#' + key + '-file-status')
 }]));
+const validate = document.querySelector('#validate-contract');
+const saveContract = document.querySelector('#download-contract');
+const draft = document.querySelector('#draft-contract');
+const draftDelimiter = document.querySelector('#draft-delimiter');
 let worker;
 let report;
 let revision = 0;
+
+const input = key => fields[key].file.files[0] || fields[key].text.value;
+const hasInput = key => Boolean(fields[key].file.files.length || fields[key].text.value.trim());
 
 function stop() {
   worker?.terminate();
   worker = undefined;
   run.disabled = false;
+  validate.disabled = false;
+  draft.disabled = false;
   cancel.hidden = true;
   form.removeAttribute('aria-busy');
 }
@@ -28,23 +37,45 @@ function clearReport() {
   download.disabled = true;
 }
 
-function changed() {
+function setFieldError(key, invalid) {
+  fields[key].file.setAttribute('aria-invalid', String(invalid));
+  fields[key].text.setAttribute('aria-invalid', String(invalid));
+}
+
+function changed(key) {
   revision++;
   stop();
   clearReport();
-  status.textContent = '';
+  if (key) {
+    setFieldError(key, false);
+    if (key === 'contract') saveContract.disabled = true;
+  }
 }
 
-for (const { file, text, note } of Object.values(fields)) {
+for (const [key, { file, text, note }] of Object.entries(fields)) {
   file.addEventListener('change', () => {
-    changed();
+    changed(key);
     const selected = file.files[0];
-    note.textContent = selected ? selected.name + ' will be checked. Editing the text below uses the text instead.' : '';
+    if (!selected) {
+      note.textContent = '';
+      status.textContent = 'Choose a file or paste text to continue.';
+      return;
+    }
+    note.textContent = 'Reading ' + selected.name + '…';
+    if (key === 'contract' || hasInput('contract')) {
+      startCheck(hasInput('csv') ? 'check' : 'validate', true);
+    } else {
+      note.textContent = 'Selected ' + selected.name + '.';
+      status.textContent = 'CSV selected. Choose a JSON contract to run the check.';
+    }
   });
   text.addEventListener('input', () => {
-    changed();
+    changed(key);
     file.value = '';
     note.textContent = '';
+    status.textContent = key === 'contract'
+      ? 'Contract edited. Validate it or check it against a CSV.'
+      : 'CSV edited. Select Check export to run the check.';
   });
 }
 
@@ -55,7 +86,7 @@ function node(tag, text, className) {
   return element;
 }
 
-function showReport(report) {
+function showReport(report, focus) {
   const verdict = report.blocking ? 'Release blocked' : report.passed ? 'Ready to ship' : 'Ready with warnings';
   const banner = node('div', undefined, 'guard-verdict ' + (report.blocking ? 'guard-blocked' : report.passed ? 'guard-passed' : 'guard-warning'));
   const heading = node('h2', verdict);
@@ -87,7 +118,7 @@ function showReport(report) {
     results.append(panel);
   }
   results.hidden = false;
-  heading.focus();
+  if (focus) heading.focus();
   return verdict;
 }
 
@@ -98,76 +129,129 @@ async function getSample(path) {
 }
 
 async function loadExample(csvPath) {
-  changed();
+  changed('csv');
   const request = revision;
   status.textContent = 'Loading example…';
   try {
-    const [contract, csv] = await Promise.all([getSample('./samples/contract.json'), getSample(csvPath)]);
+    const [contract, csv] = await Promise.all([
+      hasInput('contract') ? null : getSample('./samples/contract.json'),
+      getSample(csvPath)
+    ]);
     if (request !== revision) return;
-    for (const [key, value] of Object.entries({ contract, csv })) {
-      fields[key].text.value = value;
-      fields[key].file.value = '';
-      fields[key].note.textContent = '';
-    }
-    status.textContent = 'Example loaded. Select Check export.';
-  } catch (error) {
-    if (request === revision) status.textContent = error.message;
+    if (contract !== null && !hasInput('contract')) fields.contract.text.value = contract;
+    fields.csv.text.value = csv;
+    fields.csv.file.value = '';
+    fields.csv.note.textContent = 'Example CSV loaded.';
+    startCheck('check', true);
+  } catch {
+    if (request === revision) status.textContent = 'The example could not load. Try again or choose your own files.';
   }
 }
 
-document.querySelector('#load-passing').addEventListener('click', () => loadExample('./samples/passing.csv'));
-document.querySelector('#load-breaking').addEventListener('click', () => loadExample('./samples/breaking.csv'));
-getSample('./samples/contract.json').then(text => {
-  if (!fields.contract.text.value && !fields.contract.file.files.length) fields.contract.text.value = text;
-}).catch(() => {
-  if (!revision) status.textContent = 'Choose a contract file or paste your contract JSON to begin.';
-});
+function saveJson(source, filename) {
+  const url = URL.createObjectURL(new Blob([source], { type: 'application/json' }));
+  const link = node('a');
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
-form.addEventListener('submit', event => {
-  event.preventDefault();
+function startCheck(action, focus = false) {
   if (worker) return;
   revision++;
-  clearReport();
-  const input = {};
-  for (const [key, { file, text }] of Object.entries(fields)) {
-    input[key] = file.files[0] || text.value;
-    if (typeof input[key] === 'string' && !input[key].trim()) {
-      status.textContent = key === 'csv' ? 'Choose a CSV file or paste CSV text.' : 'Choose a contract file or paste JSON.';
-      text.focus();
-      return;
-    }
+  const task = action === 'check' && !hasInput('csv') ? 'validate' : action;
+  if (task !== 'draft' && !hasInput('contract')) {
+    status.textContent = 'Choose a JSON contract or paste its rules.';
+    return;
   }
+  if (task === 'draft' && !hasInput('csv')) {
+    status.textContent = 'Choose a known-good CSV first, or paste its text.';
+    return;
+  }
+
+  if (task !== 'draft') {
+    clearReport();
+    setFieldError('contract', false);
+  }
+  if (task !== 'validate') setFieldError('csv', false);
+
   try {
     const active = new Worker(new URL('./guard-worker.js', import.meta.url), { type: 'module' });
     worker = active;
     active.addEventListener('message', ({ data }) => {
       if (worker !== active) return;
       stop();
+      if (data.details) {
+        if (data.details.source !== null) fields.contract.text.value = data.details.source;
+        const count = data.details.count;
+        const filename = fields.contract.file.files[0]?.name;
+        fields.contract.note.textContent = 'Contract valid · ' + count +
+          (count === 1 ? ' integration' : ' integrations') + (filename ? ' · ' + filename : '.');
+        saveContract.disabled = false;
+      }
       if (data.error) {
-        status.textContent = data.error;
+        setFieldError(data.field, true);
+        fields[data.field].note.textContent = data.error;
+        status.textContent = (data.field === 'contract' ? 'Contract error. ' : 'CSV error. ') + data.error;
         return;
       }
-      report = data.report;
-      download.disabled = false;
-      status.textContent = showReport(report) + '.';
+      if (data.draft) {
+        saveJson(data.draft, 'cellar-guard-starter-contract.json');
+        status.textContent = 'Starter contract downloaded. Review it, then choose it to run a check.';
+        return;
+      }
+      if (data.report) {
+        report = data.report;
+        const filename = fields.csv.file.files[0]?.name;
+        if (filename) fields.csv.note.textContent = 'Checked ' + filename + '.';
+        download.disabled = false;
+        status.textContent = showReport(report, focus) + '.';
+        return;
+      }
+      status.textContent = hasInput('csv')
+        ? 'Contract valid. Select Check export to check the CSV.'
+        : 'Contract valid. Choose a CSV or load an example to run a check.';
     }, { once: true });
     active.addEventListener('error', () => {
       if (worker !== active) return;
       stop();
       status.textContent = 'The checker could not start. Reload the page and try again.';
     }, { once: true });
-    status.textContent = 'Checking export…';
+    status.textContent = task === 'draft' ? 'Creating starter contract…' :
+      task === 'validate' ? 'Validating contract…' : 'Checking export…';
     form.setAttribute('aria-busy', 'true');
     run.disabled = true;
+    validate.disabled = true;
+    draft.disabled = true;
     cancel.hidden = false;
-    active.postMessage(input);
+    const delimiter = draftDelimiter.value === 'tab' ? '\t' : draftDelimiter.value;
+    active.postMessage({ task, contract: input('contract'), csv: input('csv'), delimiter });
   } catch {
     stop();
     status.textContent = 'The checker needs a browser that supports web workers.';
   }
+}
+
+document.querySelector('#load-passing').addEventListener('click', () => loadExample('./samples/passing.csv'));
+document.querySelector('#load-breaking').addEventListener('click', () => loadExample('./samples/breaking.csv'));
+getSample('./samples/contract.json').then(text => {
+  if (revision || hasInput('contract')) return;
+  fields.contract.text.value = text;
+  fields.contract.note.textContent = 'Example contract loaded.';
+}).catch(() => {
+  if (!revision) status.textContent = 'Choose a contract file or paste your contract JSON to begin.';
 });
 
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  startCheck('check', true);
+});
 run.disabled = false;
+validate.addEventListener('click', () => startCheck('validate'));
+draft.addEventListener('click', () => startCheck('draft'));
 
 cancel.addEventListener('click', () => {
   stop();
@@ -175,14 +259,21 @@ cancel.addEventListener('click', () => {
   run.focus();
 });
 
+document.querySelector('#clear-inputs').addEventListener('click', () => {
+  changed('contract');
+  setFieldError('csv', false);
+  for (const { text, file, note } of Object.values(fields)) {
+    text.value = '';
+    file.value = '';
+    note.textContent = '';
+  }
+  status.textContent = 'Inputs cleared. Choose files or load an example.';
+});
+
+saveContract.addEventListener('click', () => {
+  saveJson(fields.contract.text.value, 'cellar-guard-contract.json');
+});
+
 download.addEventListener('click', () => {
-  if (!report) return;
-  const url = URL.createObjectURL(new Blob([JSON.stringify(report, null, 2) + '\n'], { type: 'application/json' }));
-  const link = node('a');
-  link.href = url;
-  link.download = 'cellar-guard-report.json';
-  document.body.append(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  if (report) saveJson(JSON.stringify(report, null, 2) + '\n', 'cellar-guard-report.json');
 });

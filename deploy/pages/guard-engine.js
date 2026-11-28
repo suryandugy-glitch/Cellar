@@ -72,7 +72,7 @@ function parseContract(source) {
   return read(0);
 }
 
-function compile(source) {
+export function compileContract(source) {
   requireInput(new TextEncoder().encode(source).length <= 1024 * 1024, 'Contract exceeds the 1 MiB browser limit.');
   let raw;
   try {
@@ -316,11 +316,28 @@ function checkIntegration(integration, header, positions, rows) {
 }
 
 export function checkExport(contractSource, csv) {
-  const { delimiter, integrations, checkRows } = compile(contractSource);
+  return checkCompiledContract(compileContract(contractSource), csv);
+}
+
+export function checkCompiledContract({ delimiter, integrations, checkRows }, csv) {
   const { header, rows } = parseCsv(csv, delimiter, checkRows);
   const positions = new Map(header.map((column, index) => [column, index]));
   const results = integrations.map(integration => checkIntegration(integration, header, positions, rows));
   const blocking = results.some(result => result.issueCount && result.severity === 'error');
   const passed = results.every(result => result.issueCount === 0);
   return { passed, blocking, rowsChecked: checkRows ? rows.length : null, header, results };
+}
+
+export function draftHeaderContract(csv, delimiter) {
+  requireInput([',', ';', '\t'].includes(delimiter), 'Choose a valid CSV delimiter.');
+  const { header } = parseCsv(csv, delimiter, true);
+  const draft = {
+    version: 2,
+    delimiter,
+    validateRows: true,
+    integrations: [{ id: 'customer-import', required: header }],
+  };
+  const source = JSON.stringify(draft, null, 2);
+  compileContract(source);
+  return source + '\n';
 }
