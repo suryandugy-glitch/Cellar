@@ -62,6 +62,8 @@ The response keeps existing keys `added`, `removed`, `reordered`, `impacted`, an
 - `affectedIntegrations`: number of integrations listed in `impacted`.
 - `renameCandidates`: conservative, deterministic header-name suggestions. Each item includes `from`, `to`, `nameSimilarityPercent`, `requiredBy` (integration IDs requiring the old name), and `action`.
 
+An `orderMismatch` in `impacted` means the baseline matched the exact declared header order and the proposed header no longer does. Use `/api/check` to detect pre-existing violations.
+
 Example candidate:
 
 ```json

@@ -28,7 +28,7 @@
         <p class="company-kicker">Cellar Guard / User manual</p>
         <h1>Protect CSV imports. <em>On every PR.</em></h1>
         <p class="company-lede">Start with a safe example. See a CSV pass, watch a renamed column block the release, fix that column, and check again. The real Java checker runs on your computer; this page explains the steps.</p>
-        <div class="company-hero-actions"><a class="company-button" href="https://github.com/suryandugy-glitch/Cellar-Studio/releases/tag/guard-v3.0.0-web.1">Download Cellar Guard ZIP</a><a class="company-button company-button-outline" href="#demo">See the fix demo</a></div>
+        <div class="company-hero-actions"><a class="company-button" href="https://github.com/suryandugy-glitch/Cellar-Studio/releases/tag/guard-v3.1.0">Download Cellar Guard ZIP</a><a class="company-button company-button-outline" href="#demo">See the fix demo</a></div>
       </div>
     </section>
     <section class="company-section company-section-tint" id="install"><div class="company-wrap">
@@ -68,6 +68,7 @@ sh start-guard.sh  # macOS / Linux
       <div class="company-section-heading"><p class="company-kicker">04 / Use your own CSV</p><h2>Define the <em>customer promise.</em></h2><p>Make a copy of the sample contract, change required columns and rules to match the customer's importer, and run the checker on your own freshly generated CSV.</p></div>
       <div class="company-panel company-panel-blue">
         <pre><code>java -jar cellar-guard.jar check --config contracts/my-contract.json --csv path/to/my-export.csv</code></pre>
+        <p>Use <code>uniqueKeys</code> to catch duplicates across a combination of columns, such as <code>order_id</code> and <code>item_id</code>. Set <code>"validateRows": true</code> to check record structure with a header-only contract.</p>
         <p><strong>Exit 0:</strong> declared rules passed. <strong>Exit 1:</strong> a breaking rule failed. <strong>Exit 2:</strong> the check could not run; nothing was verified. Never change a contract just to hide an incompatibility.</p>
       </div>
     </div></section>

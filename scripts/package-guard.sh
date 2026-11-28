@@ -2,12 +2,11 @@
 # Checked Java release bundle for users (no source build required).
 set -euo pipefail
 cd "$(dirname "$0")/.."
-repo_root="$(pwd)"
 
-version='3.0.0-web.1'
-bundle="Cellar-Guard-${version}"
 java Build.java package
-mkdir -p dist
+version="$(java -jar dist/cellar.jar --version)"
+version="${version#Cellar Guard }"
+bundle="Cellar-Guard-${version}"
 
 stage_root="$(mktemp -d)"
 trap 'if [[ -n "${stage_root:-}" && -d "$stage_root" ]]; then rm -r -- "$stage_root"; fi' EXIT
@@ -38,6 +37,7 @@ if [[ "$status" -ne 1 ]]; then
 fi
 java -jar "$stage/cellar-guard.jar" check --config "$stage/contracts/example-contract.json" --csv "$stage/samples/fixed.csv"
 
-(cd "$stage_root" && zip -q -r "$repo_root/dist/$bundle.zip" "$bundle")
-sha256sum "dist/$bundle.zip" > dist/SHA256SUMS.txt
+(cd "$stage_root" && zip -q -r "$bundle.zip" "$bundle")
+mv "$stage_root/$bundle.zip" "dist/$bundle.zip"
+(cd dist && sha256sum "$bundle.zip" > SHA256SUMS.txt)
 echo "Created dist/$bundle.zip with verified PASS/BLOCK/PASS fixtures and SHA256SUMS.txt"

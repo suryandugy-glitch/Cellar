@@ -33,6 +33,7 @@ Omit `allowed` to permit extra columns. Omit `order` to permit any order. An `or
 | Field | Default / constraint |
 |---|---|
 | `delimiter` | `,`; also accepts `;` or JSON `"\t"` |
+| `validateRows` | Optional root boolean, default `false`. Set `true` to check CSV structure across all rows, even with header-only rules |
 | `integrations` | Required; 1–100 objects, unique IDs |
 | `id` | Required nonblank name, max 256 characters, no control characters |
 | `required` | Required 1–1,000 nonblank column strings, exact matching |
@@ -42,6 +43,7 @@ Omit `allowed` to permit extra columns. Omit `order` to permit any order. An `or
 | `allowed`, `order` | Optional nonempty lists |
 | `minRows`, `maxRows` | Optional integers 0–100,000; min cannot exceed max |
 | `rules` | Optional map keyed by required column name |
+| `uniqueKeys` | Optional 1–16 groups per integration, each with 2–16 distinct required columns |
 
 ## Value semantics
 
@@ -60,11 +62,13 @@ Omit `allowed` to permit extra columns. Omit `order` to permit any order. An `or
 
 Empty fields skip type/enum/range/unique checks unless `notEmpty` is true. Use `notEmpty` alongside any rule when blanks must fail. Whitespace is significant. Repeated empty cells do not violate uniqueness. Values are not normalized, rounded or rewritten. Range checks run only after the type passes. A failed type prevents an additional enum/range finding for the same cell. Separate rule failures can produce multiple issues per record.
 
-Once any integration has value rules or row limits, the whole file is parsed and every record must match header width. A blank data record is one empty field: invalid width for multiple columns, otherwise handled by declared rules. Records may contain quoted newlines; issue `record` is the logical CSV record number (header=1), not a physical line. Row-count issues use record=0. Header-only mode stops CSV parsing after the header but still decodes the entire file as UTF-8.
+For a combined key, add `"uniqueKeys": [["order_id", "item_id"]]` to an integration that requires both fields. Each complete tuple must be unique within that file. Individual values may repeat in different tuples. Comparisons are exact and case-sensitive. A tuple with an empty field produces `EMPTY_KEY` and is skipped for duplicate detection. Later occurrences of a complete tuple produce `DUPLICATE_KEY`. If a key header is missing, the corresponding `MISSING_COLUMN` finding covers it.
+
+When any integration has value rules, row limits, or combined keys, the whole file is parsed and every record must match header width. With `validateRows: true`, a header-only contract also performs this structural validation and reports `scope=headers-and-row-structure`. Malformed row structure is an input error. A blank data record is one empty field: invalid width for multiple columns, otherwise handled by declared rules. Records may contain quoted newlines; issue `record` is the logical CSV record number (header=1), not a physical line. Row-count issues use record=0. Header-only mode stops CSV parsing after the header but still decodes the entire file as UTF-8.
 
 ## Finding codes
 
-`MISSING_COLUMN`, `UNEXPECTED_COLUMN`, `COLUMN_ORDER`, `MIN_ROWS`, `MAX_ROWS`, `EMPTY_VALUE`, `DUPLICATE_VALUE`, `INVALID_TYPE`, `ENUM_VALUE`, `BELOW_MIN`, `ABOVE_MAX`.
+`MISSING_COLUMN`, `UNEXPECTED_COLUMN`, `COLUMN_ORDER`, `MIN_ROWS`, `MAX_ROWS`, `EMPTY_VALUE`, `DUPLICATE_VALUE`, `EMPTY_KEY`, `DUPLICATE_KEY`, `INVALID_TYPE`, `ENUM_VALUE`, `BELOW_MIN`, `ABOVE_MAX`.
 
 The report gives column names and logical record numbers, never cell values. Each integration retains at most 200 findings; `issueCount` is the complete count and `truncated=true` indicates omitted details. All integrations are evaluated in configuration order.
 

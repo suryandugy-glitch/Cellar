@@ -35,14 +35,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          tag='guard-v3.0.0-web.1'
+          version="$(java -jar dist/cellar.jar --version)"
+          version="${version#Cellar Guard }"
+          tag="guard-v${version}"
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Release $tag already exists; leaving it unchanged."
             exit 0
           fi
           gh release create "$tag" \
-            dist/Cellar-Guard-3.0.0-web.1.zip dist/SHA256SUMS.txt \
-            --title 'Cellar Guard 3.0.0-web.1 — Java 21+ download' \
+            "dist/Cellar-Guard-${version}.zip" dist/SHA256SUMS.txt \
+            --title "Cellar Guard ${version} — Java 21+ download" \
             --notes-file docs/GUARD_RELEASE_NOTES.md \
             --target "$GITHUB_SHA" \
             --latest

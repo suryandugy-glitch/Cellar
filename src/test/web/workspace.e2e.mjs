@@ -122,9 +122,17 @@ try {
   await rows.nth(2).getByRole('cell', { name: 'Blocked', exact: true }).waitFor();
   await page.reload();
   await rows.nth(1).getByRole('cell', { name: 'Passed', exact: true }).waitFor();
+  await workspaceNav.getByRole('link', { name: 'Compare exports' }).click();
+  await page.getByRole('button', { name: 'Load demo exports' }).click();
+  await page.getByText('Demo exports loaded.', { exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Compare headers' }).click();
+  await page.getByRole('heading', { name: 'Possible column renames' }).waitFor();
+  const rename = page.getByRole('row').filter({ hasText: 'order_id' }).filter({ hasText: '%'});
+  await rename.getByRole('cell', { name: 'id', exact: true }).waitFor();
+
   await page.getByRole('button', { name: 'Lock workspace' }).click();
   await page.getByRole('heading', { name: 'Unlock Cellar' }).waitFor();
-  console.log('Browser workspace checks passed: preflight, authentication, pilot setup, dashboard outcomes, uploads, verdicts, history and lock.');
+  console.log('Browser workspace checks passed: preflight, authentication, pilot setup, dashboard outcomes, uploads, verdicts, history, header comparisons and lock.');
 } finally {
   await browser?.close();
   await new Promise(resolve => server.close(resolve));

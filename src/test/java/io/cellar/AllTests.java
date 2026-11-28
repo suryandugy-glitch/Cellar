@@ -44,6 +44,42 @@ public final class AllTests {
             test("numeric enum",()->{ok(blocking(single(",\"rules\":{\"a\":{\"type\":\"decimal\",\"min\":0,\"max\":10}}"),"a\n-1\n11\n"));ok(blocking(single(",\"rules\":{\"a\":{\"enum\":[\"INR\"]}}"),"a\nUSD\n"));});
             test("row limits",()->{ok(blocking(single(",\"minRows\":1"),"a\n"));ok(blocking(single(",\"maxRows\":0"),"a\n1\n"));});
             test("allowed order",()->{ok(blocking(single(",\"allowed\":[\"a\"]"),"a,b\n"));ok(blocking(single(",\"order\":[\"a\",\"b\"]"),"b,a\n"));});
+            test("composite keys are scoped to a complete tuple",()->{
+                var c=Contract.parse("""
+                    {"integrations":[{"id":"lines","required":["order_id","item_id"],
+                                      "uniqueKeys":[["order_id","item_id"]]}]}
+                    """);
+                ok(!blocking(c,"order_id,item_id\nPRIVATE-ORDER,1\nPRIVATE-ORDER,2\nOTHER,1\n"));
+                var report=Checker.check(c,"item_id,order_id\n1,PRIVATE-ORDER\n1,PRIVATE-ORDER\n,OTHER\n",false);
+                eq(report.get("blocking"),true);
+                eq(report.get("rowsChecked"),3);
+                var integration=Json.object(((List<?>)report.get("results")).getFirst());
+                var issues=(List<?>)integration.get("issues");
+                eq(issues.size(),2);
+                eq(Json.object(issues.get(0)).get("code"),"DUPLICATE_KEY");
+                eq(Json.object(issues.get(0)).get("record"),3);
+                eq(Json.object(issues.get(1)).get("code"),"EMPTY_KEY");
+                eq(Json.object(issues.get(1)).get("record"),4);
+                ok(!(Json.write(report)+Reports.text(report)+Reports.markdown(report)).contains("PRIVATE-ORDER"));
+                var missing=Checker.check(c,"order_id\n1\n",false);
+                eq(Json.object(((List<?>)missing.get("results")).getFirst()).get("issueCount"),1);
+            });
+            test("invalid composite key definitions fail validation",()->{
+                for(String keys : List.of("[]","[[\"a\"]]","[[\"a\",\"a\"]]","[[\"a\",\"c\"]]",
+                    "[[\"a\",\"b\"],[\"b\",\"a\"]]"))
+                    invalid(()->Contract.parse("{\"integrations\":[{\"id\":\"x\",\"required\":[\"a\",\"b\"],\"uniqueKeys\":"+keys+"}]}"));
+            });
+            test("opt-in row structure catches malformed data after valid headers",()->{
+                var c=Contract.parse("""
+                    {"validateRows":true,"delimiter":";","integrations":[{"id":"x","required":["a","b"]}]}
+                    """);
+                var report=Checker.check(c,"a;b\n1;2\n",false);
+                eq(report.get("scope"),"headers-and-row-structure");
+                eq(report.get("rowsChecked"),1);
+                invalid(()->Checker.check(c,"a;b\n1\n",true));
+                invalid(()->Checker.check(c,"a;b\n1;\"unfinished",false));
+                invalid(()->Contract.parse("{\"validateRows\":\"yes\","+LEGACY.substring(1)));
+            });
             test("warning does not block",()->{var r=Checker.check(single(",\"severity\":\"warning\""),"b\n",false);eq(r.get("passed"),false);eq(r.get("blocking"),false);});
             test("advisory preserves findings",()->{var r=Checker.check(Contract.parse(LEGACY),"a\n",true);eq(r.get("passed"),false);eq(r.get("blocking"),false);});
             test("determinism cell redaction",()->{var c=single(",\"rules\":{\"a\":{\"type\":\"integer\"}}");var r=Checker.check(c,"a\nPRIVATE-SECRET\n",false);eq(Json.write(r),Json.write(Checker.check(c,"a\nPRIVATE-SECRET\n",false)));ok(!(Json.write(r)+Reports.text(r)+Reports.markdown(r)).contains("PRIVATE-SECRET"));});
@@ -71,6 +107,12 @@ public final class AllTests {
                 eq(((List<?>)r.get("renameCandidates")).size(),1);
             });
             test("diff reorder",()->eq(Checker.diff(single(""),"a,b\n","b,a\n").get("reordered"),true));
+            test("diff reports only newly introduced order violations",()->{
+                var c=single(",\"order\":[\"a\",\"b\"]");
+                eq(Checker.diff(c,"b,a\n","b,a\n").get("affectedIntegrations"),0);
+                eq(Checker.diff(c,"a,b\n","b,a\n").get("affectedIntegrations"),1);
+                eq(Checker.diff(c,"b,a\n","a,b\n").get("affectedIntegrations"),0);
+            });
             test("invalid configs typo rejection",()->{for(String c:List.of("{}","null","{\"integrations\":[]}","{\"integrations\":[{\"id\":\"x\",\"required\":[\"a\"],\"requried\":[]}]}"))invalid(()->Contract.parse(c));invalid(()->single(",\"severity\":\"oops\""));invalid(()->single(",\"rules\":{\"a\":{\"type\":\"string\",\"min\":0}}"));invalid(()->single(",\"minRows\":-1"));invalid(()->single(",\"rules\":{\"b\":{}}"));});
             test("JSON strict nesting duplicate keys",()->{for(String s:List.of("{\"a\":1,\"a\":2}","[1,]","01","1e","{x:1}","\"\n\"","[".repeat(70)+"]".repeat(70)))invalid(()->Json.parse(s));});
             test("JSON unicode",()->{String s="Bengali বাংলা \"quoted\"\n 😃";eq(Json.parse(Json.write(s)),s);});
@@ -93,6 +135,26 @@ public final class AllTests {
             test("CLI demo generation",()->{Path out=temp.resolve("demo.csv");eq(Main.run(new String[]{"export-demo","--out",out.toString()}),0);eq(Main.run(new String[]{"check","--config",cfg.toString(),"--csv",out.toString()}),0);});
             test("CLI advisory and invalid remain distinct",()->{eq(Main.run(new String[]{"check","--config",cfg.toString(),"--csv",csv.toString(),"--advisory"}),0);Path bad=temp.resolve("empty.csv");Files.writeString(bad,"");eq(Main.run(new String[]{"check","--config",cfg.toString(),"--csv",bad.toString(),"--advisory"}),2);});
             test("CLI writes JSON report",()->{Path report=temp.resolve("report.json");eq(Main.run(new String[]{"check","--config",cfg.toString(),"--csv",csv.toString(),"--format","json","--output",report.toString()}),1);eq(Json.object(Json.parse(Files.readString(report))).get("blocking"),true);});
+            test("CLI diff writes Markdown to report and job summary",()->{
+                Path before=temp.resolve("before.csv"), after=temp.resolve("after.csv");
+                Path report=temp.resolve("comparison.md"), summary=temp.resolve("comparison-summary.md");
+                Files.writeString(before,Demo.CSV);
+                Files.writeString(after,Demo.csv(true));
+                String bin=Path.of(System.getProperty("java.home"),"bin",
+                    System.getProperty("os.name").startsWith("Windows")?"java.exe":"java").toString();
+                ProcessBuilder process=new ProcessBuilder(bin,"-cp",System.getProperty("java.class.path"),
+                    "io.cellar.Main","diff","--config",cfg.toString(),"--baseline",before.toString(),
+                    "--csv",after.toString(),"--format","markdown","--output",report.toString(),"--summary");
+                process.environment().put("GITHUB_STEP_SUMMARY",summary.toString());
+                process.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+                process.redirectError(ProcessBuilder.Redirect.DISCARD);
+                eq(process.start().waitFor(),0);
+                String markdown=Files.readString(report);
+                ok(markdown.contains("order_id → id"));
+                ok(markdown.contains("inventory"));
+                ok(!markdown.contains("ORD-001"));
+                eq(Files.readString(summary).strip(),markdown.strip());
+            });
             test("invalid edit preserves contract",()->{String original=Files.readString(cfg);invalid(()->store.save("{}",(String)store.config().get("revision")));eq(Files.readString(cfg),original);});
             test("GitHub summary process integration",()->{
                 Path summary=temp.resolve("summary.md");
