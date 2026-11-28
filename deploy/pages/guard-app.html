@@ -22,7 +22,7 @@
       <div>
         <p class="guard-kicker">Cellar Guard</p>
         <h1 id="guard-title">CSV <span>Checker</span></h1>
-        <p>Choose a JSON contract with the import rules and a CSV with the data to check. Both files stay in this browser.</p>
+        <p>Set your import rules and choose a CSV to check. Your rules and data stay in this browser.</p>
       </div>
       <div class="guard-hero-actions">
         <button type="button" id="load-passing">Load passing example</button>
@@ -31,19 +31,31 @@
     </section>
     <noscript><p class="guard-notice">Enable JavaScript to use the browser checker, or <a href="./manual.html#install">download the Java app</a>.</p></noscript>
     <form id="guard-form" novalidate>
-      <p id="guard-status" class="guard-notice" role="status">Choose a JSON contract and a CSV, or try an example above.</p>
+      <p id="guard-status" class="guard-notice" role="status">Enter the required columns, choose a CSV, or try an example above.</p>
       <div class="guard-inputs">
         <section class="guard-card guard-contract" aria-labelledby="contract-title">
-          <header><h2 id="contract-title">Import contract</h2><p>Set the columns and rules your customer expects.</p></header>
-          <label class="guard-upload" for="contract-file">Choose JSON contract</label>
-          <input id="contract-file" type="file" accept=".json,application/json" aria-describedby="contract-file-status">
-          <p id="contract-file-status" class="guard-file-status" aria-live="polite"></p>
-          <label for="contract-text">Contract JSON</label>
-          <textarea id="contract-text" rows="10" spellcheck="false" autocomplete="off" aria-describedby="contract-file-status"></textarea>
-          <div class="guard-field-actions">
-            <button type="button" id="validate-contract">Validate contract</button>
-            <button type="button" id="download-contract" disabled>Download contract</button>
+          <header><h2 id="contract-title">Import rules</h2><p>Build a contract here or use an existing JSON contract.</p></header>
+          <div class="guard-builder">
+            <label for="builder-columns">Required columns</label>
+            <p id="builder-help">Enter one column name per line, using the names the receiving app expects.</p>
+            <textarea id="builder-columns" rows="3" spellcheck="false" autocapitalize="off" autocomplete="off"
+              aria-describedby="builder-help" placeholder="order_id&#10;sku"></textarea>
+            <label for="builder-delimiter">Contract delimiter</label>
+            <select id="builder-delimiter"><option value=",">Comma</option><option value=";">Semicolon</option><option value="tab">Tab</option></select>
+            <button type="button" id="apply-rules">Use these rules</button>
           </div>
+          <p id="contract-file-status" class="guard-file-status" aria-live="polite"></p>
+          <details class="guard-json">
+            <summary>Import or edit JSON</summary>
+            <label for="contract-file">Choose JSON contract</label>
+            <input id="contract-file" type="file" accept=".json,application/json" aria-describedby="contract-file-status">
+            <label for="contract-text">Contract JSON</label>
+            <textarea id="contract-text" rows="10" spellcheck="false" autocomplete="off" aria-describedby="contract-file-status"></textarea>
+            <div class="guard-field-actions">
+              <button type="button" id="validate-contract">Validate contract</button>
+              <button type="button" id="download-contract" disabled>Download contract</button>
+            </div>
+          </details>
         </section>
         <section class="guard-card guard-csv" aria-labelledby="csv-title">
           <header><h2 id="csv-title">Proposed export</h2><p>Choose a UTF-8 CSV up to 8 MiB, or paste CSV text.</p></header>
@@ -54,9 +66,10 @@
           <textarea id="csv-text" rows="10" spellcheck="false" autocomplete="off" placeholder="order_id,sku,total_cents,currency" aria-describedby="csv-file-status"></textarea>
           <details class="guard-draft">
             <summary>Create a starter contract from a known-good CSV</summary>
-            <p>The draft uses all the header names as required columns. Review it against what the receiving app expects.</p>
+            <p>Use a previously accepted CSV, then review its column names against the receiving app’s requirements.</p>
             <label for="draft-delimiter">CSV delimiter</label>
             <select id="draft-delimiter"><option value=",">Comma</option><option value=";">Semicolon</option><option value="tab">Tab</option></select>
+            <button type="button" id="fill-rules">Fill required columns</button>
             <button type="button" id="draft-contract">Download starter JSON</button>
           </details>
         </section>

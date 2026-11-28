@@ -87,3 +87,12 @@ html[data-theme="dark"] .guard-app {
 .guard-draft label{width:auto;margin:0 0 4px}
 .guard-draft select{display:block;min-height:42px;margin:0 0 10px;padding:4px 12px;font:inherit;background:var(--guard-surface);color:var(--guard-ink)}
 .guard-card [aria-invalid="true"]{outline:2px solid #be4636;outline-offset:2px}
+.guard-builder,.guard-json{margin:0 20px 16px}
+.guard-builder p{margin:4px 0 6px;color:var(--guard-muted)}
+.guard-builder :is(label,textarea),.guard-json :is(label,input,textarea){width:100%;margin-inline:0}
+.guard-builder textarea{min-height:108px;margin-bottom:10px}
+.guard-builder select{display:block;min-height:44px;margin:5px 0 12px;padding:4px 12px;font:inherit;background:var(--guard-surface);color:var(--guard-ink)}
+.guard-json{border-top:1px solid var(--guard-muted);padding-top:12px}
+.guard-json summary{cursor:pointer;font-weight:800}
+.guard-json[open] summary,.guard-json input{margin-bottom:12px}
+.guard-json .guard-field-actions{margin-inline:0}
