@@ -1,6 +1,7 @@
 """Browser smoke checks for Studio HQ and its only product, Cellar Guard."""
 import json
 import os
+import re
 from pathlib import Path
 
 from urllib.parse import parse_qs
@@ -95,22 +96,32 @@ with sync_playwright() as playwright:
     page.get_by_role('button', name='Clear form').click()
     assert page.locator('#enquiry-message').input_value() == ''
     assert not page.locator('#enquiry-consent').is_checked()
-    page.locator('#enquiry-name').fill('Sample Visitor')
-    page.locator('#enquiry-email').fill('visitor+test@example.com')
-    page.locator('#enquiry-topic').select_option(label='Collaboration idea')
-    page.locator('#enquiry-message').fill(message)
-    page.locator('#enquiry-consent').check()
-    with page.expect_navigation(url=endpoint):
-        send.click()
-    assert submissions == [('POST', {
-        '_subject': ['New Cellar Studio enquiry'],
-        '_url': ['https://cellar-csv.vercel.app/contact.html'],
-        'name': ['Sample Visitor'],
-        'email': ['visitor+test@example.com'],
-        'topic': ['Collaboration idea'],
-        'message': [message.replace('\n', '\r\n')],
-    })]
-    assert page.get_by_role('heading', name='Message received').is_visible()
+    subjects = set()
+    for attempt in range(2):
+        if attempt:
+            page.goto(BASE + 'contact.html')
+        page.locator('#enquiry-name').fill('Sample Visitor')
+        page.locator('#enquiry-email').fill('visitor+test@example.com')
+        page.locator('#enquiry-topic').select_option(label='Collaboration idea')
+        page.locator('#enquiry-message').fill(message)
+        page.locator('#enquiry-consent').check()
+        with page.expect_navigation(url=endpoint):
+            send.click()
+        assert page.get_by_role('heading', name='Message received').is_visible()
+        assert len(submissions) == attempt + 1
+        method, fields = submissions[attempt]
+        assert method == 'POST'
+        subject, = fields.pop('_subject')
+        assert re.fullmatch(r'Cellar Studio \| Collaboration idea \| #[0-9A-F]{16}', subject)
+        subjects.add(subject)
+        assert fields == {
+            '_url': ['https://cellar-csv.vercel.app/contact.html'],
+            'name': ['Sample Visitor'],
+            'email': ['visitor+test@example.com'],
+            'topic': ['Collaboration idea'],
+            'message': [message.replace('\n', '\r\n')],
+        }
+    assert len(subjects) == 2, 'Identical enquiries must still use different email subjects.'
 
     # Small-screen navigation has a keyboard-reachable open/close control.
     page.set_viewport_size({'width': 390, 'height': 780})
