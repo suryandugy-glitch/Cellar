@@ -14,7 +14,7 @@ COMPANY_PAGES = [
     'about', 'licenses', 'certifications', 'privacy', 'terms', 'policies',
     'cookie-policy', 'refund-policy', 'business', 'contact',
 ]
-ROUTES = ['index', 'products', 'guard', 'manual', 'guide', 'walkthrough', 'handbook', 'guard-app'] + COMPANY_PAGES
+ROUTES = ['index', 'products', 'guard', 'manual', 'guide', 'walkthrough', 'handbook', 'guard-app', 'themes'] + COMPANY_PAGES
 
 
 with sync_playwright() as playwright:
@@ -164,6 +164,32 @@ with sync_playwright() as playwright:
     assert appearance.get_attribute('aria-expanded') == 'false'
     appearance.click()
     page.locator('input[name="studio-theme-choice"][value="light"]').check()
+
+    # Visitors can create and apply a named custom palette on a separate page.
+    page.set_viewport_size({'width': 390, 'height': 850})
+    page.goto(BASE + 'themes.html')
+    page.locator('#theme-name').fill('My ocean palette')
+    page.locator('#theme-accent').evaluate("el => { el.value = '#2d7a68'; el.dispatchEvent(new Event('input', { bubbles: true })); }")
+    assert '#2D7A68' in page.locator('label[for="theme-accent"]').inner_text()
+    page.locator('#theme-corners').select_option('rounded')
+    page.locator('#theme-type').select_option('large')
+    page.locator('#theme-motion').select_option('reduced')
+    page.get_by_role('button', name='Save & apply to all pages').click()
+    assert page.locator('html').get_attribute('data-theme-preference') == 'custom'
+    assert page.locator('html').get_attribute('data-theme-corners') == 'rounded'
+    assert page.locator('html').get_attribute('data-theme-type') == 'large'
+    assert page.locator('#theme-library article').count() == 1
+    saved = page.evaluate("JSON.parse(localStorage.getItem('cellar-studio-custom-theme'))")
+    assert saved['name'] == 'My ocean palette' and saved['accent'] == '#2d7a68'
+    page.goto(BASE + 'guard-app.html')
+    assert page.locator('html').get_attribute('data-theme-preference') == 'custom'
+    assert page.evaluate("getComputedStyle(document.body).getPropertyValue('--guard-violet').trim()") == '#2d7a68'
+    page.goto(BASE + 'themes.html')
+    page.get_by_role('button', name='Use', exact=True).click()
+    assert page.locator('html').get_attribute('data-theme-preference') == 'custom'
+    page.locator('#studio-theme-toggle').click()
+    page.locator('input[name="studio-theme-choice"][value="light"]').check()
+    assert page.locator('html').get_attribute('data-theme-preference') == 'light'
 
     # The homepage must promote one product and link to its public manual.
     page.goto(BASE + 'index.html')

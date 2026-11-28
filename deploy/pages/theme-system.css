@@ -37,7 +37,7 @@
 .studio-theme-toggle:focus-visible{outline:3px solid #d7782f;outline-offset:4px}
 .studio-theme-toggle .studio-theme-glyph{font:800 22px/1 system-ui,sans-serif}
 .studio-theme-menu {
-  width:min(292px,calc(100vw - 24px));max-height:min(470px,calc(100dvh - 95px));overflow-y:auto;
+  width:min(292px,calc(100vw - 24px));max-height:min(550px,calc(100dvh - 95px));overflow-y:auto;
   margin-bottom:14px;padding:20px;border:2px solid var(--theme-line);border-radius:0;
   background:var(--theme-panel);color:var(--theme-ink);box-shadow:6px 6px 0 var(--theme-shadow);
 }
@@ -55,6 +55,9 @@
 .studio-theme-option span{display:grid;gap:2px}
 .studio-theme-option strong{color:var(--theme-ink);font:800 15px/1.2 'DM Sans',Inter,system-ui,sans-serif}
 .studio-theme-option small{color:var(--theme-muted);font:500 13px/1.25 'DM Sans',Inter,system-ui,sans-serif}
+.studio-theme-editor-link{display:block;margin-top:12px;padding:12px 9px;border:2px solid var(--theme-line);background:var(--theme-ink);color:var(--theme-page)!important;font:800 14px/1.3 'DM Sans',Inter,system-ui,sans-serif;text-align:center;text-decoration:none!important;overflow-wrap:anywhere}
+.studio-theme-editor-link:hover{filter:brightness(.9)}
+.studio-theme-editor-link:focus-visible{outline:3px solid #d7782f;outline-offset:3px}
 .studio-theme-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:640px){.studio-theme-toggle{min-width:132px;min-height:46px;padding:8px 12px;gap:7px}.studio-theme-toggle .studio-theme-glyph{font-size:20px}.studio-theme-menu{padding:16px}}
 @media(prefers-reduced-motion:reduce){.studio-theme-toggle{transition:none}}
@@ -111,3 +114,60 @@ html[data-theme="dark"] .cellar-workspace-demo :is(.nav-link,.nav-label,.panel-d
 :is(.cellar-home,.studio-detail,.studio-explore,.studio-deadlock,.cellar-product) :is(h1,h2,h3,p,a,pre,code){overflow-wrap:anywhere}
 pre{max-width:100%;overflow:auto}
 @media(max-width:640px){.cellar-home .studio-choices{grid-template-columns:minmax(0,1fr)}.bar>div{flex-wrap:wrap}}
+
+/* Custom palettes are browser-local and apply to every published page. */
+:root[data-theme-preference="custom"] {
+  --theme-page:var(--custom-background);--theme-panel:var(--custom-surface);
+  --theme-ink:var(--custom-text);--theme-muted:var(--custom-muted);
+  --theme-line:var(--custom-border);--theme-shadow:var(--custom-border);
+  --studio-violet:var(--custom-accent);--studio-coral:var(--custom-secondary);
+  --studio-lime:var(--custom-highlight);
+  --studio-lavender:color-mix(in srgb,var(--custom-accent) 20%,var(--custom-surface));
+  --studio-hatch:color-mix(in srgb,var(--custom-accent) 18%,transparent);
+  --studio-depth:color-mix(in srgb,var(--custom-border) 35%,transparent);
+  --neo-ink:var(--custom-text);--neo-paper:var(--custom-background);
+  --neo-white:var(--custom-surface);--neo-muted:var(--custom-muted);
+  --neo-yellow:var(--custom-highlight);--neo-blue:var(--studio-lavender);
+  --neo-coral:var(--custom-secondary);
+  --bg:var(--custom-background);--surface:var(--custom-surface);
+  --surface-2:var(--studio-lavender);--panel:var(--custom-surface);
+  --ink:var(--custom-text);--muted:var(--custom-muted);
+  --paper:var(--custom-background);--wash:var(--studio-lavender);
+  --accent:var(--custom-accent);--accent-ink:var(--custom-on-accent);
+}
+html[data-theme-preference="custom"] body{background-color:var(--custom-background);color:var(--custom-text)}
+html[data-theme-preference="custom"] body.company-page {
+  --company-bg:var(--custom-background);--company-panel:var(--custom-surface);
+  --company-ink:var(--custom-text);--company-muted:var(--custom-muted);
+  --company-line:var(--custom-border);--company-shadow:var(--custom-border);
+}
+html[data-theme-preference="custom"] body.cellar-home {
+  --vision-paper:var(--custom-background);--vision-card:var(--custom-surface);
+  --vision-ink:var(--custom-text);--vision-muted:var(--custom-muted);
+  --vision-stroke:var(--custom-border);--vision-shadow:var(--custom-border);
+  --vision-yellow:var(--custom-highlight);--vision-blue:var(--studio-lavender);
+  --vision-coral:var(--custom-secondary);
+}
+html[data-theme-preference="custom"] body.guard-app {
+  --guard-bg:var(--custom-background);--guard-surface:var(--custom-surface);
+  --guard-ink:var(--custom-text);--guard-muted:var(--custom-muted);
+  --guard-violet:var(--custom-accent);--guard-orange:var(--custom-secondary);
+  --guard-lime:var(--custom-highlight);--guard-shadow:var(--custom-border);
+}
+html[data-theme-preference="custom"] body:is(.cellar-product,.studio-detail,.studio-explore,.studio-deadlock,.cellar-workspace-demo){
+  --paper:var(--custom-background);--surface:var(--custom-surface);
+  --ink:var(--custom-text);--muted:var(--custom-muted);
+  --accent:var(--custom-accent);--wash:var(--studio-lavender);
+}
+html[data-theme-preference="custom"] :is(.studio-site-footer,.company-footer){background-color:var(--custom-surface);color:var(--custom-text)}
+html[data-theme-preference="custom"] .company-button:not(.company-button-outline){background:var(--custom-highlight);color:var(--custom-on-highlight)!important}
+html[data-theme-preference="custom"] .cellar-home .vision-next{background:var(--custom-highlight);color:var(--custom-on-highlight)}
+html[data-theme-preference="custom"] .cellar-home .vision-tile-large{background:var(--custom-highlight);color:var(--custom-on-highlight)}
+html[data-theme-preference="custom"] .guard-app .guard-hero{background-color:var(--custom-accent);color:var(--custom-on-accent)}
+html[data-theme-preference="custom"] .guard-app :is(#run-check,#apply-rules){background:var(--custom-highlight);color:var(--custom-on-highlight)}
+
+/* The extra preferences are only active while Custom is selected. */
+html[data-theme-type="large"]{font-size:112.5%}
+html[data-theme-corners="rounded"] :is(.company-panel,.company-button,.company-status-board,.company-stamp,.vision-tile,.vision-board,.guard-card,.guard-hero,.guard-notice,.guard-result-card,.studio-theme-menu,.studio-theme-toggle,.studio-theme-option,.studio-theme-editor-link){border-radius:16px}
+html[data-theme-motion="reduced"]{scroll-behavior:auto!important}
+html[data-theme-motion="reduced"] *,html[data-theme-motion="reduced"] *::before,html[data-theme-motion="reduced"] *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}

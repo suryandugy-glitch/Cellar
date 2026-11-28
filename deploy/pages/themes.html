@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <meta name="description" content="Theme Studio: create, preview, save and switch your own Cellar Studio color themes, typography, corners and motion preferences.">
+  <title>Theme Studio | Customize Cellar Studio</title>
+  <link rel="icon" href="./logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./company-pages.css">
+  <link rel="stylesheet" href="./theme-studio.css">
+  <script src="./company-pages.js" defer></script>
+  <script src="./theme-studio.js" defer></script>
+</head>
+<body class="company-page theme-studio-page">
+  <a class="company-skip" href="#main">Skip to theme editor</a>
+  <header class="company-header">
+    <div class="company-wrap company-nav-row">
+      <a class="company-brand" href="./" aria-label="Cellar Studio home"><img src="./logo.svg" width="35" height="35" alt=""><span>CELLAR <strong>STUDIO</strong></span></a>
+      <nav class="company-nav" id="company-nav" aria-label="Company navigation">
+        <a href="./">Cellar Studio</a><a href="./products.html">Products</a><a href="./guard.html">Cellar Guard</a><a href="./about.html">About us</a><a href="./themes.html" aria-current="page">Themes</a>
+      </nav>
+      <button class="company-menu-toggle" type="button" aria-expanded="false" aria-controls="company-nav" aria-label="Open navigation"><span></span><span></span></button>
+    </div>
+  </header>
+  <main id="main">
+    <section class="theme-hero company-wrap">
+      <div>
+        <p class="company-kicker">Cellar Studio / Appearance Lab</p>
+        <h1>Your internet. <em>Your palette.</em></h1>
+        <p class="theme-hero-copy">Move beyond Light and Dark. Mix your own colors, fine-tune readability, choose how the interface feels, and save multiple themes. Your pick follows you across our pages.</p>
+        <div class="theme-hero-tags"><span>Live preview</span><span>Custom palettes</span><span>Phone-friendly</span><span>Saved on this device</span></div>
+      </div>
+      <div class="theme-hero-art" aria-hidden="true"><div class="theme-art-square theme-art-one"></div><div class="theme-art-square theme-art-two"></div><div class="theme-art-square theme-art-three"></div><span>MAKE IT YOURS</span></div>
+    </section>
+    <section class="theme-section theme-section-tint" aria-labelledby="presets-heading">
+      <div class="company-wrap">
+        <div class="theme-section-header"><p class="company-kicker">A place to start</p><h2 id="presets-heading">Pick a mood. <em>Make it yours.</em></h2><p>Presets only fill the editor. Nothing changes across the site until you save and apply.</p></div>
+        <div class="theme-presets" role="group" aria-label="Starter color palettes">
+          <button class="theme-preset" type="button" data-preset="studio"><span class="theme-preset-swatches" aria-hidden="true"><i style="background:#f6f5ef"></i><i style="background:#582eb7"></i><i style="background:#d9ef8e"></i></span><strong>Studio Original</strong><small>Fresh and bold</small></button>
+          <button class="theme-preset" type="button" data-preset="midnight"><span class="theme-preset-swatches" aria-hidden="true"><i style="background:#121728"></i><i style="background:#9775fa"></i><i style="background:#abf0d1"></i></span><strong>Midnight Signal</strong><small>Deep and electric</small></button>
+          <button class="theme-preset" type="button" data-preset="sunset"><span class="theme-preset-swatches" aria-hidden="true"><i style="background:#fff5ed"></i><i style="background:#bd4429"></i><i style="background:#ffd08c"></i></span><strong>Sunset Type</strong><small>Warm editorial</small></button>
+          <button class="theme-preset" type="button" data-preset="forest"><span class="theme-preset-swatches" aria-hidden="true"><i style="background:#ecf4e7"></i><i style="background:#1d6454"></i><i style="background:#c5e590"></i></span><strong>Forest Circuit</strong><small>Calm green energy</small></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="theme-section" id="editor" aria-labelledby="editor-heading"><div class="company-wrap">
+      <div class="theme-section-header"><p class="company-kicker">Your workspace</p><h2 id="editor-heading">Build a <em>custom theme.</em></h2><p>Choose each color with your device's color picker. See the result before you apply it.</p></div>
+      <div class="theme-workbench">
+        <form id="theme-form" class="theme-form" novalidate>
+          <div class="theme-form-title"><h3>Color controls</h3><span>8 adjustable colors</span></div>
+          <label class="theme-name" for="theme-name">Theme name <input id="theme-name" name="name" type="text" maxlength="36" autocomplete="off" required placeholder="My custom theme"></label>
+          <div class="theme-colors">
+            <label class="theme-color" for="theme-background"><span>Page background<small>Main site canvas</small></span><input id="theme-background" data-color="background" type="color" value="#f6f5ef"><output for="theme-background">#F6F5EF</output></label>
+            <label class="theme-color" for="theme-surface"><span>Cards &amp; panels<small>Raised surfaces</small></span><input id="theme-surface" data-color="surface" type="color" value="#fffef9"><output for="theme-surface">#FFFEF9</output></label>
+            <label class="theme-color" for="theme-text"><span>Primary text<small>Headlines and body</small></span><input id="theme-text" data-color="text" type="color" value="#151515"><output for="theme-text">#151515</output></label>
+            <label class="theme-color" for="theme-muted"><span>Secondary text<small>Descriptions and labels</small></span><input id="theme-muted" data-color="muted" type="color" value="#484842"><output for="theme-muted">#484842</output></label>
+            <label class="theme-color" for="theme-accent"><span>Primary accent<small>Brand details and hero</small></span><input id="theme-accent" data-color="accent" type="color" value="#582eb7"><output for="theme-accent">#582EB7</output></label>
+            <label class="theme-color" for="theme-secondary"><span>Secondary accent<small>Supporting surfaces</small></span><input id="theme-secondary" data-color="secondary" type="color" value="#ffba91"><output for="theme-secondary">#FFBA91</output></label>
+            <label class="theme-color" for="theme-highlight"><span>Highlight color<small>Key actions and emphasis</small></span><input id="theme-highlight" data-color="highlight" type="color" value="#d9ef8e"><output for="theme-highlight">#D9EF8E</output></label>
+            <label class="theme-color" for="theme-border"><span>Borders &amp; shadows<small>Outlines and depth</small></span><input id="theme-border" data-color="border" type="color" value="#151515"><output for="theme-border">#151515</output></label>
+          </div>
+          <div class="theme-options-title"><h3>More than colors</h3><p>Choose how every page feels.</p></div>
+          <div class="theme-preferences">
+            <label for="theme-type">Text size <select id="theme-type" name="type"><option value="normal">Standard</option><option value="large">Larger text</option></select></label>
+            <label for="theme-corners">Corners <select id="theme-corners" name="corners"><option value="sharp">Sharp &amp; bold</option><option value="rounded">Soft &amp; rounded</option></select></label>
+            <label for="theme-motion">Motion <select id="theme-motion" name="motion"><option value="full">Animated</option><option value="reduced">Reduced motion</option></select></label>
+          </div>
+          <div class="theme-contrast" id="theme-contrast" role="status" aria-live="polite">Checking color contrast…</div>
+          <div class="theme-form-actions">
+            <button class="theme-save-button" type="submit">Save &amp; apply to all pages</button>
+            <button class="theme-quiet-button" type="button" id="theme-fix-contrast">Improve text contrast</button>
+            <button class="theme-quiet-button" type="button" id="theme-reset">Reset editor</button>
+          </div>
+          <p class="theme-status" id="theme-status" role="status" aria-live="polite">Preview your changes, then save to apply them.</p>
+        </form>
+
+        <aside class="theme-preview-column" aria-labelledby="preview-heading">
+          <div class="theme-preview-head"><span>LIVE PREVIEW / NOT YET APPLIED</span><h3 id="preview-heading">See your colors at work.</h3></div>
+          <div class="theme-preview" id="theme-preview">
+            <div class="theme-preview-nav"><strong>CELLAR STUDIO</strong><span>PREVIEW</span></div>
+            <div class="theme-preview-body">
+              <span class="theme-preview-kicker">BUILD WHAT COMES NEXT.</span>
+              <h4>Make ideas <em>stand out.</em></h4>
+              <p>This is how your background, text, accents and cards look together.</p>
+              <div class="theme-preview-actions"><span class="theme-preview-primary">Primary action</span><span class="theme-preview-secondary">Secondary action</span></div>
+              <div class="theme-preview-cards"><div class="theme-preview-card"><span>01 / Product</span><strong>Cellar Guard</strong><small>Import checks, made clear.</small></div><div class="theme-preview-card theme-preview-card-highlight"><span>02 / Ready</span><strong>Looks good.</strong><small>Bright ideas, your colors.</small></div></div>
+            </div>
+          </div>
+          <p class="theme-preview-note">Changes here stay in the preview until you select <strong>Save &amp; apply</strong>. All themes are stored in this browser, not uploaded to a server.</p>
+        </aside>
+      </div>
+    </div></section>
+
+    <section class="theme-section theme-section-tint" id="my-themes" aria-labelledby="library-heading"><div class="company-wrap">
+      <div class="theme-section-header"><p class="company-kicker">Your collection</p><h2 id="library-heading">Saved <em>by you.</em></h2><p>Store up to 12 named themes. Apply one instantly, load one to edit, or remove one you no longer need.</p></div>
+      <div class="theme-library" id="theme-library" aria-live="polite"><p>No custom themes saved yet. Make your first one above.</p></div>
+      <div class="theme-transfer"><div><h3>Keep a copy.</h3><p>Export a theme as JSON to share it or keep a backup. Imports load into the editor; review them before applying.</p></div><div class="theme-transfer-actions"><button type="button" id="theme-export">Download theme JSON</button><label class="theme-import-label" for="theme-import">Import theme JSON<input id="theme-import" type="file" accept=".json,application/json"></label></div></div>
+    </div></section>
+    <section class="company-callout company-wrap theme-callout"><p class="company-kicker">Back to building</p><h2>One theme. <em>Every page.</em></h2><div class="company-link-row"><a class="company-button" href="./">Return to Cellar Studio</a><a class="company-button company-button-outline" href="./guard-app.html">Open Guard checker</a></div></section>
+  </main>
+  <!-- STUDIO_FOOTER -->
+</body>
+</html>

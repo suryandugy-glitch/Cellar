@@ -11,7 +11,7 @@ assert.ok(redirects.some(route => route.source === '/' && route.destination === 
   route.has?.some(check => check.type === 'host' && check.value === 'cellar-studio-hq.vercel.app')),
   'legacy studio domain must lead to the CSV domain');
 const files = (await readdir(root)).filter(file => file.endsWith('.html'));
-assert.ok(files.length >= 18, 'expected Guard, manual, sample, and company pages');
+assert.ok(files.length >= 23, 'expected Guard, theme editor, manual, sample, and company pages');
 for (const file of files) {
   const html = await readFile(resolve(root, file), 'utf8');
   assert.equal(html.split('theme-system.css').length - 1, 1, `${file}: missing/duplicate theme CSS`);
@@ -51,6 +51,12 @@ assert.match(products, /id="coming-soon"/);
 assert.match(products, /href="\.\/guard\.html"/);
 assert.match(products, /More products coming soon/);
 assert.doesNotMatch(products, /SpaceFix/);
+const themeEditor = await readFile(resolve(root, 'themes.html'), 'utf8');
+assert.match(themeEditor, /id="theme-form"/);
+assert.match(themeEditor, /id="theme-preview"/);
+assert.match(themeEditor, /id="theme-library"/);
+assert.match(themeEditor, /theme-studio\.js/);
+assert.match(themeEditor, /Save &amp; apply to all pages/);
 const studio = await readFile(resolve(root, 'studio.html'), 'utf8');
 assert.match(studio, /href="https:\/\/cellar-csv\.vercel\.app\/"/);
 assert.match(studio, /href="\.\/guard\.html"/);
@@ -134,4 +140,10 @@ assert.match(js, /localStorage\.setItem/);
 assert.match(js, /studio-theme-menu/);
 assert.match(js, /prefers-color-scheme/);
 assert.match(js, /storage/);
+assert.match(js, /cellar-studio-custom-theme/);
+assert.match(js, /themes\.html/);
+const themeStudioJS = await readFile(resolve(root, 'theme-studio.js'), 'utf8');
+assert.match(themeStudioJS, /readLibrary/);
+assert.match(themeStudioJS, /saveCustom/);
+assert.match(themeStudioJS, /contrast/);
 console.log(`${files.length} Guard-only HTML pages pass theme and navigation checks.`);

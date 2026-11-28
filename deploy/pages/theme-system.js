@@ -2,26 +2,61 @@
 (() => {
   'use strict';
   const key = 'cellar-studio-theme';
+  const customKey = 'cellar-studio-custom-theme';
   const root = document.documentElement;
   const device = typeof window.matchMedia === 'function'
     ? window.matchMedia('(prefers-color-scheme: dark)') : null;
-  const choices = ['system', 'light', 'dark'];
+  const choices = ['system', 'light', 'dark', 'custom'];
+  const defaults = Object.freeze({
+    name: 'My palette',
+    background: '#f6f5ef', surface: '#fffef9', text: '#151515', muted: '#484842',
+    accent: '#582eb7', secondary: '#ffba91', highlight: '#d9ef8e', border: '#151515',
+    type: 'normal', corners: 'sharp', motion: 'full'
+  });
+  const colors = ['background', 'surface', 'text', 'muted', 'accent', 'secondary', 'highlight', 'border'];
+  const isHex = value => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
+  const sanitize = value => {
+    const result = { ...defaults };
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return result;
+    if (typeof value.name === 'string' && value.name.trim()) result.name = value.name.trim().slice(0, 36);
+    colors.forEach(name => { if (isHex(value[name])) result[name] = value[name].toLowerCase(); });
+    if (['normal', 'large'].includes(value.type)) result.type = value.type;
+    if (['sharp', 'rounded'].includes(value.corners)) result.corners = value.corners;
+    if (['full', 'reduced'].includes(value.motion)) result.motion = value.motion;
+    return result;
+  };
+  const darkBackground = hex => {
+    const components = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
+    const luminance = components.map(value => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
+    return (luminance[0] * 0.2126 + luminance[1] * 0.7152 + luminance[2] * 0.0722) < 0.20;
+  };
   let preference = 'system';
+  let customTheme = { ...defaults };
 
   try {
     const saved = window.localStorage.getItem(key);
     if (choices.includes(saved)) preference = saved;
+    const savedCustom = window.localStorage.getItem(customKey);
+    if (savedCustom && savedCustom.length < 4096) customTheme = sanitize(JSON.parse(savedCustom));
   } catch (_) {
     // The theme still works for this visit when storage is unavailable.
   }
 
   const currentTheme = () => preference === 'system'
-    ? (device?.matches ? 'dark' : 'light') : preference;
+    ? (device?.matches ? 'dark' : 'light')
+    : preference === 'custom' ? (darkBackground(customTheme.background) ? 'dark' : 'light') : preference;
 
   const update = (save = false) => {
     const resolved = currentTheme();
     root.setAttribute('data-theme', resolved);
     root.setAttribute('data-theme-preference', preference);
+    root.setAttribute('data-theme-type', preference === 'custom' ? customTheme.type : 'normal');
+    root.setAttribute('data-theme-corners', preference === 'custom' ? customTheme.corners : 'sharp');
+    root.setAttribute('data-theme-motion', preference === 'custom' ? customTheme.motion : 'full');
+    colors.forEach(name => root.style.setProperty('--custom-' + name, customTheme[name]));
+    root.style.setProperty('--custom-on-accent', darkBackground(customTheme.accent) ? '#ffffff' : '#151515');
+    root.style.setProperty('--custom-on-highlight', darkBackground(customTheme.highlight) ? '#ffffff' : '#151515');
+    root.style.setProperty('--custom-on-secondary', darkBackground(customTheme.secondary) ? '#ffffff' : '#151515');
     root.style.colorScheme = resolved;
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', resolved === 'dark' ? '#18191b' : '#f6f5ef');
@@ -30,7 +65,8 @@
     }
     const trigger = document.querySelector('#studio-theme-toggle');
     if (trigger) {
-      const visibleName = preference === 'system' ? 'Auto' : preference === 'dark' ? 'Dark' : 'Light';
+      const visibleName = preference === 'system' ? 'Auto'
+        : preference === 'custom' ? 'Custom' : preference === 'dark' ? 'Dark' : 'Light';
       trigger.setAttribute('aria-label', 'Change theme. Current selection: ' + visibleName);
       trigger.setAttribute('title', 'Change theme (currently ' + visibleName + ')');
       trigger.querySelector('.studio-theme-glyph').textContent = resolved === 'dark' ? '☾' : '☼';
@@ -57,7 +93,9 @@
           <label class="studio-theme-option"><input type="radio" name="studio-theme-choice" value="system"><span><strong>System</strong><small>Match your device</small></span></label>
           <label class="studio-theme-option"><input type="radio" name="studio-theme-choice" value="light"><span><strong>Light</strong><small>Bright Studio palette</small></span></label>
           <label class="studio-theme-option"><input type="radio" name="studio-theme-choice" value="dark"><span><strong>Dark</strong><small>Low-light Studio palette</small></span></label>
+          <label class="studio-theme-option"><input type="radio" name="studio-theme-choice" value="custom"><span><strong>Custom</strong><small>Your saved colors &amp; layout</small></span></label>
         </fieldset>
+        <a class="studio-theme-editor-link" href="./themes.html">Customize colors and settings</a>
       </div>
       <button id="studio-theme-toggle" class="studio-theme-toggle" type="button"
         aria-controls="studio-theme-menu" aria-expanded="false">
@@ -104,8 +142,27 @@
   if (device?.addEventListener) device.addEventListener('change', deviceChanged);
   else if (device?.addListener) device.addListener(deviceChanged);
   window.addEventListener('storage', event => {
-    if (event.key !== key) return;
-    preference = choices.includes(event.newValue) ? event.newValue : 'system';
-    update();
+    if (event.key === key) {
+      preference = choices.includes(event.newValue) ? event.newValue : 'system';
+      update();
+    } else if (event.key === customKey) {
+      try { customTheme = event.newValue ? sanitize(JSON.parse(event.newValue)) : { ...defaults }; }
+      catch (_) { customTheme = { ...defaults }; }
+      update();
+    }
+  });
+  window.CellarTheme = Object.freeze({
+    defaults: () => ({ ...defaults }),
+    readCustom: () => ({ ...customTheme }),
+    saveCustom: value => {
+      customTheme = sanitize(value);
+      preference = 'custom';
+      try {
+        window.localStorage.setItem(customKey, JSON.stringify(customTheme));
+        window.localStorage.setItem(key, preference);
+      } catch (_) { /* The theme still applies until this page is closed. */ }
+      update();
+      return { ...customTheme };
+    }
   });
 })();
