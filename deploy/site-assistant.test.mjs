@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import { findHelp, helpSources } from './pages/assistant-search.js';
-import { POST } from '../api/site-assistant.mjs';
+import handler, { POST } from '../api/site-assistant.mjs';
 
 const output = new URL('../build/vercel/', import.meta.url);
 const documents = JSON.parse(await readFile(new URL('assistant-index.json', output), 'utf8'));
@@ -33,6 +33,7 @@ function request(data, origin = 'https://cellar-csv.vercel.app') {
 }
 
 test('API rejects unrelated origins and oversized or blank questions', async () => {
+  assert.equal((await handler.fetch(new Request('https://cellar-csv.vercel.app/api/site-assistant'))).status, 405);
   assert.equal((await POST(request({ question: 'Hi' }, 'https://example.com'))).status, 403);
   assert.equal((await POST(request({ question: ' ' }))).status, 400);
   assert.equal((await POST(request({ question: 'a'.repeat(600) }))).status, 400);
@@ -41,15 +42,21 @@ test('API rejects unrelated origins and oversized or blank questions', async () 
 
 test('the live model receives only public passages and question context', async t => {
   const token = process.env.VERCEL_OIDC_TOKEN;
-  process.env.VERCEL_OIDC_TOKEN = 'example-oidc-token';
+  const contextKey = Symbol.for('@vercel/request-context');
+  const priorContext = globalThis[contextKey];
+  process.env.VERCEL_OIDC_TOKEN = 'old-test-token';
+  globalThis[contextKey] = { get: () => ({ headers: { 'x-vercel-oidc-token': 'runtime-test-token' } }) };
   const originalFetch = globalThis.fetch;
   t.after(() => {
     if (token === undefined) delete process.env.VERCEL_OIDC_TOKEN;
     else process.env.VERCEL_OIDC_TOKEN = token;
     globalThis.fetch = originalFetch;
+    if (priorContext === undefined) delete globalThis[contextKey];
+    else globalThis[contextKey] = priorContext;
   });
   globalThis.fetch = async (url, config) => {
     assert.equal(url, 'https://ai-gateway.vercel.sh/v1/chat/completions');
+    assert.equal(config.headers.Authorization, 'Bearer runtime-test-token');
     const context = JSON.parse(JSON.parse(config.body).messages[1].content);
     assert.equal(context.question, 'How do I contact support?');
     assert.equal(context.currentPage, 'guard-app.html');
