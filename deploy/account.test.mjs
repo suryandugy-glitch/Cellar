@@ -9,7 +9,10 @@ const config = {
   key: 'sb_publishable_test',
   providers: { google: 'google', microsoft: 'azure' },
 };
-const profile = { email: 'test@example.net', user_metadata: { full_name: 'Test Account' } };
+const profile = {
+  email: 'test@example.net',
+  user_metadata: { full_name: 'Test Account', avatar_url: 'https://lh3.googleusercontent.com/a/example=s96-c' },
+};
 
 function mockHandler({ settings = config, auth = {} } = {}) {
   const calls = [];
@@ -118,7 +121,27 @@ test('remember is opt-in and signed-in account data is private and revocable', a
   const signedIn = { cookie: '__Host-cellar-session.0=test-session; __Host-cellar-remember=1' };
   const session = await call(handler, 'session', { headers: signedIn });
   assert.equal(session.headers.get('Cache-Control'), 'private, no-store');
-  assert.deepEqual(session.data.user, { email: profile.email, name: 'Test Account' });
+  assert.deepEqual(session.data.user, {
+    email: profile.email, name: 'Test Account', avatarUrl: profile.user_metadata.avatar_url,
+  });
   const logout = await call(handler, 'logout', { body: {}, headers: signedIn });
   assert.ok(logout.headers.get('Set-Cookie').some(value => value.startsWith('__Host-cellar-session.0=; Max-Age=0')));
+});
+
+test('profile uses the provider picture and ignores untrusted photo URLs', async () => {
+  const headers = { cookie: '__Host-cellar-session=test-session' };
+  const metadata = {
+    full_name: ' ',
+    name: 'Test Name',
+    avatar_url: 'https://untrusted.example/picture.png',
+    picture: 'https://lh6.googleusercontent.com/a/test',
+    unrelated: 'private metadata',
+  };
+  const { handler } = mockHandler({ auth: {
+    getUser: async () => ({ data: { user: { ...profile, user_metadata: metadata } } }),
+  } });
+  const session = await call(handler, 'session', { headers });
+  assert.deepEqual(session.data.user, { email: profile.email, name: 'Test Name', avatarUrl: metadata.picture });
+  metadata.picture = 'http://lh3.googleusercontent.com/a/test';
+  assert.equal((await call(handler, 'session', { headers })).data.user.avatarUrl, null);
 });

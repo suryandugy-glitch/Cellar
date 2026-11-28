@@ -23,10 +23,13 @@
     <section class="account-card" aria-labelledby="account-title">
       <h2 id="account-title">My account</h2>
       <p class="account-status" id="account-status" role="status" aria-live="polite">Checking your session…</p>
-      <dl class="account-profile" id="account-profile" hidden>
-        <div><dt>Name</dt><dd id="profile-name"></dd></div>
-        <div><dt>Email address</dt><dd id="profile-email"></dd></div>
-      </dl>
+      <div class="account-profile" id="account-profile" hidden>
+        <span class="account-avatar account-page-avatar" id="profile-avatar" aria-hidden="true"></span>
+        <dl>
+          <div><dt>Name</dt><dd id="profile-name"></dd></div>
+          <div><dt>Email address</dt><dd id="profile-email"></dd></div>
+        </dl>
+      </div>
       <div class="account-profile-actions" id="profile-actions" hidden>
         <a class="account-primary" href="./studio.html">Go to Cellar Studio <span aria-hidden="true">→</span></a>
         <button id="account-logout" class="account-guest" type="button">Sign out</button>

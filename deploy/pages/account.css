@@ -153,7 +153,9 @@ html[data-theme="dark"] .account-page {
 .account-status { margin: 11px 0 0; padding: 8px 10px; color: var(--account-ink); background: var(--account-soft); border-radius: 5px; font-size: 13px; }
 .account-status[data-state="error"] { background: var(--account-error-bg); color: var(--account-error); }
 .account-profile { margin: 13px 0 17px; }
-.account-profile div { padding: 9px 0; border-bottom: 1px solid var(--account-line); }
+.account-profile dl { margin: 6px 0 0; }
+.account-profile dl > div { padding: 9px 0; border-bottom: 1px solid var(--account-line); }
+.account-profile .account-page-avatar { width: 64px; height: 64px; font-size: 22px; }
 .account-profile dt { color: var(--account-muted); font-size: 12px; }
 .account-profile dd { margin: 2px 0 0; overflow-wrap: anywhere; font-size: 15px; font-weight: 650; }
 .account-footer { min-height: 51px; border-top: 1px solid var(--account-line); color: var(--account-muted); font-size: 12px; }

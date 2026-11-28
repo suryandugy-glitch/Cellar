@@ -77,8 +77,14 @@ function emailFrom(value) {
 }
 
 function profile(user) {
-  const name = user.user_metadata?.full_name ?? user.user_metadata?.name;
-  return { email: user.email || '', name: typeof name === 'string' ? name.slice(0, 100) : '' };
+  const metadata = user.user_metadata ?? {};
+  const name = [metadata.full_name, metadata.name].find(value => typeof value === 'string' && value.trim());
+  const avatarUrl = [metadata.avatar_url, metadata.picture].find(value => {
+    if (typeof value !== 'string' || value.length > 2048) return false;
+    const url = URL.parse(value);
+    return url && !url.username && !url.password && /^https:\/\/lh[3-6]\.googleusercontent\.com$/.test(url.origin);
+  });
+  return { email: user.email || '', name: name?.trim().slice(0, 100) || '', avatarUrl: avatarUrl ?? null };
 }
 
 function authError(res, error, fallback, status = 400) {

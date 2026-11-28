@@ -17,6 +17,9 @@ assert.ok(files.length >= 23, 'expected Guard, theme editor, manual, sample, and
 for (const file of files) {
   const html = await readFile(resolve(root, file), 'utf8');
   const accountPage = html.includes('data-account-page=');
+  const signInPage = html.includes('data-account-page="signin"');
+  assert.equal(html.split('account-menu.js').length - 1, signInPage ? 0 : 1, `${file}: account menu script`);
+  assert.equal(html.split('account-menu.css').length - 1, signInPage ? 0 : 1, `${file}: account menu CSS`);
   assert.equal(html.split('theme-system.css').length - 1, 1, `${file}: missing/duplicate theme CSS`);
   assert.equal(html.split('studio-maximal.css').length - 1, 1, `${file}: missing/duplicate Studio style`);
   assert.equal(html.split('studio-footer.css').length - 1, 1, `${file}: missing/duplicate footer CSS`);

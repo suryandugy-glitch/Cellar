@@ -1,18 +1,7 @@
+import { accountRequest, readAccountSession, renderAccountAvatar } from './account-client.js';
+
 const element = id => document.getElementById(id);
 const status = element('account-status');
-
-async function request(action, payload) {
-  const options = { cache: 'no-store', credentials: 'same-origin' };
-  if (payload) {
-    options.method = 'POST';
-    options.headers = { 'Content-Type': 'application/json' };
-    options.body = JSON.stringify(payload);
-  }
-  const response = await fetch('/api/account?action=' + action, options);
-  const result = await response.json();
-  if (!response.ok) throw new Error(result.error || 'Please try again.');
-  return result;
-}
 
 function message(text = '', error = false) {
   status.textContent = text;
@@ -22,30 +11,48 @@ function message(text = '', error = false) {
 
 const goToAccount = () => location.replace('/account.html');
 
-async function profilePage() {
-  try {
-    const { user, available } = await request('session');
-    if (!user && available) return location.replace('/signin.html');
-    if (!available) return message('Accounts are not available yet.');
-    element('profile-name').textContent = user.name || 'No name provided';
-    element('profile-email').textContent = user.email || 'No email provided';
-    element('account-profile').hidden = false;
-    element('profile-actions').hidden = false;
-    message();
-    element('account-logout').addEventListener('click', async event => {
-      const button = event.currentTarget;
-      button.disabled = true;
-      try {
-        await request('logout', {});
-        location.replace('/signin.html');
-      } catch (error) {
-        message(error.message, true);
-        button.disabled = false;
-      }
-    });
-  } catch {
-    message('Your session could not be checked. Reload the page to try again.', true);
+function profilePage() {
+  const details = element('account-profile');
+  const actions = element('profile-actions');
+  const name = element('profile-name');
+  const email = element('profile-email');
+  const avatar = element('profile-avatar');
+  async function refresh() {
+    details.hidden = true;
+    actions.hidden = true;
+    name.textContent = '';
+    email.textContent = '';
+    avatar.replaceChildren();
+    try {
+      const { user, available } = await readAccountSession();
+      if (!available) return message('Accounts are not available yet.');
+      if (!user) return location.replace('/signin.html');
+      name.textContent = user.name || 'No name provided';
+      email.textContent = user.email || 'No email provided';
+      renderAccountAvatar(avatar, user);
+      details.hidden = false;
+      actions.hidden = false;
+      message();
+    } catch {
+      message('Your session could not be checked. Reload the page to try again.', true);
+    }
   }
+
+  element('account-logout').addEventListener('click', async event => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      await accountRequest('logout', {});
+      location.replace('/signin.html');
+    } catch (error) {
+      message(error.message, true);
+      button.disabled = false;
+    }
+  });
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) void refresh();
+  });
+  void refresh();
 }
 
 async function signInPage() {
@@ -94,7 +101,7 @@ async function signInPage() {
     busy(true);
     message();
     try {
-      const result = await request(mode, { ...form, remember: remember.checked });
+      const result = await accountRequest(mode, { ...form, remember: remember.checked });
       if (result.signedIn) return goToAccount();
       setMode('signin');
       message('Check your inbox for a confirmation link, then sign in with your password.');
@@ -110,7 +117,7 @@ async function signInPage() {
       busy(true);
       message();
       try {
-        const { url } = await request('oauth', { provider: button.dataset.provider, remember: remember.checked });
+        const { url } = await accountRequest('oauth', { provider: button.dataset.provider, remember: remember.checked });
         location.assign(url);
       } catch (error) {
         message(error.message, true);
@@ -120,7 +127,7 @@ async function signInPage() {
   }
 
   try {
-    const result = await request('session');
+    const result = await readAccountSession();
     if (result.user) return goToAccount();
     available = result.available;
     for (const provider of result.providers || []) {
