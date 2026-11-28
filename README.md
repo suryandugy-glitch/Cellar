@@ -9,6 +9,7 @@
   <a href="https://cellar-csv.vercel.app/">Cellar Studio (Home)</a> ·
   <a href="https://cellar-csv.vercel.app/products.html">Products</a> ·
   <a href="https://cellar-csv.vercel.app/about.html">About</a> ·
+  <a href="https://cellar-csv.vercel.app/contribute.html">Contribute</a> ·
   <a href="https://cellar-csv.vercel.app/guard.html">Cellar Guard</a> ·
   <a href="https://cellar-csv.vercel.app/guard-app.html">Browser checker</a> ·
   <a href="https://github.com/suryandugy-glitch/Cellar-Studio/releases/tag/guard-v3.1.0">Download Guard</a> ·
@@ -208,3 +209,5 @@ The primary website remains **[Cellar Studio](https://cellar-csv.vercel.app/)**.
 - No commercial service, security certification, or production SLA is claimed.
 
 Contributions are welcome: read [CONTRIBUTING.md](CONTRIBUTING.md), [security guidance](SECURITY.md) and [the docs index](docs/README.md). The code is provided under the [MIT license](LICENSE).
+
+New contributors can begin at the [public Contribute page](https://cellar-csv.vercel.app/contribute.html), which explains engineering, testing, design, documentation and feedback contributions and the pull-request workflow.

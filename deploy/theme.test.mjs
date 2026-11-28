@@ -40,6 +40,7 @@ assert.match(home, /Cellar Guard/);
 assert.match(home, /href="\.\/products\.html"/);
 assert.match(home, /More products.*coming soon/i);
 assert.match(home, /href="\.\/about\.html"/);
+assert.match(home, /href="\.\/contribute\.html"/);
 assert.match(home, /rel="canonical" href="https:\/\/cellar-csv\.vercel\.app\/"/);
 const guard = await readFile(resolve(root, 'guard.html'), 'utf8');
 assert.match(guard, /href="\.\/products\.html"/);
@@ -89,6 +90,13 @@ for (const file of ['index.html', 'products.html', 'manual.html', 'handbook.html
   assert.match(html, /aria-label="Footer sitemap"/);
 }
 const about = await readFile(resolve(root, 'about.html'), 'utf8');
+const contribute = await readFile(resolve(root, 'contribute.html'), 'utf8');
+assert.match(contribute, /href="https:\/\/github\.com\/suryandugy-glitch\/Cellar-Studio\/issues"/);
+assert.match(contribute, /java Build\.java test/);
+assert.match(contribute, /aria-current="page">Contribute/);
+assert.match(contribute, /Engineering/);
+assert.match(contribute, /Documentation/);
+assert.match(contribute, /Security|security policy/i);
 assert.match(about, /Suryandu Ganguly/);
 assert.match(about, /Gunjan Roy/);
 assert.match(about, /Disha Chakraborty/);
