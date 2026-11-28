@@ -43,6 +43,7 @@ assert.match(home, /rel="canonical" href="https:\/\/cellar-csv\.vercel\.app\/"/)
 const guard = await readFile(resolve(root, 'guard.html'), 'utf8');
 assert.match(guard, /href="\.\/products\.html"/);
 assert.match(guard, /href="\.\/"[^>]*>Cellar Studio<\/a>/);
+assert.match(guard, /releases\/tag\/guard-v3\.0\.0-web\.1/);
 const products = await readFile(resolve(root,'products.html'),'utf8');
 assert.match(products, /id="guard"/);
 assert.match(products, /id="coming-soon"/);
@@ -121,8 +122,12 @@ for (const retired of ['explore.html','services.html','downloads.html','product-
 }
 const manual = await readFile(resolve(root,'manual.html'),'utf8');
 assert.match(manual, /id="pr"/);
+assert.match(manual, /id="demo"/);
+assert.match(manual, /id="fix"/);
 assert.match(manual, /csv-compatibility/);
 assert.match(manual, /Cellar Guard/);
+assert.match(manual, /samples\/my-repair\.csv/);
+assert.match(manual, /Download Cellar Guard ZIP/);
 const js = await readFile(resolve(root, 'theme-system.js'), 'utf8');
 assert.match(js, /localStorage\.setItem/);
 assert.match(js, /Switch to/);

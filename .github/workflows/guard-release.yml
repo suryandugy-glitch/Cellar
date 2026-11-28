@@ -1,0 +1,48 @@
+name: Publish Cellar Guard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/guard-release.yml'
+      - 'scripts/package-guard.sh'
+      - 'release/**'
+      - 'docs/GUARD_START_HERE.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cellar-guard-public-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Run Java tests
+        run: java Build.java test
+      - name: Package and verify user download
+        run: bash scripts/package-guard.sh
+      - name: Publish a dedicated Cellar Guard release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag='guard-v3.0.0-web.1'
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists; leaving it unchanged."
+            exit 0
+          fi
+          gh release create "$tag" \
+            dist/Cellar-Guard-3.0.0-web.1.zip dist/SHA256SUMS.txt \
+            --title 'Cellar Guard 3.0.0-web.1 — Java 21+ download' \
+            --notes-file docs/GUARD_RELEASE_NOTES.md \
+            --target "$GITHUB_SHA" \
+            --latest

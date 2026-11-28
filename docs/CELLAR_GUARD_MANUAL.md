@@ -6,7 +6,30 @@ Cellar Guard is a Java 21+ CSV contract checker. It compares a candidate CSV exp
 
 The [Studio homepage](https://cellar-csv.vercel.app/) and [Guard product page](https://cellar-csv.vercel.app/guard.html) are static sites containing synthetic examples. Actual CSV validation runs locally, in CI, or on a separately operated Java workspace. The public Vercel site does not analyze customer CSV files.
 
-## 1. Requirements and installation
+## Fastest start — download the ready-to-run ZIP
+
+If you're not a developer, **use the release ZIP first**. You don't need to clone the repository or compile Java source.
+
+1. Open [Cellar Guard's GitHub release](https://github.com/suryandugy-glitch/Cellar-Studio/releases/tag/guard-v3.0.0-web.1).
+2. Under **Assets**, download `Cellar-Guard-3.0.0-web.1.zip` and extract it.
+3. Check `java -version` in Command Prompt/Terminal. Install a Java **21 or newer** runtime if needed.
+4. **Windows:** double-click `start-guard.bat`. **macOS/Linux:** run `sh start-guard.sh` inside the extracted directory.
+5. Keep the terminal open and visit the address it prints (usually `http://127.0.0.1:8080`).
+6. **Windows:** double-click `try-demo.bat`. **macOS/Linux:** run `sh try-demo.sh`. Watch it report **PASS → BLOCK → PASS**.
+
+The ZIP contains `START_HERE.md` with beginner-friendly instructions, including a hands-on CSV repair. If you get stuck, start with that guide or the [online tutorial](https://cellar-csv.vercel.app/manual.html#demo).
+
+### What to click in the local browser
+
+1. Open the **Check** area of the local workspace.
+2. Select the built-in **Breaking demo**, then run the check to see a failing `inventory-report` integration.
+3. Read the missing-column finding and recommended fix. The report names the field the customer expects.
+4. Open **Contracts** to see or edit the consumer's required columns. Use real requirements when working with your own exports.
+5. For an actual customer's CSV, select a local file and run the same check. Keep sensitive data on authorized machines.
+
+You can also use the command line; it is the same Java validation engine used by the web workspace.
+
+## 1. Requirements and building from source (developers)
 
 - Full **JDK 21 or later** (Java compiler required).
 - Git for cloning; no Maven or Gradle required.
@@ -89,6 +112,36 @@ java -jar dist/cellar.jar check --config cellar.json --csv examples/breaking-hea
 ```
 
 The first command should exit `0`. The second should exit `1` because the inventory integration requires `order_id`, while the breaking fixture changes that header. Typical fixes are to retain the original column while introducing an alias, or update the consumer's contract **only after** the receiving application has been migrated and verified.
+
+### Fix the exact example yourself
+
+This is the expected file header from `cellar.json`:
+
+```csv
+order_id,sku,total_cents,currency
+```
+
+The deliberately broken export instead contains:
+
+```csv
+id,sku,total_cents,currency
+```
+
+Do not edit the original fixture. Copy `examples/breaking-header.csv` to a new file named `examples/my-repair.csv`, then rename only the first header `id` to `order_id` in that copy. Save and rerun:
+
+```sh
+java -jar dist/cellar.jar check --config cellar.json --csv examples/my-repair.csv
+```
+
+You should now see `PASS` for both sample integrations and `Gate: ALLOW`. This proves the **sample CSV** is compatible again. In a real application, fix the **export-generating code** so the next exported CSV also retains the expected column. If the rename is intentional, emit both names temporarily until consumers are migrated and their contracts reviewed. Don't simply delete the rule to silence the gate.
+
+| Finding | What to do |
+| --- | --- |
+| `MISSING_COLUMN order_id` | Restore the header or temporarily emit the old and new headers |
+| Invalid integer or range | Fix how the producer formats/calculates the value; review the declared type/range |
+| Duplicate unique key | Fix the producer's ID/key generation or deduplication logic |
+| Too few rows | Check filtering/export conditions; verify whether an empty export is truly allowed |
+| Exit `2` / input error | Correct the file path, permissions or invalid contract JSON; rerun before shipping |
 
 ## 5. Run on every pull request
 

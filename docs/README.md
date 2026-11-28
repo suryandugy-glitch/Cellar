@@ -5,6 +5,7 @@ Cellar Studio maintains one product in this repository: **Cellar Guard**, a Java
 | Task | Reference |
 | --- | --- |
 | Install, validate CSVs and connect GitHub PR checks | [Cellar Guard manual](CELLAR_GUARD_MANUAL.md) |
+| Download the Java ZIP and fix a broken sample step by step | [Beginner's quick-start](GUARD_START_HERE.md) |
 | Get started with a synthetic demonstration | [Getting started](GETTING_STARTED.md) |
 | Define required headers, row rules and integrations | [Contracts](CONTRACTS.md) |
 | Integrate the Java HTTP API | [API reference](API.md) |

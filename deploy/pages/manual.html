@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f6f5ef">
-  <meta name="description" content="Cellar Guard manual: build the Java CSV contract checker and run it on every pull request.">
+  <meta name="description" content="Easy Cellar Guard manual: download the Java ZIP, run PASS/BLOCK/FIX examples, repair a broken CSV header, and set up pull-request checks.">
   <title>Cellar Guard manual | Java CLI and pull request setup</title>
   <link rel="icon" href="./logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./company-pages.css">
@@ -27,33 +27,52 @@
       <div class="company-hero-copy">
         <p class="company-kicker">Cellar Guard / User manual</p>
         <h1>Protect CSV imports. <em>On every PR.</em></h1>
-        <p class="company-lede">Catch CSV export changes that would break a customer’s import, before you ship. The checker runs with Java 21 or newer; the website shows synthetic examples.</p>
-        <div class="company-hero-actions"><a class="company-button" href="#pr">Set up the PR gate</a><a class="company-button company-button-outline" href="https://github.com/suryandugy-glitch/Cellar-Studio/blob/main/docs/CELLAR_GUARD_MANUAL.md">Full technical manual</a></div>
+        <p class="company-lede">Start with a safe example. See a CSV pass, watch a renamed column block the release, fix that column, and check again. The real Java checker runs on your computer; this page explains the steps.</p>
+        <div class="company-hero-actions"><a class="company-button" href="https://github.com/suryandugy-glitch/Cellar-Studio/releases/tag/guard-v3.0.0-web.1">Download Cellar Guard ZIP</a><a class="company-button company-button-outline" href="#demo">See the fix demo</a></div>
       </div>
     </section>
     <section class="company-section company-section-tint" id="install"><div class="company-wrap">
-      <div class="company-section-heading"><p class="company-kicker">01 / Install</p><h2>Build the <em>Java checker.</em></h2><p>Use a JDK (not only a JRE). Run these commands from the repository root.</p></div>
+      <div class="company-section-heading"><p class="company-kicker">01 / Download &amp; run</p><h2>Start without <em>building code.</em></h2><p>Download and extract the dedicated Guard ZIP. Java 21 or newer must be installed; check with <code>java -version</code>. The ZIP already contains the Java application.</p></div>
       <div class="company-panel company-panel-yellow">
-        <pre><code>git clone https://github.com/suryandugy-glitch/Cellar-Studio.git
-cd Cellar-Studio
-java Build.java test
-java Build.java package
-java -jar dist/cellar.jar validate --config cellar.json</code></pre>
-        <p>To open the local web workspace, use <code>sh run.sh</code> (Windows: <code>run.bat</code>). Do not upload private customer CSV files to the public demo site.</p>
+        <p><strong>Windows:</strong> Double-click <code>start-guard.bat</code> in the extracted folder.</p>
+        <p><strong>macOS / Linux:</strong> In that folder, run <code>sh start-guard.sh</code>.</p>
+        <pre><code>java -version
+sh start-guard.sh  # macOS / Linux
+# Windows: double-click start-guard.bat</code></pre>
+        <p>Keep the terminal open. Open the local address printed by Java, usually <code>http://127.0.0.1:8080</code>. No Git or compiler is needed for the downloaded ZIP.</p>
+      </div>
+    </div></section>
+    <section class="company-section" id="demo"><div class="company-wrap">
+      <div class="company-section-heading"><p class="company-kicker">02 / Demonstration</p><h2>PASS. BLOCK. <em>PASS again.</em></h2><p>All three CSVs in the ZIP are synthetic. Run <code>try-demo.bat</code> on Windows or <code>sh try-demo.sh</code> on macOS/Linux to see the actual Java report.</p></div>
+      <div class="company-bento company-bento-three">
+        <article class="company-panel company-panel-blue"><span class="company-panel-label">PASS / Exit 0</span><h3>Original export</h3><p><code>order_id,sku,total_cents,currency</code></p><p>The consumer contract expects <code>order_id</code>, and it exists.</p></article>
+        <article class="company-panel company-panel-coral"><span class="company-panel-label">BLOCK / Exit 1</span><h3>Breaking export</h3><p><code>id,sku,total_cents,currency</code></p><p>Someone renamed <code>order_id</code> to <code>id</code>. The customer's importer may fail.</p></article>
+        <article class="company-panel company-panel-yellow"><span class="company-panel-label">FIXED / Exit 0</span><h3>Compatible export</h3><p><code>order_id,sku,total_cents,currency</code></p><p>Restore the required header, or provide both columns during a coordinated migration.</p></article>
+      </div>
+      <p class="company-small-note">The checker reports which integration failed, the exact missing column, and <strong>Gate: BLOCK</strong>. It does not automatically rewrite production data.</p>
+    </div></section>
+    <section class="company-section company-section-tint" id="fix"><div class="company-wrap">
+      <div class="company-section-heading"><p class="company-kicker">03 / Fix it yourself</p><h2>Repair the <em>broken header.</em></h2><p>A simple practice exercise you can complete in Notepad or VS Code.</p></div>
+      <div class="company-panel company-panel-yellow">
+        <ol>
+          <li>Copy <code>samples/broken.csv</code> to <code>samples/my-repair.csv</code>.</li>
+          <li>Open the copy in a text editor. Change the first header from <code>id</code> to <code>order_id</code>.</li>
+          <li>Save, then run the command below inside the extracted release folder.</li>
+          <li>Look for <strong>Gate: ALLOW</strong>. You repaired the sample!</li>
+        </ol>
+        <pre><code>java -jar cellar-guard.jar check --config contracts/example-contract.json --csv samples/my-repair.csv</code></pre>
+        <p><strong>Important:</strong> In a real app, fix the export-producing code too. Editing one CSV will not prevent next week's bad export. Keep the original column until the customer has migrated.</p>
       </div>
     </div></section>
     <section class="company-section" id="check"><div class="company-wrap">
-      <div class="company-section-heading"><p class="company-kicker">02 / Check</p><h2>A contract is the <em>import promise.</em></h2><p>Define required columns and row rules in <code>cellar.json</code>, then point the checker at the CSV produced by the code you plan to ship.</p></div>
+      <div class="company-section-heading"><p class="company-kicker">04 / Use your own CSV</p><h2>Define the <em>customer promise.</em></h2><p>Make a copy of the sample contract, change required columns and rules to match the customer's importer, and run the checker on your own freshly generated CSV.</p></div>
       <div class="company-panel company-panel-blue">
-        <pre><code>java -jar dist/cellar.jar check \
-  --config cellar.json \
-  --csv examples/sales.csv \
-  --format markdown --summary</code></pre>
-        <p><strong>Exit 0:</strong> declared rules passed. <strong>Exit 1:</strong> blocking incompatibility. <strong>Exit 2:</strong> the check could not run, so nothing was verified. The sample CSV is for demonstration only.</p>
+        <pre><code>java -jar cellar-guard.jar check --config contracts/my-contract.json --csv path/to/my-export.csv</code></pre>
+        <p><strong>Exit 0:</strong> declared rules passed. <strong>Exit 1:</strong> a breaking rule failed. <strong>Exit 2:</strong> the check could not run; nothing was verified. Never change a contract just to hide an incompatibility.</p>
       </div>
     </div></section>
     <section class="company-section company-section-tint" id="pr"><div class="company-wrap">
-      <div class="company-section-heading"><p class="company-kicker">03 / Pull requests</p><h2>Run the check <em>before merge.</em></h2><p>The repository includes <code>.github/workflows/guard-pr.yml</code>. GitHub Actions executes it on every pull request to <code>main</code>.</p></div>
+      <div class="company-section-heading"><p class="company-kicker">05 / Pull requests</p><h2>Run the check <em>before merge.</em></h2><p>The repository includes <code>.github/workflows/guard-pr.yml</code>. GitHub Actions executes it on every pull request to <code>main</code>.</p></div>
       <div class="company-bento company-bento-three">
         <article class="company-panel"><span class="company-panel-label">Step 1</span><h3>Generate the export.</h3><p>Replace the workflow’s example CSV path with a representative CSV generated from the proposed application code.</p></article>
         <article class="company-panel"><span class="company-panel-label">Step 2</span><h3>Review contracts.</h3><p>Commit consumer expectations under version control. A checker cannot infer hidden customer requirements.</p></article>
@@ -61,7 +80,7 @@ java -jar dist/cellar.jar validate --config cellar.json</code></pre>
       </div>
       <p class="company-small-note">The included workflow checks the tracked synthetic CSV until you wire it to your application’s export command. For the complete configuration, report formats, troubleshooting and security boundaries, see the <a href="https://github.com/suryandugy-glitch/Cellar-Studio/blob/main/docs/CELLAR_GUARD_MANUAL.md">technical manual</a>.</p>
     </div></section>
-    <section class="company-callout company-wrap"><p class="company-kicker">Try a failure safely</p><h2>A renamed header can <em>break an import.</em></h2><div class="company-link-row"><a class="company-button" href="./walkthrough.html">Explore synthetic checks</a><a class="company-text-link" href="./guard.html">Back to Cellar Guard</a></div></section>
+    <section class="company-callout company-wrap"><p class="company-kicker">Still need help?</p><h2>Every failure has <em>a next step.</em></h2><div class="company-link-row"><a class="company-button" href="https://github.com/suryandugy-glitch/Cellar-Studio/blob/main/docs/GUARD_START_HERE.md">Read the beginner guide</a><a class="company-text-link" href="./walkthrough.html">See synthetic reports</a></div></section>
   </main>
   <!-- STUDIO_FOOTER -->
 </body>

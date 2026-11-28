@@ -21,11 +21,11 @@ landing = landing.replace(/  <link rel="canonical" href="[^"]*">\r?\n/,
   '  <link rel="canonical" href="' + canonicalOrigin + '/guard.html">\n' +
   '  <meta property="og:url" content="' + canonicalOrigin + '/guard.html">\n');
 if (workspaceOrigin) {
-  landing = landing.replace('href="./guide.html#quick-start">Open workspace',
-    'href="./workspace.html">Open workspace');
-} else {
-  landing = landing.replace('href="./guide.html#quick-start">Open workspace',
-    'href="./guide.html#quick-start">Workspace setup');
+  // A connected Java backend provides the live workspace entry. Public static
+  // deployments instead offer the downloadable Java release.
+  landing = landing.replace(
+    '<a class="button button-primary" href="https://github.com/suryandugy-glitch/Cellar-Studio/releases/tag/guard-v3.0.0-web.1">Download Guard ZIP</a>',
+    '<a class="button button-primary" href="./workspace.html">Open workspace</a>');
 }
 
 const demo = (await readFile(new URL(web + '/index.html', root), 'utf8'))

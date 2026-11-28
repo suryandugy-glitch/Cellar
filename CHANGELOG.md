@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — Guided Cellar Guard Java release
+
+- Added a standalone Java 21+ release ZIP containing the runnable JAR, launchers for Windows/macOS/Linux, sample contract/CSVs and beginner/technical manuals.
+- Added a verified PASS → BLOCK → PASS demo, with an explicit exercise for fixing the renamed `order_id` CSV header.
+- Updated the Guard product page, product listing, public manual and README with download/repair instructions.
+- Added a dedicated, one-time GitHub Actions release flow for the `guard-v3.0.0-web.1` release tag, including a SHA-256 checksum.
+
 ## Unreleased — Studio-first navigation and team
 
 - Restored **Cellar Studio** as the primary site and README identity, with a dedicated Products page and Cellar Guard as a product underneath it.
