@@ -171,3 +171,17 @@ html[data-theme-type="large"]{font-size:112.5%}
 html[data-theme-corners="rounded"] :is(.company-panel,.company-button,.company-status-board,.company-stamp,.vision-tile,.vision-board,.guard-card,.guard-hero,.guard-notice,.guard-result-card,.studio-theme-menu,.studio-theme-toggle,.studio-theme-option,.studio-theme-editor-link){border-radius:16px}
 html[data-theme-motion="reduced"]{scroll-behavior:auto!important}
 html[data-theme-motion="reduced"] *,html[data-theme-motion="reduced"] *::before,html[data-theme-motion="reduced"] *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+
+/* Style modes change structure, not just the palette. Built-in modes stay intact. */
+html[data-theme-style="minimal"] :is(.company-panel,.company-stamp,.company-status-board,.company-button,.company-form,.vision-tile,.vision-board,.vision-process>div,.guard-card,.guard-hero,.guard-notice,.guard-result-card,.studio-theme-toggle,.studio-theme-menu,.theme-form,.theme-preset,.theme-saved-card,.theme-transfer){
+  border-width:1px!important;box-shadow:none!important;
+}
+html[data-theme-style="minimal"] :is(.company-section-tint,.company-hero,.cellar-home .vision-hero,.cellar-home .vision-possibilities,.guard-hero){background-image:none!important}
+html[data-theme-style="minimal"] :is(.company-page h1,.company-page h2,.cellar-home h1,.cellar-home h2,.guard-hero h1){font-family:'DM Sans',Inter,system-ui,sans-serif;letter-spacing:-.045em}
+html[data-theme-style="minimal"] .cellar-home :is(.vision-ring,.vision-spark){opacity:.1}
+html[data-theme-style="minimal"] .studio-site-footer{border-top-width:1px}
+html[data-theme-style="brutalist"] :is(.company-panel,.company-stamp,.company-status-board,.company-button,.company-form,.vision-tile,.vision-board,.vision-process>div,.guard-card,.guard-hero,.guard-notice,.guard-result-card,.studio-theme-toggle,.studio-theme-menu,.theme-form,.theme-preset,.theme-saved-card,.theme-transfer){
+  border-width:4px!important;border-radius:0!important;box-shadow:8px 8px 0 var(--custom-border)!important;
+}
+html[data-theme-style="brutalist"] :is(.company-page h1,.company-page h2,.cellar-home h1,.cellar-home h2,.guard-hero h1){font-family:'Space Grotesk',Inter,system-ui,sans-serif;letter-spacing:-.075em;font-weight:900}
+html[data-theme-style="brutalist"] .studio-site-footer{border-top-width:8px}

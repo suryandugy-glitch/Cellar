@@ -35,17 +35,34 @@
     </section>
     <section class="theme-section theme-section-tint" aria-labelledby="presets-heading">
       <div class="company-wrap">
-        <div class="theme-section-header"><p class="company-kicker">A place to start</p><h2 id="presets-heading">Pick a mood. <em>Make it yours.</em></h2><p>Presets only fill the editor. Nothing changes across the site until you save and apply.</p></div>
-        <div class="theme-presets" role="group" aria-label="Starter color palettes">
-          <button class="theme-preset" type="button" data-preset="studio"><span class="theme-preset-swatches" aria-hidden="true"><i style="background:#f6f5ef"></i><i style="background:#582eb7"></i><i style="background:#d9ef8e"></i></span><strong>Studio Original</strong><small>Fresh and bold</small></button>
-          <button class="theme-preset" type="button" data-preset="midnight"><span class="theme-preset-swatches" aria-hidden="true"><i style="background:#121728"></i><i style="background:#9775fa"></i><i style="background:#abf0d1"></i></span><strong>Midnight Signal</strong><small>Deep and electric</small></button>
-          <button class="theme-preset" type="button" data-preset="sunset"><span class="theme-preset-swatches" aria-hidden="true"><i style="background:#fff5ed"></i><i style="background:#bd4429"></i><i style="background:#ffd08c"></i></span><strong>Sunset Type</strong><small>Warm editorial</small></button>
-          <button class="theme-preset" type="button" data-preset="forest"><span class="theme-preset-swatches" aria-hidden="true"><i style="background:#ecf4e7"></i><i style="background:#1d6454"></i><i style="background:#c5e590"></i></span><strong>Forest Circuit</strong><small>Calm green energy</small></button>
+        <div class="theme-section-header"><p class="company-kicker">Explore design languages</p><h2 id="presets-heading">Minimal or bold. <em>You decide.</em></h2><p>Browse curated palettes for Minimalist, Brutalist and expressive Studio styles. Selecting one loads it in the editor without changing your saved theme.</p></div>
+        <div class="theme-gallery-filters" role="group" aria-label="Filter theme galleries">
+          <button type="button" data-preset-filter="all" aria-pressed="true">All palettes</button>
+          <button type="button" data-preset-filter="minimal" aria-pressed="false">Minimalism</button>
+          <button type="button" data-preset-filter="brutalist" aria-pressed="false">Brutalism</button>
+          <button type="button" data-preset-filter="studio" aria-pressed="false">Studio color</button>
         </div>
+        <div class="theme-presets" id="theme-presets" role="group" aria-label="Starter color palettes"></div>
       </div>
     </section>
 
-    <section class="theme-section" id="editor" aria-labelledby="editor-heading"><div class="company-wrap">
+    <section class="theme-section" id="palette-library" aria-labelledby="palette-heading"><div class="company-wrap">
+      <div class="theme-section-header"><p class="company-kicker">Color palettes / 30 swatches</p><h2 id="palette-heading">Pick any color. <em>Mix a new mood.</em></h2><p>Choose the part of your theme to edit, then tap a color from our curated palettes. You can still use the custom color picker below for any shade.</p></div>
+      <div class="theme-color-browser">
+        <div class="theme-color-target">
+          <label for="palette-target">Which color should change?</label>
+          <select id="palette-target">
+            <option value="accent">Primary accent</option><option value="background">Page background</option><option value="surface">Cards &amp; panels</option><option value="text">Primary text</option><option value="muted">Secondary text</option><option value="secondary">Secondary accent</option><option value="highlight">Highlight</option><option value="border">Borders &amp; shadows</option>
+          </select>
+          <label for="palette-hex">Or enter a HEX color</label>
+          <div class="theme-hex-entry"><input id="palette-hex" type="text" inputmode="text" maxlength="7" placeholder="#582EB7" pattern="#[0-9a-fA-F]{6}" aria-describedby="palette-hint"><button type="button" id="palette-use-hex">Apply color</button></div>
+          <p id="palette-hint">A six-digit HEX color, for example #582EB7. Palette changes remain a preview until saved.</p>
+        </div>
+        <div class="theme-palette-groups" id="theme-palette-groups" aria-label="Curated color swatches"></div>
+      </div>
+    </div></section>
+
+    <section class="theme-section theme-section-tint" id="editor" aria-labelledby="editor-heading"><div class="company-wrap">
       <div class="theme-section-header"><p class="company-kicker">Your workspace</p><h2 id="editor-heading">Build a <em>custom theme.</em></h2><p>Choose each color with your device's color picker. See the result before you apply it.</p></div>
       <div class="theme-workbench">
         <form id="theme-form" class="theme-form" novalidate>
@@ -61,7 +78,14 @@
             <label class="theme-color" for="theme-highlight"><span>Highlight color<small>Key actions and emphasis</small></span><input id="theme-highlight" data-color="highlight" type="color" value="#d9ef8e"><output for="theme-highlight">#D9EF8E</output></label>
             <label class="theme-color" for="theme-border"><span>Borders &amp; shadows<small>Outlines and depth</small></span><input id="theme-border" data-color="border" type="color" value="#151515"><output for="theme-border">#151515</output></label>
           </div>
-          <div class="theme-options-title"><h3>More than colors</h3><p>Choose how every page feels.</p></div>
+          <div class="theme-options-title"><h3>Visual style</h3><p>Change the design itself, not only its palette.</p></div>
+          <fieldset class="theme-style-picker">
+            <legend class="theme-style-legend">Design language</legend>
+            <label><input type="radio" name="theme-style" value="studio" checked><span><strong>Studio</strong><small>Expressive shapes, balanced impact</small></span></label>
+            <label><input type="radio" name="theme-style" value="minimal"><span><strong>Minimalist</strong><small>Fine lines, calm spacing, flat cards</small></span></label>
+            <label><input type="radio" name="theme-style" value="brutalist"><span><strong>Brutalist</strong><small>Hard edges, heavy strokes, bold shadows</small></span></label>
+          </fieldset>
+          <div class="theme-options-title"><h3>More than colors</h3><p>Fine-tune comfort and movement.</p></div>
           <div class="theme-preferences">
             <label for="theme-type">Text size <select id="theme-type" name="type"><option value="normal">Standard</option><option value="large">Larger text</option></select></label>
             <label for="theme-corners">Corners <select id="theme-corners" name="corners"><option value="sharp">Sharp &amp; bold</option><option value="rounded">Soft &amp; rounded</option></select></label>

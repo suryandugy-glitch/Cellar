@@ -11,7 +11,7 @@
     name: 'My palette',
     background: '#f6f5ef', surface: '#fffef9', text: '#151515', muted: '#484842',
     accent: '#582eb7', secondary: '#ffba91', highlight: '#d9ef8e', border: '#151515',
-    type: 'normal', corners: 'sharp', motion: 'full'
+    type: 'normal', corners: 'sharp', motion: 'full', style: 'studio'
   });
   const colors = ['background', 'surface', 'text', 'muted', 'accent', 'secondary', 'highlight', 'border'];
   const isHex = value => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
@@ -23,6 +23,7 @@
     if (['normal', 'large'].includes(value.type)) result.type = value.type;
     if (['sharp', 'rounded'].includes(value.corners)) result.corners = value.corners;
     if (['full', 'reduced'].includes(value.motion)) result.motion = value.motion;
+    if (['studio', 'minimal', 'brutalist'].includes(value.style)) result.style = value.style;
     return result;
   };
   const darkBackground = hex => {
@@ -53,6 +54,7 @@
     root.setAttribute('data-theme-type', preference === 'custom' ? customTheme.type : 'normal');
     root.setAttribute('data-theme-corners', preference === 'custom' ? customTheme.corners : 'sharp');
     root.setAttribute('data-theme-motion', preference === 'custom' ? customTheme.motion : 'full');
+    root.setAttribute('data-theme-style', preference === 'custom' ? customTheme.style : 'studio');
     colors.forEach(name => root.style.setProperty('--custom-' + name, customTheme[name]));
     root.style.setProperty('--custom-on-accent', darkBackground(customTheme.accent) ? '#ffffff' : '#151515');
     root.style.setProperty('--custom-on-highlight', darkBackground(customTheme.highlight) ? '#ffffff' : '#151515');

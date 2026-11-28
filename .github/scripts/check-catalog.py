@@ -168,9 +168,23 @@ with sync_playwright() as playwright:
     # Visitors can create and apply a named custom palette on a separate page.
     page.set_viewport_size({'width': 390, 'height': 850})
     page.goto(BASE + 'themes.html')
+    page.get_by_role('button', name='Minimalism', exact=True).click()
+    assert page.locator('#theme-presets .theme-preset').count() == 4
+    page.get_by_role('button', name='Load Paper & Ink palette').click()
+    assert page.locator('#theme-preview').get_attribute('data-style') == 'minimal'
+    assert page.locator('#theme-preview').evaluate('el => getComputedStyle(el).borderTopWidth') == '1px'
+    page.get_by_role('button', name='Brutalism', exact=True).click()
+    assert page.locator('#theme-presets .theme-preset').count() == 4
+    page.get_by_role('button', name='Load Bauhaus Punch palette').click()
+    assert page.locator('#theme-preview').get_attribute('data-style') == 'brutalist'
+    assert page.locator('#theme-preview').evaluate('el => getComputedStyle(el).borderTopWidth') == '4px'
+    page.locator('#palette-target').select_option('accent')
+    page.get_by_role('button', name='Ocean #087e8b color').click()
+    assert page.locator('#theme-accent').input_value() == '#087e8b'
     page.locator('#theme-name').fill('My ocean palette')
-    page.locator('#theme-accent').evaluate("el => { el.value = '#2d7a68'; el.dispatchEvent(new Event('input', { bubbles: true })); }")
-    assert '#2D7A68' in page.locator('label[for="theme-accent"]').inner_text()
+    page.locator('input[name="theme-style"][value="minimal"]').check()
+    assert page.locator('#theme-preview').get_attribute('data-style') == 'minimal'
+    assert '#087E8B' in page.locator('label[for="theme-accent"]').inner_text()
     page.locator('#theme-corners').select_option('rounded')
     page.locator('#theme-type').select_option('large')
     page.locator('#theme-motion').select_option('reduced')
@@ -178,12 +192,15 @@ with sync_playwright() as playwright:
     assert page.locator('html').get_attribute('data-theme-preference') == 'custom'
     assert page.locator('html').get_attribute('data-theme-corners') == 'rounded'
     assert page.locator('html').get_attribute('data-theme-type') == 'large'
+    assert page.locator('html').get_attribute('data-theme-style') == 'minimal'
     assert page.locator('#theme-library article').count() == 1
     saved = page.evaluate("JSON.parse(localStorage.getItem('cellar-studio-custom-theme'))")
-    assert saved['name'] == 'My ocean palette' and saved['accent'] == '#2d7a68'
+    assert saved['name'] == 'My ocean palette' and saved['accent'] == '#087e8b'
+    assert saved['style'] == 'minimal'
     page.goto(BASE + 'guard-app.html')
     assert page.locator('html').get_attribute('data-theme-preference') == 'custom'
-    assert page.evaluate("getComputedStyle(document.body).getPropertyValue('--guard-violet').trim()") == '#2d7a68'
+    assert page.evaluate("getComputedStyle(document.body).getPropertyValue('--guard-violet').trim()") == '#087e8b'
+    assert page.locator('.guard-card').first.evaluate('el => getComputedStyle(el).borderTopWidth') == '1px'
     page.goto(BASE + 'themes.html')
     page.get_by_role('button', name='Use', exact=True).click()
     assert page.locator('html').get_attribute('data-theme-preference') == 'custom'
