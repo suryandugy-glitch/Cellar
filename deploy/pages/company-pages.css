@@ -120,10 +120,10 @@ html[data-theme="dark"] :is(.company-stamp-license,.company-stamp-credentials){c
 .company-form fieldset{min-width:0;margin:0;padding:0;border:0}
 .company-form-intro{margin:0 0 24px;font-size:.95rem;color:var(--company-muted)}
 .company-form-field{display:grid;gap:8px;margin-bottom:20px}
-.company-form-field label,.company-copy-fallback label{font-weight:800;font-size:.95rem}
+.company-form-field label{font-weight:800;font-size:.95rem}
 .company-form-field label span{font-weight:500;color:var(--company-muted)}
-.company-form-field :is(input,select,textarea),.company-copy-fallback textarea{width:100%;min-width:0;padding:13px 15px;min-height:50px;border:2px solid var(--company-line);border-radius:0;background:var(--company-panel);color:var(--company-ink);font:500 1rem/1.45 'DM Sans',system-ui,sans-serif}
-.company-form-field textarea,.company-copy-fallback textarea{min-height:145px;resize:vertical}
+.company-form-field :is(input,select,textarea){width:100%;min-width:0;padding:13px 15px;min-height:50px;border:2px solid var(--company-line);border-radius:0;background:var(--company-panel);color:var(--company-ink);font:500 1rem/1.45 'DM Sans',system-ui,sans-serif}
+.company-form-field textarea{min-height:145px;resize:vertical}
 .company-form-field :is(input,select,textarea)::placeholder{color:var(--company-muted);opacity:.8}
 .company-form-field small{font-size:.79rem;color:var(--company-muted)}
 .company-field-error{display:block;color:#a32920;font-weight:700;font-size:.85rem;min-height:0}
@@ -137,8 +137,6 @@ html[data-theme="dark"] .company-field-error{color:#ffb4a9}
 .company-form-actions{display:flex;flex-wrap:wrap;gap:13px;margin:25px 0 12px}
 .company-form-actions button{cursor:pointer;font-size:.92rem}
 .company-form-status{min-height:24px;margin:15px 0 0;font-weight:700;color:var(--company-ink)}
-.company-copy-fallback{display:grid;gap:10px;margin-top:20px}
-.company-copy-fallback[hidden]{display:none}
 .company-page :is(input,select,textarea,button):focus-visible{outline:3px solid #dc6e37;outline-offset:3px}
 .company-footer{background:var(--company-panel);border-top:3px solid var(--company-line)}
 .company-footer-grid{display:grid;grid-template-columns:1fr auto;gap:50px;align-items:start;padding-block:48px}
