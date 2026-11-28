@@ -59,6 +59,10 @@ Use **Validate contract** to check edited JSON without a CSV. To start from a kn
 
 The browser reads UTF-8 CSV files up to 8 MiB and contracts up to 1 MiB. Your CSV and contract stay on your device. Use the Java workspace for revisions, history and side-by-side header comparisons, and the CLI for release gates.
 
+### Ask the website assistant
+
+Select **Ask Cellar** on the public website. The assistant answers questions using public site pages and links to the relevant instructions. On static hosting or when the model is unavailable, it shows matching passages from the site guide. The checker keeps CSVs and contracts on the device.
+
 ### Download and run (no source build)
 
 1. Open the dedicated [Cellar Guard GitHub release](https://github.com/suryandugy-glitch/Cellar-Studio/releases/tag/guard-v3.1.0), download **Cellar-Guard-3.1.0.zip**, and extract it.
