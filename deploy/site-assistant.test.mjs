@@ -9,6 +9,7 @@ const documents = JSON.parse(await readFile(new URL('assistant-index.json', outp
 
 test('assistant indexes public pages and excludes account and workspace pages', async () => {
   const excluded = new Set(['workspace.html', 'signin.html', 'account.html']);
+  if ((await readFile(new URL('index.html', output), 'utf8')).includes('data-account-page=')) excluded.add('index.html');
   const pages = (await readdir(output)).filter(name => name.endsWith('.html') && !excluded.has(name));
   assert.deepEqual(documents.map(doc => doc.page).sort(), pages.sort());
   assert.ok(documents.every(doc => doc.sections.length > 0));

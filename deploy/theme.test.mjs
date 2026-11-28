@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 import { access, readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { accountConfig } from '../server/account-config.mjs';
 
 const root = resolve('build/vercel');
+const signInLanding = process.env.CELLAR_AUTH_LANDING === '1' && Boolean(accountConfig());
 const redirects = JSON.parse(await readFile(resolve('vercel.json'), 'utf8')).redirects;
 assert.ok(!redirects.some(route => route.source === '/' &&
   (!route.has || route.has.some(check => check.type === 'host' && check.value === 'cellar-csv.vercel.app'))),
@@ -31,7 +33,13 @@ for (const file of files) {
     });
   }
 }
-const home = await readFile(resolve(root, 'index.html'), 'utf8');
+const index = await readFile(resolve(root, 'index.html'), 'utf8');
+const studio = await readFile(resolve(root, 'studio.html'), 'utf8');
+const home = signInLanding ? studio : index;
+if (signInLanding) {
+  assert.match(index, /data-account-page="signin"/);
+  assert.match(index, /href="\.\/studio\.html"[^>]*>Continue as a guest/);
+}
 assert.match(home, /We build what/);
 assert.match(home, /comes next/);
 assert.match(home, /studio-vision\.css/);
@@ -42,10 +50,12 @@ assert.match(home, /href="\.\/products\.html"/);
 assert.match(home, /More products.*coming soon/i);
 assert.match(home, /href="\.\/about\.html"/);
 assert.match(home, /href="\.\/contribute\.html"/);
-assert.match(home, /rel="canonical" href="https:\/\/cellar-csv\.vercel\.app\/"/);
+const canonical = signInLanding ? 'https://cellar-csv.vercel.app/studio.html' : 'https://cellar-csv.vercel.app/';
+assert.ok(home.includes(`rel="canonical" href="${canonical}"`));
 const guard = await readFile(resolve(root, 'guard.html'), 'utf8');
 assert.match(guard, /href="\.\/products\.html"/);
-assert.match(guard, /href="\.\/"[^>]*>Cellar Studio<\/a>/);
+const studioHref = signInLanding ? './studio.html' : './';
+assert.ok(guard.includes(`href="${studioHref}">Cellar Studio</a>`));
 assert.match(guard, /releases\/tag\/guard-v3\.1\.0/);
 const products = await readFile(resolve(root,'products.html'),'utf8');
 assert.match(products, /id="guard"/);
@@ -63,14 +73,14 @@ assert.match(themeEditor, /data-preset-filter="minimal"/);
 assert.match(themeEditor, /data-preset-filter="brutalist"/);
 assert.match(themeEditor, /id="palette-target"/);
 assert.match(themeEditor, /name="theme-style" value="brutalist"/);
-const studio = await readFile(resolve(root, 'studio.html'), 'utf8');
-assert.match(studio, /href="https:\/\/cellar-csv\.vercel\.app\/"/);
+assert.ok(studio.includes(`rel="canonical" href="${canonical}"`));
 assert.match(studio, /href="\.\/guard\.html"/);
 assert.match(studio, /id="possibilities"/);
 for (const file of files) {
   const html = await readFile(resolve(root, file), 'utf8');
   assert.doesNotMatch(html, /cellar-studio-hq\.vercel\.app/, `${file}: old public hostname`);
-  assert.doesNotMatch(html, /href="\.\/studio\.html#possibilities"/, `${file}: obsolete studio subpage anchor`);
+  const wrongAnchor = signInLanding ? './#possibilities' : './studio.html#possibilities';
+  assert.ok(!html.includes(`href="${wrongAnchor}"`), `${file}: incorrect Studio section link`);
 }
 for (const page of ['about.html', 'licenses.html', 'certifications.html', 'privacy.html', 'terms.html', 'policies.html', 'cookie-policy.html', 'refund-policy.html', 'business.html', 'contact.html']) {
   assert.match(home, new RegExp(`href="\\./${page}"`), `home: missing ${page}`);
@@ -85,7 +95,7 @@ for (const page of ['about.html', 'licenses.html', 'certifications.html']) {
   const html = await readFile(resolve(root, page), 'utf8');
   assert.match(html, /aria-current="page"/);
 }
-for (const file of ['index.html', 'products.html', 'manual.html', 'handbook.html']) {
+for (const file of [signInLanding ? 'studio.html' : 'index.html', 'products.html', 'manual.html', 'handbook.html']) {
   const html = await readFile(resolve(root, file), 'utf8');
   assert.equal(html.split('studio-site-footer').length - 1, 1, `${file}: expected one shared footer`);
   assert.match(html, /aria-label="Footer sitemap"/);
