@@ -16,6 +16,10 @@ const draftDelimiter = document.querySelector('#draft-delimiter');
 const fillRules = document.querySelector('#fill-rules');
 const builder = document.querySelector('#builder-columns');
 const builderDelimiter = document.querySelector('#builder-delimiter');
+const rememberRules = document.querySelector('#remember-rules');
+const forgetRules = document.querySelector('#forget-rules');
+const savedRulesStatus = document.querySelector('#saved-rules-status');
+const rulesKey = 'cellar-guard-saved-rules';
 let worker;
 let report;
 let revision = 0;
@@ -164,7 +168,7 @@ function saveJson(source, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function startCheck(action, focus = false) {
+function startCheck(action, focus = false, rulesToRemember) {
   if (worker) return;
   revision++;
   const task = action === 'fill' ? 'draft' : action === 'check' && !hasInput('csv') ? 'validate' : action;
@@ -196,6 +200,15 @@ function startCheck(action, focus = false) {
         fields.contract.note.textContent = 'Contract valid · ' + count +
           (count === 1 ? ' integration' : ' integrations') + (filename ? ' · ' + filename : '.');
         saveContract.disabled = false;
+        if (rulesToRemember && rememberRules.checked) {
+          try {
+            localStorage.setItem(rulesKey, JSON.stringify(rulesToRemember));
+            forgetRules.hidden = false;
+            savedRulesStatus.textContent = 'Rules saved on this device.';
+          } catch {
+            savedRulesStatus.textContent = 'The browser could not save these rules. You can still use them now.';
+          }
+        }
       }
       if (data.error) {
         setFieldError(data.field, true);
@@ -252,7 +265,7 @@ function startCheck(action, focus = false) {
 document.querySelector('#load-passing').addEventListener('click', () => loadExample('./samples/passing.csv'));
 document.querySelector('#load-breaking').addEventListener('click', () => loadExample('./samples/breaking.csv'));
 getSample('./samples/contract.json').then(text => {
-  if (revision || hasInput('contract')) return;
+  if (revision || hasInput('contract') || !forgetRules.hidden) return;
   fields.contract.text.value = text;
   fields.contract.note.textContent = 'Example contract loaded.';
 }).catch(() => {
@@ -286,7 +299,34 @@ document.querySelector('#apply-rules').addEventListener('click', () => {
     integrations: [{ id: 'customer-import', required }],
   }, null, 2);
   fields.contract.note.textContent = 'Validating your import rules…';
-  startCheck('check', true);
+  const rulesToRemember = rememberRules.checked
+    ? { columns: required.join('\n'), delimiter: builderDelimiter.value }
+    : undefined;
+  startCheck('check', true, rulesToRemember);
+});
+
+try {
+  const saved = JSON.parse(localStorage.getItem(rulesKey));
+  if (typeof saved?.columns === 'string' && saved.columns.trim() && [',', ';', 'tab'].includes(saved.delimiter)) {
+    builder.value = saved.columns;
+    builderDelimiter.value = saved.delimiter;
+    rememberRules.checked = true;
+    forgetRules.hidden = false;
+    savedRulesStatus.textContent = 'Saved rules loaded. Tap Use these rules to apply them.';
+  }
+} catch {
+  // A blocked or unavailable storage area does not prevent CSV checks.
+}
+
+forgetRules.addEventListener('click', () => {
+  try {
+    localStorage.removeItem(rulesKey);
+    rememberRules.checked = false;
+    forgetRules.hidden = true;
+    savedRulesStatus.textContent = 'Saved rules removed from this device.';
+  } catch {
+    savedRulesStatus.textContent = 'The browser could not remove the saved rules.';
+  }
 });
 
 cancel.addEventListener('click', () => {
@@ -306,6 +346,7 @@ document.querySelector('#clear-inputs').addEventListener('click', () => {
   builder.value = '';
   builderDelimiter.value = ',';
   builder.removeAttribute('aria-invalid');
+  savedRulesStatus.textContent = forgetRules.hidden ? '' : 'Saved rules stay on this device. Reload to restore them.';
   status.textContent = 'Inputs cleared. Enter your import rules or load an example.';
 });
 

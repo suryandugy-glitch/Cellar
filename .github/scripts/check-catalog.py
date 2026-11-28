@@ -283,6 +283,40 @@ with sync_playwright() as playwright:
         apply.click()
         page.get_by_role('heading', name='Ready to ship').wait_for()
 
+        remember = page.get_by_role('checkbox', name='Remember these rules on this device')
+        remember.check()
+        apply.click()
+        page.get_by_text('Rules saved on this device.', exact=True).wait_for()
+        assert page.evaluate("JSON.parse(localStorage.getItem('cellar-guard-saved-rules'))") == {
+            'columns': 'order_id\nsku', 'delimiter': ';',
+        }
+
+        page.reload()
+        page.get_by_text('Saved rules loaded. Tap Use these rules to apply them.', exact=True).wait_for()
+        assert page.get_by_label('Required columns', exact=True).input_value() == 'order_id\nsku'
+        assert page.get_by_label('Contract delimiter').input_value() == ';'
+        assert page.get_by_label('CSV text', exact=True).input_value() == ''
+
+        page.get_by_role('link', name='Add CSV', exact=True).click()
+        assert page.url.endswith('#csv-title')
+        page.get_by_role('link', name='Get help', exact=True).click()
+        assert page.url.endswith('#guard-help')
+        page.get_by_text('Can I check a CSV without a JSON file?', exact=True).click()
+        assert page.get_by_text('Yes. Enter one required column name per line', exact=False).is_visible()
+        with page.expect_popup() as support:
+            page.get_by_role('link', name='Ask for help', exact=False).click()
+        contact_page = support.value
+        contact_page.wait_for_load_state()
+        assert contact_page.url == BASE + 'contact.html?topic=guard#enquiry-form'
+        assert contact_page.locator('#enquiry-topic').input_value() == 'Cellar Guard support'
+        contact_page.close()
+        assert page.get_by_label('Required columns', exact=True).input_value() == 'order_id\nsku'
+
+        page.get_by_role('button', name='Forget saved rules').click()
+        assert page.evaluate("localStorage.getItem('cellar-guard-saved-rules')") is None
+        page.reload()
+        assert page.get_by_label('Required columns', exact=True).input_value() == ''
+
         assert page.locator('#studio-theme-toggle').is_visible()
         assert page.locator('html').get_attribute('data-theme') == 'light'
         assert page.evaluate('document.documentElement.scrollWidth - innerWidth') <= 1

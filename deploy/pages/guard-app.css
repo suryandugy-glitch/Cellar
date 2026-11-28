@@ -96,3 +96,51 @@ html[data-theme="dark"] .guard-app {
 .guard-json summary{cursor:pointer;font-weight:800}
 .guard-json[open] summary,.guard-json input{margin-bottom:12px}
 .guard-json .guard-field-actions{margin-inline:0}
+.guard-shortcuts,.guard-help-actions,.guard-builder-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.guard-shortcuts {margin:0 0 16px}
+.guard-shortcuts a,.guard-help-actions a {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  padding:8px 12px;
+  border:1px solid var(--guard-ink);
+  background:var(--guard-surface);
+  color:var(--guard-ink);
+  font-weight:800;
+  text-underline-offset:4px;
+}
+.guard-help-actions a:first-child {background:var(--guard-lime);color:#21163d;border-color:#21163d}
+html[data-theme-preference="custom"] .guard-help-actions a:first-child {color:var(--custom-on-highlight);border-color:var(--guard-ink)}
+.guard-help-actions span {font-size:.82em;font-weight:600;margin-inline-start:.4em}
+.guard-builder .guard-remember {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:44px;
+  margin:0 0 8px;
+}
+.guard-remember input {
+  flex:0 0 20px;
+  width:20px;
+  height:20px;
+  margin:0;
+  accent-color:var(--guard-violet);
+}
+#saved-rules-status:empty {display:none}
+.guard-help {margin:22px 0 48px}
+.guard-help-content {padding:0 20px 20px}
+.guard-help-content details {border-bottom:1px solid var(--guard-muted)}
+.guard-help-content summary {padding:12px 0;min-height:44px;font-weight:800;cursor:pointer}
+.guard-help-content p {overflow-wrap:anywhere}
+.guard-app :is(#contract-title,#csv-title,#guard-actions,#guard-help) {scroll-margin-top:20px}
+@media(max-width:700px){
+  .guard-shortcuts a {flex:1 1 auto}
+  .guard-csv textarea {height:140px;min-height:110px}
+  .guard-action-bar button {flex:1 1 135px}
+  .guard-help-actions a {justify-content:flex-start;flex-wrap:wrap}
+}

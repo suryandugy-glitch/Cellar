@@ -10,6 +10,9 @@
   const topic = form.elements.topic;
   const message = form.elements.message;
   const consent = document.querySelector('#enquiry-consent');
+  if (new URLSearchParams(window.location.search).get('topic') === 'guard' && !topic.value) {
+    topic.value = 'Cellar Guard support';
+  }
 
   const validation = [
     [email, () => email.validity.typeMismatch ? 'Enter a valid email address or leave this field blank.' : ''],
