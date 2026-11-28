@@ -131,5 +131,7 @@ assert.match(manual, /samples\/my-repair\.csv/);
 assert.match(manual, /Download Cellar Guard ZIP/);
 const js = await readFile(resolve(root, 'theme-system.js'), 'utf8');
 assert.match(js, /localStorage\.setItem/);
-assert.match(js, /Switch to/);
+assert.match(js, /studio-theme-menu/);
+assert.match(js, /prefers-color-scheme/);
+assert.match(js, /storage/);
 console.log(`${files.length} Guard-only HTML pages pass theme and navigation checks.`);

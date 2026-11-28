@@ -133,6 +133,36 @@ with sync_playwright() as playwright:
     page.keyboard.press('Escape')
     assert page.get_by_role('button', name='Open navigation').get_attribute('aria-expanded') == 'false'
 
+    # A single appearance preference must work on phones and follow visitors
+    # from the Studio homepage to Guard and its manual.
+    page.set_viewport_size({'width': 320, 'height': 760})
+    page.emulate_media(color_scheme='light')
+    page.goto(BASE + 'index.html')
+    appearance = page.locator('#studio-theme-toggle')
+    assert appearance.is_visible()
+    appearance.click()
+    assert page.locator('#studio-theme-menu').is_visible()
+    assert page.evaluate('document.documentElement.scrollWidth - innerWidth') <= 1
+    page.locator('input[name="studio-theme-choice"][value="dark"]').check()
+    assert page.locator('html').get_attribute('data-theme') == 'dark'
+    assert page.evaluate("localStorage.getItem('cellar-studio-theme')") == 'dark'
+    page.goto(BASE + 'guard.html')
+    assert page.locator('html').get_attribute('data-theme') == 'dark'
+    page.goto(BASE + 'manual.html')
+    appearance = page.locator('#studio-theme-toggle')
+    appearance.click()
+    page.locator('input[name="studio-theme-choice"][value="system"]').check()
+    assert page.evaluate("localStorage.getItem('cellar-studio-theme')") == 'system'
+    page.emulate_media(color_scheme='dark')
+    assert page.locator('html').get_attribute('data-theme') == 'dark'
+    page.emulate_media(color_scheme='light')
+    assert page.locator('html').get_attribute('data-theme') == 'light'
+    appearance.click()
+    page.keyboard.press('Escape')
+    assert appearance.get_attribute('aria-expanded') == 'false'
+    appearance.click()
+    page.locator('input[name="studio-theme-choice"][value="light"]').check()
+
     # The homepage must promote one product and link to its public manual.
     page.goto(BASE + 'index.html')
     assert page.locator('.hero-copy').get_by_role('link', name='Explore our products').count() == 1
@@ -225,10 +255,9 @@ with sync_playwright() as playwright:
         apply.click()
         page.get_by_role('heading', name='Ready to ship').wait_for()
 
-        page.get_by_role('button', name='Switch to dark mode').click()
-        assert page.locator('html').get_attribute('data-theme') == 'dark'
+        assert page.locator('#studio-theme-toggle').is_visible()
+        assert page.locator('html').get_attribute('data-theme') == 'light'
         assert page.evaluate('document.documentElement.scrollWidth - innerWidth') <= 1
-        page.get_by_role('button', name='Switch to light mode').click()
 
     assert not errors, errors
     print(f'Checked {len(ROUTES)} routes at four widths, privacy choices, enquiry validation and mobile menu.')

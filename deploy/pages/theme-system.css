@@ -18,20 +18,45 @@
   --night:#202226;--mint:#687a9e;--pink:#926860;--green:#b5c6e1;
 }
 
-/* A persistent switch independent of the many page-specific navigation shells. */
-.studio-theme-toggle {
+/* The picker appears on every page, independently of its navigation shell. */
+.studio-theme-picker,.studio-theme-picker *{box-sizing:border-box}
+.studio-theme-picker {
   position:fixed;right:clamp(12px,2vw,26px);bottom:clamp(12px,2vw,26px);z-index:1000;
-  display:inline-flex;align-items:center;justify-content:center;gap:10px;min-width:124px;min-height:48px;
-  padding:9px 16px;border:2px solid var(--theme-line);border-radius:0;
+  display:flex;align-items:flex-end;flex-direction:column;
+  font-family:'DM Sans',Inter,system-ui,sans-serif;line-height:1.4;
+}
+.studio-theme-toggle {
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;min-width:144px;min-height:48px;
+  padding:9px 15px;border:2px solid var(--theme-line);border-radius:0;
   background:var(--theme-panel);color:var(--theme-ink);box-shadow:4px 4px 0 var(--theme-shadow);
-  font:800 13px/1.2 'DM Sans',Inter,system-ui,sans-serif;letter-spacing:.09em;
+  font:800 13px/1.2 'DM Sans',Inter,system-ui,sans-serif;letter-spacing:.045em;
   cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
 }
 .studio-theme-toggle:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--theme-shadow)}
 .studio-theme-toggle:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--theme-shadow)}
 .studio-theme-toggle:focus-visible{outline:3px solid #d7782f;outline-offset:4px}
-.studio-theme-toggle .theme-icon{font:800 24px/1 system-ui,sans-serif}
-@media(max-width:640px){.studio-theme-toggle{min-width:96px;min-height:46px;padding:8px 12px;gap:7px}.studio-theme-toggle .theme-icon{font-size:20px}}
+.studio-theme-toggle .studio-theme-glyph{font:800 22px/1 system-ui,sans-serif}
+.studio-theme-menu {
+  width:min(292px,calc(100vw - 24px));max-height:min(470px,calc(100dvh - 95px));overflow-y:auto;
+  margin-bottom:14px;padding:20px;border:2px solid var(--theme-line);border-radius:0;
+  background:var(--theme-panel);color:var(--theme-ink);box-shadow:6px 6px 0 var(--theme-shadow);
+}
+.studio-theme-menu[hidden]{display:none}
+.studio-theme-heading{margin:0!important;color:var(--theme-ink)!important;font:800 20px/1.15 'DM Sans',Inter,system-ui,sans-serif!important;letter-spacing:-.025em}
+.studio-theme-hint{margin:7px 0 14px!important;color:var(--theme-muted)!important;font:500 14px/1.45 'DM Sans',Inter,system-ui,sans-serif!important}
+.studio-theme-options{display:grid;gap:7px;min-width:0;margin:0;padding:0;border:0}
+.studio-theme-option{
+  display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 11px;
+  border:2px solid var(--theme-line);color:var(--theme-ink);background:var(--theme-page);cursor:pointer;
+}
+.studio-theme-option:has(input:checked){background:var(--theme-panel);box-shadow:inset 4px 0 0 var(--theme-ink)}
+.studio-theme-option:focus-within{outline:3px solid #d7782f;outline-offset:1px}
+.studio-theme-option input{flex:0 0 auto;width:19px;height:19px;margin:0;accent-color:var(--theme-ink);cursor:pointer}
+.studio-theme-option span{display:grid;gap:2px}
+.studio-theme-option strong{color:var(--theme-ink);font:800 15px/1.2 'DM Sans',Inter,system-ui,sans-serif}
+.studio-theme-option small{color:var(--theme-muted);font:500 13px/1.25 'DM Sans',Inter,system-ui,sans-serif}
+.studio-theme-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:640px){.studio-theme-toggle{min-width:132px;min-height:46px;padding:8px 12px;gap:7px}.studio-theme-toggle .studio-theme-glyph{font-size:20px}.studio-theme-menu{padding:16px}}
 @media(prefers-reduced-motion:reduce){.studio-theme-toggle{transition:none}}
 
 /* Shared dark surfaces. Keep outlined neo-brutalist cards, never invert imagery. */

@@ -21,6 +21,8 @@
 
 [Cellar Studio](https://cellar-csv.vercel.app/) is the main company identity and homepage. Products, team information, documentation and policy pages live beneath that identity. The studio works on practical software problems with careful engineering and reproducible evidence.
 
+**Site appearance:** Select the floating **THEME** control on any page to choose **System**, **Light**, or **Dark**. Your preference applies to Studio, Guard, the browser checker, manuals, Products, About and policy pages; it is remembered as you navigate. System follows your device's light/dark setting. The control works on phones and computers.
+
 ## Products
 
 | Product | Status | Details |
