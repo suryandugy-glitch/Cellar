@@ -56,6 +56,11 @@
       return;
     }
 
+    // Gmail uses the subject to thread automated mail. Give each enquiry its own reference.
+    const randomBytes = crypto.getRandomValues(new Uint8Array(8));
+    const reference = Array.from(randomBytes, byte => byte.toString(16).padStart(2, '0')).join('').toUpperCase();
+    form.elements.namedItem('_subject').value = `Cellar Studio | ${topic.value} | #${reference}`;
+
     status.textContent = 'Sending your message…';
     send.disabled = true;
   });
