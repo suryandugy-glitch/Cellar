@@ -37,11 +37,12 @@
       <div class="company-wrap company-form-layout">
         <div>
           <h2 id="form-title">Write to <em>our team.</em></h2>
-          <p class="company-body-copy">Fill in the form, open your email app, and select Send there. You can also copy your message and paste it into webmail.</p>
-          <noscript><p class="company-body-copy">Enable JavaScript to use the form, or email <a href="mailto:cellarcsv@gmail.com">cellarcsv@gmail.com</a>.</p></noscript>
+          <p class="company-body-copy">Fill in the form and select Send message. Your message will be delivered to the Cellar Studio inbox.</p>
         </div>
-        <form id="enquiry-form" class="company-form" method="post" aria-labelledby="form-title" novalidate>
-          <fieldset id="enquiry-fields" disabled>
+        <form id="enquiry-form" class="company-form" action="https://formsubmit.co/cellarcsv@gmail.com" method="post" aria-labelledby="form-title">
+          <input type="hidden" name="_subject" value="New Cellar Studio enquiry">
+          <input type="hidden" name="_url" value="https://cellar-csv.vercel.app/contact.html">
+          <fieldset>
             <p class="company-form-intro">Required fields are marked <strong>*</strong>.</p>
             <div class="company-form-field">
               <label for="enquiry-name">Your name <span>(optional)</span></label>
@@ -71,22 +72,16 @@
               <span class="company-field-error" id="enquiry-message-error"></span>
             </div>
             <div class="company-form-consent">
-              <input id="enquiry-consent" name="consent" type="checkbox" required aria-describedby="consent-help">
-              <label for="enquiry-consent">I understand that my message and any contact details I enter will be shared with Cellar Studio when I send the email. <strong>*</strong></label>
+              <input id="enquiry-consent" type="checkbox" required aria-describedby="consent-help">
+              <label for="enquiry-consent">I agree to share my message and any contact details I enter with Cellar Studio. <strong>*</strong></label>
             </div>
-            <p id="consent-help" class="company-small-note">See our <a href="./privacy.html">privacy notice</a>.</p>
+            <p id="consent-help" class="company-small-note">FormSubmit delivers your message. See our <a href="./privacy.html">privacy notice</a>.</p>
             <span class="company-field-error" id="enquiry-consent-error"></span>
             <div class="company-form-actions">
-              <button class="company-button" type="submit">Open email app</button>
-              <button class="company-button company-button-outline" id="enquiry-copy" type="button">Copy message</button>
+              <button class="company-button" type="submit">Send message</button>
               <button class="company-button company-button-outline" type="reset">Clear form</button>
             </div>
             <p class="company-form-status" id="enquiry-status" role="status"></p>
-            <div class="company-copy-fallback" id="enquiry-fallback" hidden>
-              <label for="enquiry-preview">Message to paste into your email</label>
-              <textarea id="enquiry-preview" readonly rows="7"></textarea>
-            </div>
-            <a id="enquiry-draft-link" hidden>Open prepared email</a>
           </fieldset>
         </form>
       </div>

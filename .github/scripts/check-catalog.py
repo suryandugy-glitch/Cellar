@@ -1,7 +1,9 @@
 """Browser smoke checks for Studio HQ and its only product, Cellar Guard."""
+import json
 import os
+from pathlib import Path
 
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs
 
 from playwright.sync_api import sync_playwright
 
@@ -50,19 +52,35 @@ with sync_playwright() as playwright:
     dialog.get_by_role('button', name='Save preferences').click()
     assert page.evaluate("JSON.parse(localStorage.getItem('cellar-privacy-preferences')).embeds") is False
 
-    # Verify validation and the email draft without opening an external app.
+    # Use the production policy and intercept the external POST so CI never sends email.
+    headers = json.loads(Path('vercel.json').read_text())['headers']
+    policy = next(header['value'] for rule in headers for header in rule['headers']
+                  if header['key'] == 'Content-Security-Policy')
+
+    def serve_contact_with_policy(route):
+        response = route.fetch()
+        route.fulfill(response=response, headers={
+            **response.headers, 'content-security-policy': policy,
+        })
+
+    page.route(BASE + 'contact.html', serve_contact_with_policy)
+    endpoint = 'https://formsubmit.co/cellarcsv@gmail.com'
+    submissions = []
+
+    def receive_contact_post(route):
+        request = route.request
+        submissions.append((request.method, parse_qs(request.post_data or '')))
+        route.fulfill(status=200, content_type='text/html', body='<h1>Message received</h1>')
+
+    page.route(endpoint, receive_contact_post)
     page.goto(BASE + 'index.html')
     page.get_by_role('navigation').get_by_role('link', name='Contact us').filter(visible=True).first.click()
     assert page.url == BASE + 'contact.html'
-    inbox = 'cellarcsv@gmail.com'
-    assert page.get_by_role('link', name=inbox).get_attribute('href') == f'mailto:{inbox}'
-    open_email = page.get_by_role('button', name='Open email app')
-    draft_link = page.locator('#enquiry-draft-link')
-    page.evaluate("document.querySelector('#enquiry-draft-link').addEventListener('click', event => event.preventDefault())")
-    open_email.click()
+    send = page.get_by_role('button', name='Send message')
+    send.click()
     assert page.locator('#enquiry-consent').get_attribute('aria-invalid') == 'true'
     assert page.locator('#enquiry-topic').evaluate('element => element === document.activeElement')
-    assert draft_link.get_attribute('href') is None
+    assert not submissions
 
     page.locator('#enquiry-email').fill('invalid-address')
     page.locator('#enquiry-topic').select_option(label='Collaboration idea')
@@ -70,32 +88,29 @@ with sync_playwright() as playwright:
     page.locator('#enquiry-message').fill(message)
     page.locator('#enquiry-consent').press('Space')
     assert page.locator('#enquiry-consent').is_checked()
-    open_email.click()
+    send.click()
     assert page.locator('#enquiry-email').get_attribute('aria-invalid') == 'true'
-    assert draft_link.get_attribute('href') is None
+    assert not submissions
 
-    page.locator('#enquiry-name').fill('Sample Visitor')
-    page.locator('#enquiry-email').fill('visitor+test@example.com')
-    open_email.click()
-    draft = urlsplit(draft_link.get_attribute('href'))
-    assert (draft.scheme, draft.path) == ('mailto', inbox)
-    assert parse_qs(draft.query) == {
-        'subject': ['Cellar Studio | Collaboration idea'],
-        'body': ['Name: Sample Visitor\r\n\r\nPreferred reply email: visitor+test@example.com\r\n\r\n' +
-                 message.replace('\n', '\r\n')],
-    }
-    assert 'Select Send in your email app.' in page.locator('#enquiry-status').inner_text()
-
-    page.evaluate("Object.defineProperty(navigator, 'clipboard', {value: undefined})")
-    page.get_by_role('button', name='Copy message').click()
-    preview = page.get_by_role('textbox', name='Message to paste into your email')
-    assert preview.is_visible()
-    assert message in preview.input_value()
     page.get_by_role('button', name='Clear form').click()
     assert page.locator('#enquiry-message').input_value() == ''
     assert not page.locator('#enquiry-consent').is_checked()
-    assert draft_link.get_attribute('href') is None
-    assert not preview.is_visible()
+    page.locator('#enquiry-name').fill('Sample Visitor')
+    page.locator('#enquiry-email').fill('visitor+test@example.com')
+    page.locator('#enquiry-topic').select_option(label='Collaboration idea')
+    page.locator('#enquiry-message').fill(message)
+    page.locator('#enquiry-consent').check()
+    with page.expect_navigation(url=endpoint):
+        send.click()
+    assert submissions == [('POST', {
+        '_subject': ['New Cellar Studio enquiry'],
+        '_url': ['https://cellar-csv.vercel.app/contact.html'],
+        'name': ['Sample Visitor'],
+        'email': ['visitor+test@example.com'],
+        'topic': ['Collaboration idea'],
+        'message': [message.replace('\n', '\r\n')],
+    })]
+    assert page.get_by_role('heading', name='Message received').is_visible()
 
     # Small-screen navigation has a keyboard-reachable open/close control.
     page.set_viewport_size({'width': 390, 'height': 780})
