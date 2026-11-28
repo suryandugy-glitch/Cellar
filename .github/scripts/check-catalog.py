@@ -154,8 +154,10 @@ with sync_playwright() as playwright:
     page.locator('input[name="studio-theme-choice"][value="system"]').check()
     assert page.evaluate("localStorage.getItem('cellar-studio-theme')") == 'system'
     page.emulate_media(color_scheme='dark')
+    page.wait_for_function("document.documentElement.dataset.theme === 'dark'")
     assert page.locator('html').get_attribute('data-theme') == 'dark'
     page.emulate_media(color_scheme='light')
+    page.wait_for_function("document.documentElement.dataset.theme === 'light'")
     assert page.locator('html').get_attribute('data-theme') == 'light'
     appearance.click()
     page.keyboard.press('Escape')
