@@ -78,12 +78,13 @@ body .site-assistant-header-controls button[type] {padding-inline:8px;font-size:
 .site-assistant-suggestions {display:flex;flex-wrap:wrap;gap:6px}
 .site-assistant-suggestions[hidden] {display:none}
 body .site-assistant-suggestions button[type] {font-size:.86rem}
-.site-assistant-form {display:grid;gap:6px;padding-bottom:14px;border-top:1px solid var(--assistant-border)}
+.site-assistant-form {display:grid;grid-template-columns:minmax(0,1fr);gap:6px;padding-bottom:14px;border-top:1px solid var(--assistant-border)}
 .site-assistant-form label {font-weight:700}
 .site-assistant-input {display:flex;align-items:flex-start;gap:8px}
 .site-assistant-input textarea {
   box-sizing:border-box;
-  flex:1 1 auto;
+  flex:1 1 0;
+  width:0;
   min-width:0;
   max-height:18dvh;
   padding:8px;

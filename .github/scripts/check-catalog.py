@@ -370,7 +370,13 @@ with sync_playwright() as playwright:
     assistant = page.get_by_role('dialog', name='Ask Cellar')
     assistant.get_by_role('button', name='Expand').click()
     assert assistant.get_by_role('button', name='Expand').get_attribute('aria-pressed') == 'true'
-    assert assistant.evaluate('element => element.scrollWidth <= element.clientWidth + 1')
+    layout = assistant.evaluate('''element => ({
+        fits: element.scrollWidth <= element.clientWidth + 1,
+        overflow: [element, ...element.querySelectorAll('*')]
+            .filter(node => node.scrollWidth > node.clientWidth + 1)
+            .map(node => [node.className || node.tagName, node.clientWidth, node.scrollWidth]),
+    })''')
+    assert layout['fits'], layout['overflow']
     assistant.get_by_role('button', name='Explain a general topic').click()
     assistant.get_by_text('Worked example reply.', exact=True).wait_for()
     assistant.get_by_label('Your question').fill('What happens in year three?')
