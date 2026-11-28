@@ -5,7 +5,7 @@
 <h1 align="center">CELLAR STUDIO</h1>
 
 <p align="center"><strong>We build what comes next.</strong></p>
-<p align="center">An independent creative technology studio exploring software, products, services and meaningful experiments. Our first public product direction is still taking shape.</p>
+<p align="center">An independent creative technology studio exploring ideas, engineering research, design and future products. Our public website introduces the studio; it does not currently offer finished software downloads.</p>
 
 <p align="center">
   <a href="https://cellar-csv.vercel.app/">Company website</a> ·
@@ -19,19 +19,21 @@
   <a href="https://cellar-csv.vercel.app/business.html">Business details</a> ·
   <a href="https://cellar-csv.vercel.app/contact.html">Enquiries</a> ·
   <a href="https://cellar-csv.vercel.app/policies.html">Policies</a> ·
-  <a href="https://cellar-csv.vercel.app/guard.html">Cellar Guard</a> ·
-  <a href="https://cellar-csv.vercel.app/explore.html">Product briefs</a> ·
+  <a href="https://cellar-csv.vercel.app/guard.html">Guard demonstration</a> ·
+  <a href="https://cellar-csv.vercel.app/explore.html">Ideas and research</a> ·
   <a href="docs/README.md">Documentation</a> ·
   <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
-<p align="center"><sub>Java 21+ · Local-first tooling · Evidence-driven engineering · MIT licensed</sub></p>
+<p align="center"><sub>Company website · Research and experiments · Open-source development · MIT licensed repository</sub></p>
 
 ---
 
 ## What is Cellar Studio?
 
-**Cellar Studio** is an independent creative technology identity and the public home for our evolving software and services work. The first flagship product and exact startup direction have **not been announced**. Existing experiments and source projects in this repository are evidence of engineering work, not a confirmed future commercial catalogue.
+**Cellar Studio** is an independent creative technology identity and a home for ideas, experimental engineering and future services. Its first flagship product and exact startup direction have **not been announced**. The [main website](https://cellar-csv.vercel.app/) is an informational company homepage, **not a software store, download center or hosted application platform**. No finished software is offered for download from that homepage.
+
+Some repositories contain working prototypes and developer-facing source code. These are separate from the public website and should not be interpreted as released, supported Studio software. The existence of a project brief or demo does not mean an app is available to install.
 
 The company [About Us](https://cellar-csv.vercel.app/about.html), [Licensing](https://cellar-csv.vercel.app/licenses.html) and [Certifications & Credentials](https://cellar-csv.vercel.app/certifications.html) pages explain the team, repository terms and current certification status. No verified company-level certifications are presently claimed.
 
@@ -44,35 +46,37 @@ Our existing developer-infrastructure experiments tackle failure modes and aim t
 3. **Who or what is affected?** Explain the impact in practical terms.
 4. **What happens next?** Provide a useful fix, safe migration, or release decision.
 
-The Studio homepage is now a company introduction, not a public product catalogue. The old code and legacy demonstration routes remain available for continuity, but their presence is not a product launch. The website is **not** a unified account system or a production backend for every source project.
+The Studio homepage introduces the company, its approach and possible directions. Legacy example pages remain accessible for context, but they do not constitute a product launch. The website has no shared user accounts, online checkout, software download service or production backend for the research projects.
 
 ### The structure today
 
 | Layer | Purpose | Current state |
 | --- | --- | --- |
-| **Cellar Studio** | Company home, product directory, project documentation and common visual language | Live website |
-| **Studio products** | Independent tools with their own code, maintainers and release schedules | Mixed maturity; see below |
+| **Cellar Studio** | Company introduction, ideas, project background and common visual language | Live informational website |
+| **Project concepts** | Potential developer tools and independent source projects | Exploration; not a downloadable catalogue |
 | **Studio Labs** | Systems research with testable hypotheses and reproducible experiments | Research and prototypes |
 | **Shared platform** | Common identity, reports, permissions and cross-product workflows | Planned; not deployed |
 
 This repository was renamed from **Cellar** to **Cellar-Studio**. It still contains the complete **Cellar Guard** Java implementation. A separate child repository for Guard is a future migration, not a completed split. Read the [repository hierarchy](docs/REPOSITORY_HIERARCHY.md) before moving code or changing ownership.
 
-## Explore the products
+## Ideas and engineering experiments
 
-| Project | The problem it tackles | Status | Explore |
+The entries below describe areas of work, **not software available to download from the Studio website**. Links lead to concept briefs, static demonstrations or source repositories where available. There are no promised releases or installation buttons on the company homepage.
+
+| Area | Problem being explored | Verified state | Reference |
 | --- | --- | --- | --- |
-| **Cellar Guard** | CSV exports silently break downstream imports when columns or contracts change | **Working pilot** — Java checker, CLI and local web workspace | [Live demo](https://cellar-csv.vercel.app/guard.html) |
-| **Cellar SpaceFix** | Free space on a crowded drive by copying personal files to a second volume and verifying their contents before recycling originals | Downloadable Java desktop pilot | [Download and instructions](https://cellar-csv.vercel.app/explore.html#spacefix) · [Source](products/spacefix/) |
-| **Deadlock Sentinel** | Circular waits in JVM thread dumps are difficult to diagnose | **Java prototype / research demo** | [Trace explorer](https://cellar-csv.vercel.app/deadlock.html) · [Run locally](products/deadlock-sentinel/README.md) |
-| **BuildClinic** | Build failures are buried in noisy logs | Early-stage standalone tool | [Product brief](https://cellar-csv.vercel.app/explore.html#buildclinic) |
-| **ClauseCraft** | Teams need an explainable first pass over risky document patterns | Prototype, not legal advice | [Product brief](https://cellar-csv.vercel.app/explore.html#clausecraft) |
-| **PlanCliff** | Database query plans can regress when data distributions change | Research | [Research brief](https://cellar-csv.vercel.app/explore.html#plancliff) |
-| **CrashCheck** | SQLite-backed apps can violate assumptions after abrupt termination | Storage research | [Research brief](https://cellar-csv.vercel.app/explore.html#crashcheck) |
-| **Cellar Learn** | Difficult engineering concepts need clearer interactive explanations | Candidate / exploratory | [Product brief](https://cellar-csv.vercel.app/explore.html#learn) |
+| **Cellar Guard** | CSV exports can break downstream imports | Java pilot source in this repository; website shows static samples | [Example page](https://cellar-csv.vercel.app/guard.html) · [Local instructions](#existing-developer-code-cellar-guard) |
+| **SpaceFix** | Investigating safer ways to free disk space | Concept only in this repository; no downloadable desktop release | [Idea brief](https://cellar-csv.vercel.app/explore.html#spacefix) |
+| **Deadlock Sentinel** | Identifying circular waits in JVM thread dumps | Local Java research prototype; not hosted as an installable app | [Source and tests](products/deadlock-sentinel/README.md) |
+| **BuildClinic** | Making build errors easier to diagnose | Exploration; no Studio-hosted application claimed | [Idea brief](https://cellar-csv.vercel.app/explore.html#buildclinic) |
+| **ClauseCraft** | Inspecting risky document patterns | Exploration; not legal advice or an online service | [Idea brief](https://cellar-csv.vercel.app/explore.html#clausecraft) |
+| **PlanCliff** | Studying database query-plan regressions | Research direction, not a shipped product | [Research brief](https://cellar-csv.vercel.app/explore.html#plancliff) |
+| **CrashCheck** | Testing SQLite-backed apps after abrupt termination | Storage research, not a Studio-hosted service | [Research brief](https://cellar-csv.vercel.app/explore.html#crashcheck) |
+| **Cellar Learn** | Explaining engineering concepts interactively | Possible future direction | [Idea brief](https://cellar-csv.vercel.app/explore.html#learn) |
 
-**Status labels matter:** a product appearing on the Studio website does not mean it has a production API, shared login, hosted backend, or completed integration with other products. Independent repositories retain their own licenses and contributors.
+These descriptions are intentionally provisional. Source code, a research page and a working release are different things; independent repositories retain their own licenses and contributors.
 
-## Try Cellar Guard
+## Existing developer code: Cellar Guard
 
 Cellar Guard checks CSV files against declared contracts **before** a release. For example, a customer import expects `order_id`, but a new export renames it to `id`:
 
@@ -83,7 +87,7 @@ Triage: "order_id" may have been renamed to "id".
 Verdict: do not ship.                         (exit code 1)
 ```
 
-The [public Guard website](https://cellar-csv.vercel.app/guard.html) includes **synthetic demonstrations and sample reports**. It does not run the complete Java backend. To upload your own CSV, edit contracts or keep local run history, start the Java application.
+The separate [Guard example page](https://cellar-csv.vercel.app/guard.html) includes **synthetic demonstrations and sample reports**. It does not run the complete Java backend, offer an installer or accept live customer files. Developers who want to examine the existing Java pilot can build and run its source code locally, as described below. This is **not a downloadable product offered on the Studio homepage**.
 
 <a id="quick-start"></a>
 
@@ -192,17 +196,18 @@ New contributors can use [GitHub Codespaces](docs/DEVELOPMENT_ENVIRONMENT.md) or
 
 | Component | Deployment | Important distinction |
 | --- | --- | --- |
-| [Cellar Studio](https://cellar-csv.vercel.app/) | Vercel static website (primary homepage) | Company pages, product briefs and demonstrations |
+| [Cellar Studio](https://cellar-csv.vercel.app/) | Vercel static website (primary homepage) | Company information and ideas; no software downloads |
 | [Cellar Guard](https://cellar-csv.vercel.app/guard.html) | Vercel static demonstration, using the same web build | Synthetic examples; not the persistent Java workspace |
 | Guard Java workspace | Local machine or separately provisioned Java host | Real CSV checks, contract editing, history and API |
 
-Vercel uses `vercel.json` and `node deploy/build-vercel.mjs` to build the public pages. The Guard-specific hostname opens `/guard.html`; the Studio hostname opens the company homepage.
+Vercel uses `vercel.json` and `node deploy/build-vercel.mjs` to build the public pages. The primary `cellar-csv.vercel.app/` URL opens **Studio HQ**; `/guard.html` is a separate static example. The legacy Studio HQ hostname redirects to the primary domain.
 
 A shared Java deployment requires HTTPS, origin restrictions and server-side keys. Configure the Java host first; connect a separate frontend only with the documented origin settings. **Do not place `CELLAR_ACCESS_KEY` or `CELLAR_MASTER_KEY` in public frontend code.** Follow [security and deployment](docs/WEB_SECURITY.md) and [operations](docs/OPERATIONS.md). The optional AI key remains server-side.
 
 ## Honest limits
 
-- The public website is a static demonstration. Uploading and storing your own CSV requires the Java workspace.
+- **No finished software is available for download from the company homepage.** Project briefs are informational and must not be mistaken for releases.
+- The public Guard page is a static demonstration. Uploading and storing your own CSV requires the separately run Java workspace.
 - Guard is a **working pilot**, not a multi-tenant production SaaS or an independently audited security product.
 - A passing CSV check only proves that the **declared** rules passed. It does not prove the meaning or correctness of every data value.
 - Studio's shared login, organization permissions, unified report backend and cross-product orchestration are **not implemented**.
