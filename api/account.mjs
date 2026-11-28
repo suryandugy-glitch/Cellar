@@ -8,6 +8,8 @@ const flowCookie = '__Host-cellar-signin';
 const month = 30 * 24 * 60 * 60;
 const flowExpiry = 15 * 60;
 const maxBody = 8192;
+const profileLimits = { name: 100, organization: 100, jobTitle: 100, website: 512 };
+const signInMethods = { email: 'Email', google: 'Google', azure: 'Microsoft' };
 
 function json(res, status, value) {
   res.statusCode = status;
@@ -76,15 +78,42 @@ function emailFrom(value) {
     ? value.trim() : '';
 }
 
-function profile(user) {
+function profileText(value, limit) {
+  if (typeof value !== 'string' || value.length > limit || /[\u0000-\u001f\u007f]/u.test(value)) return null;
+  return value.trim();
+}
+
+function websiteUrl(value) {
+  if (!value) return value;
+  const url = URL.parse(value);
+  return url && ['https:', 'http:'].includes(url.protocol) && !url.username && !url.password &&
+    url.href.length <= profileLimits.website ? url.href : null;
+}
+
+function profile(user, detailed = false) {
   const metadata = user.user_metadata ?? {};
-  const name = [metadata.full_name, metadata.name].find(value => typeof value === 'string' && value.trim());
+  const edited = metadata.cellar_profile ?? {};
+  const name = profileText(edited.name, profileLimits.name) ||
+    [metadata.full_name, metadata.name].find(value => typeof value === 'string' && value.trim())?.trim().slice(0, 100) || '';
   const avatarUrl = [metadata.avatar_url, metadata.picture].find(value => {
     if (typeof value !== 'string' || value.length > 2048) return false;
     const url = URL.parse(value);
     return url && !url.username && !url.password && /^https:\/\/lh[3-6]\.googleusercontent\.com$/.test(url.origin);
   });
-  return { email: user.email || '', name: name?.trim().slice(0, 100) || '', avatarUrl: avatarUrl ?? null };
+  const summary = { email: user.email || '', name, avatarUrl: avatarUrl ?? null };
+  if (!detailed) return summary;
+  const providers = user.app_metadata?.providers;
+  const methods = Array.isArray(providers) ? providers : [user.app_metadata?.provider];
+  const lastSignIn = Date.parse(user.last_sign_in_at);
+  return {
+    ...summary,
+    organization: profileText(edited.organization, profileLimits.organization) ?? '',
+    jobTitle: profileText(edited.jobTitle, profileLimits.jobTitle) ?? '',
+    website: websiteUrl(profileText(edited.website, profileLimits.website)) ?? '',
+    signInMethods: [...new Set(methods.filter(method => typeof method === 'string' && Object.hasOwn(signInMethods, method))
+      .map(method => signInMethods[method]))],
+    lastSignIn: Number.isFinite(lastSignIn) ? new Date(lastSignIn).toISOString() : null,
+  };
 }
 
 function authError(res, error, fallback, status = 400) {
@@ -114,6 +143,7 @@ export function buildAccountHandler({ getConfig = accountConfig, createClient = 
       if (!config) return json(res, 200, { available: false, providers: [], user: null });
 
       const cookie = requestCookies(req, res);
+      const hasSession = cookie.get(sessionCookie) || cookie.get(sessionCookie + '.0');
       let remember = cookie.get(rememberCookie) === '1';
       if (method === 'GET' && ['callback', 'confirm'].includes(action)) {
         remember = action === 'callback' && cookie.get(flowCookie) === 'keep';
@@ -158,10 +188,12 @@ export function buildAccountHandler({ getConfig = accountConfig, createClient = 
           if (error) return redirect(res, '/signin.html?notice=confirm');
           return redirect(res, '/signin.html?notice=verified');
         }
-        if (action !== 'session') return json(res, 404, { error: 'Action not found.' });
-        const hasSession = cookie.get(sessionCookie) || cookie.get(sessionCookie + '.0');
+        if (action !== 'session' && action !== 'profile') return json(res, 404, { error: 'Action not found.' });
         const { data, error } = hasSession ? await auth.getUser() : {};
         if (error?.status >= 500) return authError(res, error, '');
+        if (action === 'profile') {
+          return json(res, 200, { available: true, user: data?.user ? profile(data.user, true) : null });
+        }
         return json(res, 200, {
           available: true, providers: Object.keys(config.providers), user: data?.user ? profile(data.user) : null,
         });
@@ -170,10 +202,32 @@ export function buildAccountHandler({ getConfig = accountConfig, createClient = 
       let input;
       try { input = await body(req); } catch { return json(res, 400, { error: 'The request is invalid.' }); }
       if (action === 'logout') {
-        const { error } = await auth.signOut({ scope: 'local' });
+        const allDevices = input.allDevices === true;
+        if (allDevices) {
+          const { data, error } = hasSession ? await auth.getUser() : {};
+          if (error?.status >= 500) return authError(res, error, '');
+          if (!data?.user) return json(res, 401, { error: 'Sign in again to manage your sessions.' });
+        }
+        const { error } = await auth.signOut({ scope: allDevices ? 'global' : 'local' });
+        if (allDevices && error) return authError(res, error, 'Unable to sign out on all devices.');
         cookie.clearSession();
         if (error && error.status >= 500) return authError(res, error, '');
         return json(res, 200, { ok: true });
+      }
+      if (action === 'profile') {
+        if (!hasSession) return json(res, 401, { error: 'Sign in to edit your profile.' });
+        const details = Object.fromEntries(Object.entries(profileLimits).map(([key, max]) =>
+          [key, profileText(input[key], max)]));
+        details.website = websiteUrl(details.website);
+        if (Object.values(details).some(value => value === null)) {
+          return json(res, 400, { error: 'Check the field lengths and enter a website URL starting with https:// or http://.' });
+        }
+        const { data, error } = await auth.updateUser({ data: { cellar_profile: details } });
+        if ([401, 403].includes(error?.status) || error?.name === 'AuthSessionMissingError') {
+          return json(res, 401, { error: 'Sign in again to edit your profile.' });
+        }
+        if (error || !data?.user) return authError(res, error, 'Unable to save your profile.');
+        return json(res, 200, { user: profile(data.user, true) });
       }
       remember = input.remember === true;
       if (action === 'oauth') {

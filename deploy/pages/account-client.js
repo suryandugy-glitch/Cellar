@@ -14,7 +14,8 @@ export async function accountRequest(action, payload) {
 let pendingSession;
 
 export function readAccountSession() {
-  pendingSession ??= accountRequest('session').finally(() => { pendingSession = undefined; });
+  const action = document.body.dataset.accountPage === 'profile' ? 'profile' : 'session';
+  pendingSession ??= accountRequest(action).finally(() => { pendingSession = undefined; });
   return pendingSession;
 }
 

@@ -153,11 +153,21 @@ html[data-theme="dark"] .account-page {
 .account-status { margin: 11px 0 0; padding: 8px 10px; color: var(--account-ink); background: var(--account-soft); border-radius: 5px; font-size: 13px; }
 .account-status[data-state="error"] { background: var(--account-error-bg); color: var(--account-error); }
 .account-profile { margin: 13px 0 17px; }
-.account-profile dl { margin: 6px 0 0; }
-.account-profile dl > div { padding: 9px 0; border-bottom: 1px solid var(--account-line); }
+.account-profile dl, .account-security dl { margin: 6px 0 0; }
+:is(.account-profile, .account-security) dl > div { padding: 9px 0; border-bottom: 1px solid var(--account-line); }
 .account-profile .account-page-avatar { width: 64px; height: 64px; font-size: 22px; }
-.account-profile dt { color: var(--account-muted); font-size: 12px; }
-.account-profile dd { margin: 2px 0 0; overflow-wrap: anywhere; font-size: 15px; font-weight: 650; }
+:is(.account-profile, .account-security) dt { color: var(--account-muted); font-size: 12px; }
+:is(.account-profile, .account-security) dd { margin: 2px 0 0; overflow-wrap: anywhere; font-size: 15px; font-weight: 650; }
+.account-profile a { color: var(--account-ink); text-underline-offset: 3px; }
+.account-edit, .account-security { margin: 18px 0; padding: 12px; border: 1px solid var(--account-line); border-radius: 9px; }
+:is(.account-edit, .account-security) h3 { margin: 0; font-size: 16px; }
+.account-edit > p:not(.account-status) { margin: 3px 0 10px; color: var(--account-muted); font-size: 13px; }
+.account-edit > label { display: block; margin-block-start: 9px; }
+.account-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-block-start: 12px; }
+.account-buttons .account-primary { width: auto; }
+.account-secondary { min-height: 44px; padding: 7px 12px; border: 1px solid var(--account-line); border-radius: 7px; background: var(--account-surface); color: var(--account-ink); font: 650 13px/1.3 system-ui, sans-serif; }
+.account-secondary:hover:not(:disabled) { background: var(--account-soft); }
+:is(.account-profile, .account-security) > .account-secondary { margin-block-start: 10px; }
 .account-footer { min-height: 51px; border-top: 1px solid var(--account-line); color: var(--account-muted); font-size: 12px; }
 .account-footer nav { display: flex; gap: 13px; }
 

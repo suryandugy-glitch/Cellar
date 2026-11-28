@@ -28,8 +28,37 @@
         <dl>
           <div><dt>Name</dt><dd id="profile-name"></dd></div>
           <div><dt>Email address</dt><dd id="profile-email"></dd></div>
+          <div id="profile-organization-row" hidden><dt>Organization</dt><dd id="profile-organization"></dd></div>
+          <div id="profile-job-title-row" hidden><dt>Job title</dt><dd id="profile-job-title"></dd></div>
+          <div id="profile-website-row" hidden><dt>Website</dt><dd><a id="profile-website" target="_blank" rel="noopener noreferrer"></a></dd></div>
         </dl>
+        <button class="account-secondary" id="profile-edit" type="button" aria-controls="profile-form" aria-expanded="false">Edit profile</button>
       </div>
+      <form class="account-edit" id="profile-form" method="post" autocomplete="on" hidden>
+        <h3>Profile details</h3>
+        <p>These details are optional and saved to your account.</p>
+        <label for="edit-name">Display name</label>
+        <input id="edit-name" name="name" autocomplete="name" maxlength="100">
+        <label for="edit-organization">Organization</label>
+        <input id="edit-organization" name="organization" autocomplete="organization" maxlength="100">
+        <label for="edit-job-title">Job title</label>
+        <input id="edit-job-title" name="jobTitle" autocomplete="organization-title" maxlength="100">
+        <label for="edit-website">Website</label>
+        <input id="edit-website" name="website" type="url" autocomplete="url" maxlength="512" placeholder="https://example.com">
+        <div class="account-buttons">
+          <button class="account-primary" id="profile-save" type="submit">Save profile</button>
+          <button class="account-secondary" id="profile-cancel" type="button">Cancel</button>
+        </div>
+        <p class="account-status" id="profile-edit-status" role="status" hidden></p>
+      </form>
+      <section class="account-security" id="account-security" aria-labelledby="account-security-title" hidden>
+        <h3 id="account-security-title">Sign-in and security</h3>
+        <dl>
+          <div id="sign-in-method-row" hidden><dt>Sign-in methods</dt><dd id="sign-in-methods"></dd></div>
+          <div id="last-sign-in-row" hidden><dt>Last sign-in</dt><dd><time id="last-sign-in"></time></dd></div>
+        </dl>
+        <button class="account-secondary" id="account-logout-all" type="button">Sign out on all devices</button>
+      </section>
       <div class="account-profile-actions" id="profile-actions" hidden>
         <a class="account-primary" href="./studio.html">Go to Cellar Studio <span aria-hidden="true">→</span></a>
         <button id="account-logout" class="account-guest" type="button">Sign out</button>

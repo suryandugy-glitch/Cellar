@@ -13,42 +13,121 @@ const goToAccount = () => location.replace('/account.html');
 
 function profilePage() {
   const details = element('account-profile');
+  const security = element('account-security');
   const actions = element('profile-actions');
   const name = element('profile-name');
   const email = element('profile-email');
   const avatar = element('profile-avatar');
+  const website = element('profile-website');
+  const lastSignIn = element('last-sign-in');
+  const edit = element('profile-edit');
+  const form = element('profile-form');
+  const save = element('profile-save');
+  const cancel = element('profile-cancel');
+  const editStatus = element('profile-edit-status');
+  const localLogout = element('account-logout');
+  const globalLogout = element('account-logout-all');
+  const fields = [
+    ['organization', 'profile-organization'],
+    ['jobTitle', 'profile-job-title'],
+    ['website', 'profile-website'],
+  ];
+  let currentUser;
+
+  function renderProfile(user) {
+    currentUser = user;
+    details.hidden = !user;
+    security.hidden = !user;
+    actions.hidden = !user;
+    name.textContent = user ? user.name || 'No name provided' : '';
+    email.textContent = user ? user.email || 'No email provided' : '';
+    if (user) renderAccountAvatar(avatar, user);
+    else avatar.replaceChildren();
+    for (const [key, id] of fields) {
+      const value = user?.[key] || '';
+      element(id).textContent = value;
+      element(id + '-row').hidden = !value;
+    }
+    if (user?.website) website.href = user.website;
+    else website.removeAttribute('href');
+
+    const methods = user?.signInMethods?.join(', ') || '';
+    element('sign-in-methods').textContent = methods;
+    element('sign-in-method-row').hidden = !methods;
+    const date = user?.lastSignIn ? new Date(user.lastSignIn) : null;
+    element('last-sign-in-row').hidden = !date;
+    lastSignIn.dateTime = user?.lastSignIn || '';
+    lastSignIn.textContent = date ? new Intl.DateTimeFormat(undefined, {
+      dateStyle: 'medium', timeStyle: 'short',
+    }).format(date) : '';
+  }
+
+  function setEditing(open) {
+    form.hidden = !open;
+    edit.setAttribute('aria-expanded', String(open));
+    editStatus.hidden = true;
+    if (open) {
+      for (const input of form.querySelectorAll('input')) input.value = currentUser?.[input.name] || '';
+      element('edit-name').focus();
+    } else {
+      form.reset();
+    }
+  }
+
   async function refresh() {
-    details.hidden = true;
-    actions.hidden = true;
-    name.textContent = '';
-    email.textContent = '';
-    avatar.replaceChildren();
+    renderProfile(null);
+    setEditing(false);
     try {
       const { user, available } = await readAccountSession();
       if (!available) return message('Accounts are not available yet.');
       if (!user) return location.replace('/signin.html');
-      name.textContent = user.name || 'No name provided';
-      email.textContent = user.email || 'No email provided';
-      renderAccountAvatar(avatar, user);
-      details.hidden = false;
-      actions.hidden = false;
+      renderProfile(user);
       message();
     } catch {
       message('Your session could not be checked. Reload the page to try again.', true);
     }
   }
 
-  element('account-logout').addEventListener('click', async event => {
-    const button = event.currentTarget;
-    button.disabled = true;
+  edit.addEventListener('click', () => {
+    message();
+    setEditing(form.hidden);
+  });
+  cancel.addEventListener('click', () => {
+    setEditing(false);
+    edit.focus();
+  });
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    const payload = Object.fromEntries(new FormData(form));
+    edit.disabled = save.disabled = cancel.disabled = true;
+    editStatus.hidden = true;
     try {
-      await accountRequest('logout', {});
-      location.replace('/signin.html');
+      const { user } = await accountRequest('profile', payload);
+      renderProfile(user);
+      setEditing(false);
+      message('Profile saved.');
+      window.dispatchEvent(new Event('cellar-profile-updated'));
     } catch (error) {
-      message(error.message, true);
-      button.disabled = false;
+      editStatus.textContent = error.message;
+      editStatus.dataset.state = 'error';
+      editStatus.hidden = false;
+    } finally {
+      edit.disabled = save.disabled = cancel.disabled = false;
+      if (form.hidden) edit.focus();
     }
   });
+  for (const button of [localLogout, globalLogout]) {
+    button.addEventListener('click', async () => {
+      localLogout.disabled = globalLogout.disabled = true;
+      try {
+        await accountRequest('logout', button === globalLogout ? { allDevices: true } : {});
+        location.replace('/signin.html');
+      } catch (error) {
+        message(error.message, true);
+        localLogout.disabled = globalLogout.disabled = false;
+      }
+    });
+  }
   window.addEventListener('pageshow', event => {
     if (event.persisted) void refresh();
   });

@@ -87,6 +87,7 @@ async function refreshMenu() {
 
 if (header || workspace) {
   void refreshMenu();
+  window.addEventListener('cellar-profile-updated', refreshMenu);
   trigger.addEventListener('click', () => setOpen(panel.hidden));
   window.addEventListener('pageshow', event => {
     if (event.persisted) {

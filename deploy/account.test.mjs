@@ -12,17 +12,25 @@ const config = {
 const profile = {
   email: 'test@example.net',
   user_metadata: { full_name: 'Test Account', avatar_url: 'https://lh3.googleusercontent.com/a/example=s96-c' },
+  app_metadata: { provider: 'google', providers: ['google', 'google'] },
+  last_sign_in_at: '2026-11-28T08:00:00.000Z',
 };
 
 function mockHandler({ settings = config, auth = {} } = {}) {
   const calls = [];
+  let user = profile;
   const handler = buildAccountHandler({
     getConfig: () => settings,
     createClient(url, key, { cookies }) {
       const setSession = () => cookies.setAll([{ name: '__Host-cellar-session', value: 'test-session', options: {} }]);
       return {
         auth: {
-          getUser: async () => ({ data: { user: profile } }),
+          getUser: async () => ({ data: { user } }),
+          updateUser: async ({ data }) => {
+            calls.push(['update', data]);
+            user = { ...user, user_metadata: { ...user.user_metadata, ...data } };
+            return { data: { user } };
+          },
           signInWithPassword: async details => { calls.push(['signin', details]); setSession(); return {}; },
           signUp: async details => { calls.push(['signup', details]); return { data: { session: null } }; },
           signOut: async details => { calls.push(['logout', details]); return {}; },
@@ -144,4 +152,51 @@ test('profile uses the provider picture and ignores untrusted photo URLs', async
   assert.deepEqual(session.data.user, { email: profile.email, name: 'Test Name', avatarUrl: metadata.picture });
   metadata.picture = 'http://lh3.googleusercontent.com/a/test';
   assert.equal((await call(handler, 'session', { headers })).data.user.avatarUrl, null);
+});
+
+test('only the signed-in owner can save and view optional profile details', async () => {
+  const { handler, calls } = mockHandler();
+  const headers = { cookie: '__Host-cellar-session=test-session' };
+  const body = {
+    name: ' New Name ', organization: 'Example Studio', jobTitle: 'Engineer',
+    website: 'https://example.net', role: 'admin', email: 'another@example.net',
+  };
+  assert.equal((await call(handler, 'profile', { body })).status, 401);
+  assert.equal((await call(handler, 'profile', { body, headers: { ...headers, origin: 'https://other.example' } })).status, 403);
+  for (const website of ['javascript:alert(1)', 'https://secret@example.net/', 'not a URL']) {
+    assert.equal((await call(handler, 'profile', { headers, body: { ...body, website } })).status, 400);
+  }
+  assert.equal((await call(handler, 'profile', { headers, body: { ...body, organization: 'x'.repeat(101) } })).status, 400);
+  assert.equal(calls.length, 0);
+
+  const saved = await call(handler, 'profile', { headers, body });
+  const details = { name: 'New Name', organization: 'Example Studio', jobTitle: 'Engineer', website: 'https://example.net/' };
+  assert.deepEqual(calls, [['update', { cellar_profile: details }]]);
+  assert.deepEqual(saved.data.user, {
+    ...details, email: profile.email, avatarUrl: profile.user_metadata.avatar_url,
+    signInMethods: ['Google'], lastSignIn: '2026-11-28T08:00:00.000Z',
+  });
+  const reloaded = await call(handler, 'profile', { headers });
+  assert.equal(reloaded.headers.get('Cache-Control'), 'private, no-store');
+  assert.deepEqual(reloaded.data.user, saved.data.user);
+  assert.equal((await call(handler, 'profile')).data.user, null);
+  const headerSession = await call(handler, 'session', { headers });
+  assert.deepEqual(headerSession.data.user, {
+    name: 'New Name', email: profile.email, avatarUrl: profile.user_metadata.avatar_url,
+  });
+  const cleared = await call(handler, 'profile', { headers, body: { name: '', organization: '', jobTitle: '', website: '' } });
+  assert.equal(cleared.data.user.name, 'Test Account');
+  assert.equal(cleared.data.user.website, '');
+});
+
+test('sign out on all devices requires an authenticated account and requests global revocation', async () => {
+  const { handler, calls } = mockHandler();
+  const body = { allDevices: true };
+  assert.equal((await call(handler, 'logout', { body })).status, 401);
+  assert.equal(calls.length, 0);
+  const headers = { cookie: '__Host-cellar-session=test-session' };
+  const result = await call(handler, 'logout', { body, headers });
+  assert.deepEqual(calls, [['logout', { scope: 'global' }]]);
+  assert.equal(result.status, 200);
+  assert.ok(result.headers.get('Set-Cookie').some(value => value.startsWith('__Host-cellar-session=; Max-Age=0')));
 });
