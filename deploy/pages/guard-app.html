@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Check your CSV exports against Cellar Guard contracts on your phone or computer. Files stay in your browser.">
+  <title>CSV Checker | Cellar Guard</title>
+  <link rel="icon" href="./logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./guard-app.css">
+  <script type="module" src="./guard-app.js"></script>
+</head>
+<body class="guard-app">
+  <a class="guard-skip" href="#main">Skip to checker</a>
+  <header class="guard-header">
+    <div class="guard-wrap guard-nav">
+      <a class="guard-brand" href="./"><img src="./logo.svg" width="32" height="32" alt="">Cellar Studio</a>
+      <nav aria-label="Guard navigation"><a href="./guard.html">Cellar Guard</a><a href="./manual.html#web-app">How to use</a></nav>
+    </div>
+  </header>
+  <main id="main" class="guard-wrap">
+    <section class="guard-hero" aria-labelledby="guard-title">
+      <div>
+        <p class="guard-kicker">Cellar Guard</p>
+        <h1 id="guard-title">CSV <span>Checker</span></h1>
+        <p>Catch export changes before they break a customer’s import. Your CSV and contract stay in this browser.</p>
+      </div>
+      <div class="guard-hero-actions">
+        <button type="button" id="load-passing">Load passing example</button>
+        <button type="button" id="load-breaking">Load breaking example</button>
+      </div>
+    </section>
+    <noscript><p class="guard-notice">Enable JavaScript to use the browser checker, or <a href="./manual.html#install">download the Java app</a>.</p></noscript>
+    <form id="guard-form" novalidate>
+      <div class="guard-inputs">
+        <section class="guard-card guard-contract" aria-labelledby="contract-title">
+          <header><h2 id="contract-title">Import contract</h2><p>Set the columns and rules your customer expects.</p></header>
+          <label class="guard-upload" for="contract-file">Choose JSON contract</label>
+          <input id="contract-file" type="file" accept=".json,application/json">
+          <p id="contract-file-status" class="guard-file-status" aria-live="polite"></p>
+          <label for="contract-text">Contract JSON</label>
+          <textarea id="contract-text" rows="10" spellcheck="false" autocomplete="off"></textarea>
+        </section>
+        <section class="guard-card guard-csv" aria-labelledby="csv-title">
+          <header><h2 id="csv-title">Proposed export</h2><p>Choose a UTF-8 CSV up to 8 MiB, or paste CSV text.</p></header>
+          <label class="guard-upload" for="csv-file">Choose CSV file</label>
+          <input id="csv-file" type="file" accept=".csv,.tsv,text/csv,text/tab-separated-values,text/plain">
+          <p id="csv-file-status" class="guard-file-status" aria-live="polite"></p>
+          <label for="csv-text">CSV text</label>
+          <textarea id="csv-text" rows="10" spellcheck="false" autocomplete="off" placeholder="order_id,sku,total_cents,currency"></textarea>
+        </section>
+      </div>
+      <div class="guard-action-bar">
+        <button type="submit" id="run-check" disabled>Check export</button>
+        <button type="button" id="cancel-check" hidden>Cancel</button>
+        <button type="button" id="download-report" disabled>Download report</button>
+        <p id="guard-status" role="status"></p>
+      </div>
+    </form>
+    <section id="guard-results" class="guard-results" aria-label="Check results" hidden></section>
+  </main>
+  <!-- STUDIO_FOOTER -->
+</body>
+</html>

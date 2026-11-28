@@ -35,6 +35,8 @@ jobs:
           for page in demo.html guide.html walkthrough.html workplace.html; do
             sed '/<meta http-equiv="Content-Security-Policy"/d' "build/vercel/$page" | diff "build/pages/$page" -
           done
+      - name: Test the browser checker and shared site styles
+        run: node --test deploy/guard-engine.test.mjs deploy/theme.test.mjs
       - name: Verify catalog navigation and responsive layouts
         run: |
           python -m pip install playwright==1.56.0

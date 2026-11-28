@@ -15,6 +15,7 @@ assert.ok(files.length >= 18, 'expected Guard, manual, sample, and company pages
 for (const file of files) {
   const html = await readFile(resolve(root, file), 'utf8');
   assert.equal(html.split('theme-system.css').length - 1, 1, `${file}: missing/duplicate theme CSS`);
+  assert.equal(html.split('studio-maximal.css').length - 1, 1, `${file}: missing/duplicate Studio style`);
   assert.equal(html.split('studio-footer.css').length - 1, 1, `${file}: missing/duplicate footer CSS`);
   assert.equal(html.split('cookie-consent.css').length - 1, 1, `${file}: missing/duplicate consent CSS`);
   assert.equal(html.split('theme-system.js').length - 1, 1, `${file}: missing/duplicate theme JS`);
@@ -122,6 +123,7 @@ for (const retired of ['explore.html','services.html','downloads.html','product-
 const manual = await readFile(resolve(root,'manual.html'),'utf8');
 assert.match(manual, /id="pr"/);
 assert.match(manual, /id="demo"/);
+assert.match(manual, /id="web-app"/);
 assert.match(manual, /id="fix"/);
 assert.match(manual, /csv-compatibility/);
 assert.match(manual, /Cellar Guard/);

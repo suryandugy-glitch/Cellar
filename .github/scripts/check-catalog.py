@@ -14,7 +14,7 @@ COMPANY_PAGES = [
     'about', 'licenses', 'certifications', 'privacy', 'terms', 'policies',
     'cookie-policy', 'refund-policy', 'business', 'contact',
 ]
-ROUTES = ['index', 'products', 'guard', 'manual', 'guide', 'walkthrough', 'handbook'] + COMPANY_PAGES
+ROUTES = ['index', 'products', 'guard', 'manual', 'guide', 'walkthrough', 'handbook', 'guard-app'] + COMPANY_PAGES
 
 
 with sync_playwright() as playwright:
@@ -141,6 +141,36 @@ with sync_playwright() as playwright:
     assert page.locator('#coming-soon').count() == 1
     page.goto(BASE + 'manual.html')
     assert page.locator('#pr').count() == 1
+
+    # Check uploaded and pasted exports using the production worker policy.
+    page.route(BASE + 'guard-app.html', serve_contact_with_policy)
+    for width in (390, 1440):
+        page.set_viewport_size({'width': width, 'height': 900})
+        page.goto(BASE + 'guard-app.html')
+        page.get_by_role('button', name='Load breaking example').click()
+        page.get_by_text('Example loaded. Select Check export.', exact=True).wait_for()
+        check = page.get_by_role('button', name='Check export')
+        check.click()
+        page.get_by_role('heading', name='Release blocked').wait_for()
+        assert page.get_by_text('MISSING_COLUMN', exact=True).is_visible()
+        assert page.get_by_text('order_id · record 1', exact=True).is_visible()
+
+        page.locator('#csv-file').set_input_files({
+            'name': 'valid.csv', 'mimeType': 'text/csv',
+            'buffer': b'order_id,sku,total_cents,currency\nPRIVATE-TEST-ORDER,SKU1,100,INR\n',
+        })
+        check.click()
+        page.get_by_role('heading', name='Ready to ship').wait_for()
+        with page.expect_download() as saved:
+            page.get_by_role('button', name='Download report').click()
+        report_text = saved.value.path().read_text()
+        assert json.loads(report_text)['passed'] is True
+        assert 'PRIVATE-TEST-ORDER' not in report_text
+
+        page.get_by_role('button', name='Switch to dark mode').click()
+        assert page.locator('html').get_attribute('data-theme') == 'dark'
+        assert page.evaluate('document.documentElement.scrollWidth - innerWidth') <= 1
+        page.get_by_role('button', name='Switch to light mode').click()
 
     assert not errors, errors
     print(f'Checked {len(ROUTES)} routes at four widths, privacy choices, enquiry validation and mobile menu.')
