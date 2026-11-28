@@ -7,6 +7,12 @@
   "redirects": [
     {
       "source": "/",
+      "has": [{ "type": "host", "value": "cellar-studio-hq.vercel.app" }],
+      "destination": "https://cellar-csv.vercel.app/studio.html",
+      "permanent": false
+    },
+    {
+      "source": "/",
       "has": [{ "type": "host", "value": "cellar-csv.vercel.app" }],
       "destination": "/guard.html",
       "permanent": false

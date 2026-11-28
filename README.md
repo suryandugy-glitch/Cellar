@@ -8,19 +8,19 @@
 <p align="center">An independent creative technology studio exploring software, products, services and meaningful experiments. Our first public product direction is still taking shape.</p>
 
 <p align="center">
-  <a href="https://cellar-studio-hq.vercel.app/">Company website</a> ·
-  <a href="https://cellar-studio-hq.vercel.app/about.html">About us</a> ·
-  <a href="https://cellar-studio-hq.vercel.app/licenses.html">Licensing</a> ·
-  <a href="https://cellar-studio-hq.vercel.app/certifications.html">Credentials</a> ·
-  <a href="https://cellar-studio-hq.vercel.app/privacy.html">Privacy</a> ·
-  <a href="https://cellar-studio-hq.vercel.app/cookie-policy.html">Cookies</a> ·
-  <a href="https://cellar-studio-hq.vercel.app/terms.html">Terms</a> ·
-  <a href="https://cellar-studio-hq.vercel.app/refund-policy.html">Refunds</a> ·
-  <a href="https://cellar-studio-hq.vercel.app/business.html">Business details</a> ·
-  <a href="https://cellar-studio-hq.vercel.app/contact.html">Enquiries</a> ·
-  <a href="https://cellar-studio-hq.vercel.app/policies.html">Policies</a> ·
+  <a href="https://cellar-csv.vercel.app/studio.html">Company website</a> ·
+  <a href="https://cellar-csv.vercel.app/about.html">About us</a> ·
+  <a href="https://cellar-csv.vercel.app/licenses.html">Licensing</a> ·
+  <a href="https://cellar-csv.vercel.app/certifications.html">Credentials</a> ·
+  <a href="https://cellar-csv.vercel.app/privacy.html">Privacy</a> ·
+  <a href="https://cellar-csv.vercel.app/cookie-policy.html">Cookies</a> ·
+  <a href="https://cellar-csv.vercel.app/terms.html">Terms</a> ·
+  <a href="https://cellar-csv.vercel.app/refund-policy.html">Refunds</a> ·
+  <a href="https://cellar-csv.vercel.app/business.html">Business details</a> ·
+  <a href="https://cellar-csv.vercel.app/contact.html">Enquiries</a> ·
+  <a href="https://cellar-csv.vercel.app/policies.html">Policies</a> ·
   <a href="https://cellar-csv.vercel.app/">Cellar Guard</a> ·
-  <a href="https://cellar-studio-hq.vercel.app/explore.html">Product briefs</a> ·
+  <a href="https://cellar-csv.vercel.app/explore.html">Product briefs</a> ·
   <a href="docs/README.md">Documentation</a> ·
   <a href="CONTRIBUTING.md">Contribute</a>
 </p>
@@ -33,9 +33,9 @@
 
 **Cellar Studio** is an independent creative technology identity and the public home for our evolving software and services work. The first flagship product and exact startup direction have **not been announced**. Existing experiments and source projects in this repository are evidence of engineering work, not a confirmed future commercial catalogue.
 
-The company [About Us](https://cellar-studio-hq.vercel.app/about.html), [Licensing](https://cellar-studio-hq.vercel.app/licenses.html) and [Certifications & Credentials](https://cellar-studio-hq.vercel.app/certifications.html) pages explain the team, repository terms and current certification status. No verified company-level certifications are presently claimed.
+The company [About Us](https://cellar-csv.vercel.app/about.html), [Licensing](https://cellar-csv.vercel.app/licenses.html) and [Certifications & Credentials](https://cellar-csv.vercel.app/certifications.html) pages explain the team, repository terms and current certification status. No verified company-level certifications are presently claimed.
 
-Public [privacy](https://cellar-studio-hq.vercel.app/privacy.html), [cookies and storage](https://cellar-studio-hq.vercel.app/cookie-policy.html), [website terms](https://cellar-studio-hq.vercel.app/terms.html), [refund status](https://cellar-studio-hq.vercel.app/refund-policy.html), and [business details](https://cellar-studio-hq.vercel.app/business.html) pages explain the current informational site. An [enquiry form](https://cellar-studio-hq.vercel.app/contact.html) prepares and copies a local draft; **it does not submit or transmit a message**, and there is no online checkout. Optional third-party embeds require an explicit browser preference; none are currently active.
+Public [privacy](https://cellar-csv.vercel.app/privacy.html), [cookies and storage](https://cellar-csv.vercel.app/cookie-policy.html), [website terms](https://cellar-csv.vercel.app/terms.html), [refund status](https://cellar-csv.vercel.app/refund-policy.html), and [business details](https://cellar-csv.vercel.app/business.html) pages explain the current informational site. An [enquiry form](https://cellar-csv.vercel.app/contact.html) prepares and copies a local draft; **it does not submit or transmit a message**, and there is no online checkout. Optional third-party embeds require an explicit browser preference; none are currently active.
 
 Our existing developer-infrastructure experiments tackle failure modes and aim to answer four questions:
 
@@ -62,13 +62,13 @@ This repository was renamed from **Cellar** to **Cellar-Studio**. It still conta
 | Project | The problem it tackles | Status | Explore |
 | --- | --- | --- | --- |
 | **Cellar Guard** | CSV exports silently break downstream imports when columns or contracts change | **Working pilot** — Java checker, CLI and local web workspace | [Live demo](https://cellar-csv.vercel.app/) |
-| **Cellar SpaceFix** | Free space on a crowded drive by copying personal files to a second volume and verifying their contents before recycling originals | Downloadable Java desktop pilot | [Download and instructions](https://cellar-studio-hq.vercel.app/explore.html#spacefix) · [Source](products/spacefix/) |
-| **Deadlock Sentinel** | Circular waits in JVM thread dumps are difficult to diagnose | **Java prototype / research demo** | [Trace explorer](https://cellar-studio-hq.vercel.app/deadlock.html) · [Run locally](products/deadlock-sentinel/README.md) |
-| **BuildClinic** | Build failures are buried in noisy logs | Early-stage standalone tool | [Product brief](https://cellar-studio-hq.vercel.app/explore.html#buildclinic) |
-| **ClauseCraft** | Teams need an explainable first pass over risky document patterns | Prototype, not legal advice | [Product brief](https://cellar-studio-hq.vercel.app/explore.html#clausecraft) |
-| **PlanCliff** | Database query plans can regress when data distributions change | Research | [Research brief](https://cellar-studio-hq.vercel.app/explore.html#plancliff) |
-| **CrashCheck** | SQLite-backed apps can violate assumptions after abrupt termination | Storage research | [Research brief](https://cellar-studio-hq.vercel.app/explore.html#crashcheck) |
-| **Cellar Learn** | Difficult engineering concepts need clearer interactive explanations | Candidate / exploratory | [Product brief](https://cellar-studio-hq.vercel.app/explore.html#learn) |
+| **Cellar SpaceFix** | Free space on a crowded drive by copying personal files to a second volume and verifying their contents before recycling originals | Downloadable Java desktop pilot | [Download and instructions](https://cellar-csv.vercel.app/explore.html#spacefix) · [Source](products/spacefix/) |
+| **Deadlock Sentinel** | Circular waits in JVM thread dumps are difficult to diagnose | **Java prototype / research demo** | [Trace explorer](https://cellar-csv.vercel.app/deadlock.html) · [Run locally](products/deadlock-sentinel/README.md) |
+| **BuildClinic** | Build failures are buried in noisy logs | Early-stage standalone tool | [Product brief](https://cellar-csv.vercel.app/explore.html#buildclinic) |
+| **ClauseCraft** | Teams need an explainable first pass over risky document patterns | Prototype, not legal advice | [Product brief](https://cellar-csv.vercel.app/explore.html#clausecraft) |
+| **PlanCliff** | Database query plans can regress when data distributions change | Research | [Research brief](https://cellar-csv.vercel.app/explore.html#plancliff) |
+| **CrashCheck** | SQLite-backed apps can violate assumptions after abrupt termination | Storage research | [Research brief](https://cellar-csv.vercel.app/explore.html#crashcheck) |
+| **Cellar Learn** | Difficult engineering concepts need clearer interactive explanations | Candidate / exploratory | [Product brief](https://cellar-csv.vercel.app/explore.html#learn) |
 
 **Status labels matter:** a product appearing on the Studio website does not mean it has a production API, shared login, hosted backend, or completed integration with other products. Independent repositories retain their own licenses and contributors.
 
@@ -192,7 +192,7 @@ New contributors can use [GitHub Codespaces](docs/DEVELOPMENT_ENVIRONMENT.md) or
 
 | Component | Deployment | Important distinction |
 | --- | --- | --- |
-| [Cellar Studio](https://cellar-studio-hq.vercel.app/) | Vercel static website | Company pages, product briefs and demonstrations |
+| [Cellar Studio](https://cellar-csv.vercel.app/studio.html) | Vercel static website | Company pages, product briefs and demonstrations |
 | [Cellar Guard](https://cellar-csv.vercel.app/) | Vercel static demonstration, using the same web build | Synthetic examples; not the persistent Java workspace |
 | Guard Java workspace | Local machine or separately provisioned Java host | Real CSV checks, contract editing, history and API |
 
