@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public final class Main {
-    public static final String VERSION="3.0.0-web.1";
+    public static final String VERSION="3.1.0";
     private Main() {}
     public static void main(String[] args) {int code=run(args);if(code!=0)System.exit(code);}
     public static int run(String[] args) {
@@ -16,7 +16,7 @@ public final class Main {
             Set<String> flags=Set.of("--advisory","--summary","--record","--demo-break");
             Set<String> allowed=switch(command){
                 case "check" -> Set.of("--config","--csv","--format","--output","--advisory","--summary","--record","--data");
-                case "diff" -> Set.of("--config","--baseline","--csv","--format","--output");
+                case "diff" -> Set.of("--config","--baseline","--csv","--format","--output","--summary");
                 case "history" -> Set.of("--config","--data");
                 case "web" -> Set.of("--data","--port");
                 case "audit-verify" -> Set.of("--data");
@@ -43,7 +43,12 @@ public final class Main {
                     Path out=Path.of(required(options,"--out"));FilesEx.atomicWrite(out,Demo.csv(options.containsKey("--demo-break")));
                     System.out.println("Generated synthetic export: "+out);return 0;
                 }
-                case "validate" -> {Contract c=store.contract();System.out.println("VALID: "+c.integrations().size()+" integrations; row rules="+c.checksRows());return 0;}
+                case "validate" -> {
+                    Contract c=store.contract();
+                    System.out.println("VALID: "+c.integrations().size()+" integrations; row rules="+c.hasRowRules()
+                        +(c.validateRows()?"; validateRows=true":""));
+                    return 0;
+                }
                 case "history" -> {System.out.println(Json.write(store.history()));return 0;}
                 case "web" -> {
                     int port=-1;
@@ -74,7 +79,6 @@ public final class Main {
                 default -> {
                     String format=options.getOrDefault("--format","text");
                     if(!Set.of("text","json","markdown").contains(format))throw new InputError("Format must be text, json, or markdown.");
-                    if(command.equals("diff")&&format.equals("markdown"))throw new InputError("Diff supports text or json.");
                     Path csvPath=Path.of(required(options,"--csv"));Path baseline=null;
                     if(command.equals("diff"))baseline=Path.of(required(options,"--baseline"));
                     if(options.containsKey("--output")) {
@@ -97,7 +101,7 @@ public final class Main {
             String message=(e instanceof InputError||e instanceof Store.Conflict)?e.getMessage():"Operation failed. Check paths, permissions, available memory, and port availability.";
             if("json".equals(options.get("--format")))System.out.println(Json.write(Json.map("error",message,"exitCode",2)));
             else {System.err.println("ERROR  "+message);if(!(e instanceof InputError||e instanceof Store.Conflict))System.err.println("DETAIL "+e);}
-            if(options.containsKey("--summary"))summary("### Cellar check could not run\n\nNothing was verified. See the job log for the input error.\n");
+            if(options.containsKey("--summary"))summary("### Cellar Guard could not complete the operation\n\nNothing was verified. See the job log for the input error.\n");
             return 2;
         }
     }
@@ -117,7 +121,7 @@ public final class Main {
           export-demo --out FILE     Generate a synthetic CSV; optional --demo-break
           check --csv FILE           Check declared header and row rules
             --format text|json|markdown --output FILE --advisory --summary --record
-          diff --baseline FILE --csv FILE [--format json] [--output FILE]
+          diff --baseline FILE --csv FILE [--format json|markdown] [--output FILE] [--summary]
           history                    Read latest 100 locally saved check summaries
         --config FILE defaults to cellar.json; --data DIR defaults beside config/.cellar (web: CELLAR_DATA or ./data)
         Web settings come from CELLAR_* environment variables; see docs/WEB_SECURITY.md.

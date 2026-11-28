@@ -10,8 +10,8 @@ The [Studio homepage](https://cellar-csv.vercel.app/) and [Guard product page](h
 
 If you're not a developer, **use the release ZIP first**. You don't need to clone the repository or compile Java source.
 
-1. Open [Cellar Guard's GitHub release](https://github.com/suryandugy-glitch/Cellar-Studio/releases/tag/guard-v3.0.0-web.1).
-2. Under **Assets**, download `Cellar-Guard-3.0.0-web.1.zip` and extract it.
+1. Open [Cellar Guard's GitHub release](https://github.com/suryandugy-glitch/Cellar-Studio/releases/tag/guard-v3.1.0).
+2. Under **Assets**, download `Cellar-Guard-3.1.0.zip` and extract it.
 3. Check `java -version` in Command Prompt/Terminal. Install a Java **21 or newer** runtime if needed.
 4. **Windows:** double-click `start-guard.bat`. **macOS/Linux:** run `sh start-guard.sh` inside the extracted directory.
 5. Keep the terminal open and visit the address it prints (usually `http://127.0.0.1:8080`).
@@ -100,7 +100,9 @@ Exit codes:
 | `1` | Blocking contract violation | Check fails |
 | `2` | Invalid input, configuration or runtime error; **no successful verification** | Check fails |
 
-The `--advisory` option can deliberately avoid blocking some violations; **do not enable it for a required PR release gate**. The `diff` command reports differences but its exit code does not mean contract compatibility; use `check` for merging decisions.
+The `--advisory` option can deliberately avoid blocking some violations; **do not enable it for a required PR release gate**. The `diff` command compares headers and can publish Markdown with `--format markdown --summary`. Run `check` for the release decision.
+
+Set the root option `"validateRows": true` to parse every record with a header-only contract. For a combined key, add an integration rule such as `"uniqueKeys": [["order_id", "item_id"]]`, with both columns in `required`. The [contract reference](CONTRACTS.md) documents exact matching and blank key values.
 
 ## 4. Demonstrate failure and recovery
 
@@ -139,7 +141,8 @@ You should now see `PASS` for both sample integrations and `Gate: ALLOW`. This p
 | --- | --- |
 | `MISSING_COLUMN order_id` | Restore the header or temporarily emit the old and new headers |
 | Invalid integer or range | Fix how the producer formats/calculates the value; review the declared type/range |
-| Duplicate unique key | Fix the producer's ID/key generation or deduplication logic |
+| `DUPLICATE_VALUE` or `DUPLICATE_KEY` | Fix the producer’s key generation or deduplication logic |
+| `EMPTY_KEY` | Populate every field in the reported combined key |
 | Too few rows | Check filtering/export conditions; verify whether an empty export is truly allowed |
 | Exit `2` / input error | Correct the file path, permissions or invalid contract JSON; rerun before shipping |
 

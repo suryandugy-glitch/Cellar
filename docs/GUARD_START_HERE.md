@@ -14,7 +14,7 @@ You need Java **21 or newer**. If the command isn't found or prints version 17/1
 
 ## Step 2 — Open the local Cellar Guard app
 
-- **Windows:** Extract the ZIP, open the extracted `Cellar-Guard-3.0.0-web.1` folder, and double-click `start-guard.bat`.
+- **Windows:** Extract the ZIP, open the extracted `Cellar-Guard-3.1.0` folder, and double-click `start-guard.bat`.
 - **macOS/Linux:** Open a terminal inside that folder and run `sh start-guard.sh`.
 
 The black terminal window is the running Java server. Keep it open. Open the exact URL printed there in a browser (usually `http://127.0.0.1:8080`; a different port is possible).

@@ -8,7 +8,9 @@ import java.util.*;
 public final class Checker {
     private Checker() {}
     public static Map<String,Object> check(Contract contract,String csv,boolean advisory) {
-        boolean rows=contract.checksRows();Csv.Table table=Csv.parse(csv,contract.delimiter(),rows);
+        boolean rowRules=contract.hasRowRules();
+        boolean rows=contract.validateRows()||rowRules;
+        Csv.Table table=Csv.parse(csv,contract.delimiter(),rows);
         List<Object> results=new ArrayList<>();boolean passed=true;int errors=0,warnings=0;
         Map<String,Integer> positions=new HashMap<>();for(int i=0;i<table.header().size();i++)positions.put(table.header().get(i),i);
         for(Contract.Integration integration:contract.integrations()) {
@@ -39,15 +41,39 @@ public final class Checker {
                     }
                 }
             }
+            for(List<String> key : integration.uniqueKeys()) {
+                checkUniqueKey(key, positions, table.rows(), issues);
+            }
             boolean ok=issues.total==0;if(!ok){passed=false;if(integration.severity().equals("error"))errors++;else warnings++;}
             results.add(Json.map("integration",integration.id(),"owner",integration.owner(),"severity",integration.severity(),
                 "passed",ok,"missing",missing,"issueCount",issues.total,"issues",issues.saved,"truncated",issues.total>issues.saved.size()));
         }
+        String scope = rowRules ? "headers-and-declared-row-rules"
+            : rows ? "headers-and-row-structure" : "headers-only";
         return Json.map("version",Main.VERSION,"passed",passed,"blocking",errors>0&&!advisory,"advisory",advisory,
-            "scope",rows?"headers-and-declared-row-rules":"headers-only","header",table.header(),
+            "scope",scope,"header",table.header(),
             "rowsChecked",rows?table.rows().size():0,"failedIntegrations",errors,"warningIntegrations",warnings,
             "contractHash",FilesEx.hash(contract.canonical()),"results",results);
     }
+    private static void checkUniqueKey(List<String> key, Map<String,Integer> positions,
+                                       List<List<String>> rows, Issues issues) {
+        if(!positions.keySet().containsAll(key)) return; // The required-column rule reports missing headers.
+        List<Integer> indexes = key.stream().map(positions::get).toList();
+
+        String label = String.join(", ", key);
+        Set<List<String>> seen = new HashSet<>();
+        int record = 1;
+        for(List<String> row : rows) {
+            record++;
+            List<String> values = indexes.stream().map(row::get).toList();
+            if(values.contains("")) {
+                issues.add("EMPTY_KEY", label, record, "Supply a value for every column in this key.");
+            } else if(!seen.add(values)) {
+                issues.add("DUPLICATE_KEY", label, record, "Use a unique combination of values for these columns.");
+            }
+        }
+    }
+
     static boolean validType(String value,String type) {
         try {
             return switch(type) {
@@ -70,7 +96,7 @@ public final class Checker {
         for(var i:contract.integrations()) {
             List<String> lost=i.required().stream().filter(removed::contains).toList();
             List<String> unexpected=added.stream().filter(x->!i.allowed().isEmpty()&&!i.allowed().contains(x)).toList();
-            boolean order=!i.order().isEmpty()&&!i.order().equals(current);
+            boolean order=i.order().equals(old)&&!i.order().equals(current);
             if(!lost.isEmpty()||!unexpected.isEmpty()||order)impacted.add(Json.map("integration",i.id(),"owner",i.owner(),"removedRequired",lost,"unexpectedAdded",unexpected,"orderMismatch",order));
         }
         boolean reordered=!old.stream().filter(current::contains).toList().equals(current.stream().filter(old::contains).toList());

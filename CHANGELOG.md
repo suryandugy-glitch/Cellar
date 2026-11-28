@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.0
+
+- Added combined keys that check duplicate or empty tuples across required columns.
+- Added `validateRows` for full CSV structure checks with header-only contracts.
+- Added Markdown and GitHub job summaries to `diff`, plus rename suggestions in the local comparison screen.
+- Fixed header comparisons that reported an unchanged column-order violation as a new regression.
+
 ## Unreleased — Guided Cellar Guard Java release
 
 - Added a standalone Java 21+ release ZIP containing the runnable JAR, launchers for Windows/macOS/Linux, sample contract/CSVs and beginner/technical manuals.

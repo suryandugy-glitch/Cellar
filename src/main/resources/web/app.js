@@ -59,6 +59,7 @@ const state = {
 const ruleLabels = {
   MISSING_COLUMN: 'Required column missing', EMPTY_VALUE: 'Required value is blank',
   DUPLICATE_VALUE: 'Value must be unique', INVALID_TYPE: 'Wrong value type',
+  EMPTY_KEY: 'Key has a blank field', DUPLICATE_KEY: 'Column combination must be unique',
   ENUM_VALUE: 'Value outside allowed list', BELOW_MIN: 'Below minimum', ABOVE_MAX: 'Above maximum',
   UNEXPECTED_COLUMN: 'Unexpected column', COLUMN_ORDER: 'Column order changed',
   MIN_ROWS: 'Too few rows', MAX_ROWS: 'Too many rows'
@@ -920,16 +921,22 @@ function comparePage() {
   }, message));
   const compareHeaders = locked(compare, async () => {
     const diff = await api('diff', 'POST', { before: before.area.value, after: after.area.value });
-    results.replaceChildren(panel('Header changes', node('div', { class: 'pad stack' },
+    const renames = diff.renameCandidates || [];
+    const panels = [panel('Header changes', node('div', { class: 'pad stack' },
       node('div', { class: 'two' },
         node('div', { class: 'stack' }, node('h3', {}, 'Added columns'), chips(diff.added)),
         node('div', { class: 'stack' }, node('h3', {}, 'Removed columns'), chips(diff.removed))),
       node('p', { class: 'small muted' }, diff.reordered ? 'Shared columns were reordered.' : 'Shared columns have the same relative order.'),
       node('p', { class: 'small muted' }, diff.note))),
     panel('Affected integrations', diff.impacted.length
-      ? table(['Integration', 'Owner', 'Required columns removed', 'Unexpected columns', 'Order mismatch'],
+      ? table(['Integration', 'Owner', 'Required columns removed', 'Unexpected columns', 'New order mismatch'],
         diff.impacted.map(item => [item.integration, item.owner, chips(item.removedRequired), chips(item.unexpectedAdded), item.orderMismatch ? 'Yes' : 'No']))
-      : empty('shield', 'No integrations affected', 'No declared header rule flags this change.')));
+      : empty('shield', 'No integrations affected', 'This comparison found no new violations of the declared header rules.')),
+    renames.length ? panel('Possible column renames',
+      table(['Old column', 'New column', 'Name similarity', 'Required by', 'Suggested action'],
+        renames.map(item => [node('code', {}, item.from), node('code', {}, item.to),
+          item.nameSimilarityPercent + '%', chips(item.requiredBy), item.action]))) : null];
+    results.replaceChildren(...panels.filter(Boolean));
     announce('Header comparison complete.');
   }, message);
   const form = node('form', { class: 'pad stack', onsubmit: event => { event.preventDefault(); results.replaceChildren(); void compareHeaders(); } },

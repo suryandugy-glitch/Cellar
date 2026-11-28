@@ -26,6 +26,7 @@ public final class Reports {
             .replace("|","&#124;").replace("`","&#96;").replace("\r"," ").replace("\n"," ");
     }
     public static String markdown(Map<String,Object> report) {
+        if(!report.containsKey("results")) return diffMarkdown(report);
         StringBuilder b=new StringBuilder("### Cellar compatibility report\n\n| Status | Integration | Owner | Issues |\n|---|---|---|---:|\n");
         for(Object obj:(List<?>)report.get("results")) {
             Map<String,Object> r=Json.object(obj);
@@ -43,4 +44,47 @@ public final class Reports {
         }
         return b.append("\nA pass covers only declared requirements and the supplied fixture. Cell values are omitted.\n").toString();
     }
+    private static String diffMarkdown(Map<String,Object> report) {
+        StringBuilder b = new StringBuilder("### Cellar export comparison\n\n");
+        b.append("- Added columns: ").append(names((List<?>)report.get("added"))).append('\n');
+        b.append("- Removed columns: ").append(names((List<?>)report.get("removed"))).append('\n');
+        b.append("- Shared columns reordered: ").append(yesNo(report.get("reordered"))).append('\n');
+
+        List<?> impacted = (List<?>)report.get("impacted");
+        if(impacted.isEmpty()) {
+            b.append("\nNo new header violations for the configured integrations.\n");
+        } else {
+            b.append("\n| Integration | Owner | Required columns removed | Disallowed additions | New order mismatch |\n")
+                .append("|---|---|---|---|---|\n");
+            for(Object item : impacted) {
+                Map<String,Object> impact = Json.object(item);
+                b.append("| ").append(safe(impact.get("integration")))
+                    .append(" | ").append(safe(impact.get("owner")))
+                    .append(" | ").append(names((List<?>)impact.get("removedRequired")))
+                    .append(" | ").append(names((List<?>)impact.get("unexpectedAdded")))
+                    .append(" | ").append(yesNo(impact.get("orderMismatch"))).append(" |\n");
+            }
+        }
+
+        List<?> suggestions = (List<?>)report.get("renameCandidates");
+        if(!suggestions.isEmpty()) {
+            b.append("\nPossible renames based on header names:\n");
+            for(Object item : suggestions) {
+                Map<String,Object> suggestion = Json.object(item);
+                b.append("- ").append(safe(suggestion.get("from"))).append(" → ")
+                    .append(safe(suggestion.get("to"))).append(" (")
+                    .append(suggestion.get("nameSimilarityPercent")).append("% name similarity)\n");
+            }
+        }
+        return b.append("\nRun `check` on the proposed export for the release decision.\n").toString();
+    }
+
+    private static String names(List<?> names) {
+        return names.isEmpty() ? "—" : String.join(", ", names.stream().map(Reports::safe).toList());
+    }
+
+    private static String yesNo(Object value) {
+        return Boolean.TRUE.equals(value) ? "Yes" : "No";
+    }
+
 }
