@@ -1,6 +1,8 @@
 """Browser smoke checks for Studio HQ and its only product, Cellar Guard."""
 import os
 
+from urllib.parse import parse_qs, urlsplit
+
 from playwright.sync_api import sync_playwright
 
 
@@ -48,22 +50,52 @@ with sync_playwright() as playwright:
     dialog.get_by_role('button', name='Save preferences').click()
     assert page.evaluate("JSON.parse(localStorage.getItem('cellar-privacy-preferences')).embeds") is False
 
-    # Consent is required. The copy-only builder must not claim to send data.
-    page.goto(BASE + 'contact.html')
-    page.get_by_role('button', name='Copy enquiry to clipboard').click()
+    # Verify validation and the email draft without opening an external app.
+    page.goto(BASE + 'index.html')
+    page.get_by_role('navigation').get_by_role('link', name='Contact us').filter(visible=True).first.click()
+    assert page.url == BASE + 'contact.html'
+    inbox = 'cellarcsv@gmail.com'
+    assert page.get_by_role('link', name=inbox).get_attribute('href') == f'mailto:{inbox}'
+    open_email = page.get_by_role('button', name='Open email app')
+    draft_link = page.locator('#enquiry-draft-link')
+    page.evaluate("document.querySelector('#enquiry-draft-link').addEventListener('click', event => event.preventDefault())")
+    open_email.click()
     assert page.locator('#enquiry-consent').get_attribute('aria-invalid') == 'true'
-    assert 'Nothing has been sent' in page.locator('#enquiry-status').inner_text()
+    assert page.locator('#enquiry-topic').evaluate('element => element === document.activeElement')
+    assert draft_link.get_attribute('href') is None
+
+    page.locator('#enquiry-email').fill('invalid-address')
     page.locator('#enquiry-topic').select_option(label='Collaboration idea')
-    page.locator('#enquiry-message').fill('A sample project collaboration enquiry.')
-    # Operate the checkbox through the keyboard to verify keyboard support.
+    message = 'A sample collaboration enquiry.\nTests: CSV & Java? Café.'
+    page.locator('#enquiry-message').fill(message)
     page.locator('#enquiry-consent').press('Space')
     assert page.locator('#enquiry-consent').is_checked()
-    page.get_by_role('button', name='Copy enquiry to clipboard').click()
-    status = page.locator('#enquiry-status').inner_text()
-    assert 'not been sent' in status.lower() or 'nothing has been sent' in status.lower(), status
+    open_email.click()
+    assert page.locator('#enquiry-email').get_attribute('aria-invalid') == 'true'
+    assert draft_link.get_attribute('href') is None
+
+    page.locator('#enquiry-name').fill('Sample Visitor')
+    page.locator('#enquiry-email').fill('visitor+test@example.com')
+    open_email.click()
+    draft = urlsplit(draft_link.get_attribute('href'))
+    assert (draft.scheme, draft.path) == ('mailto', inbox)
+    assert parse_qs(draft.query) == {
+        'subject': ['Cellar Studio | Collaboration idea'],
+        'body': ['Name: Sample Visitor\r\n\r\nPreferred reply email: visitor+test@example.com\r\n\r\n' +
+                 message.replace('\n', '\r\n')],
+    }
+    assert 'Select Send in your email app.' in page.locator('#enquiry-status').inner_text()
+
+    page.evaluate("Object.defineProperty(navigator, 'clipboard', {value: undefined})")
+    page.get_by_role('button', name='Copy message').click()
+    preview = page.get_by_role('textbox', name='Message to paste into your email')
+    assert preview.is_visible()
+    assert message in preview.input_value()
     page.get_by_role('button', name='Clear form').click()
     assert page.locator('#enquiry-message').input_value() == ''
     assert not page.locator('#enquiry-consent').is_checked()
+    assert draft_link.get_attribute('href') is None
+    assert not preview.is_visible()
 
     # Small-screen navigation has a keyboard-reachable open/close control.
     page.set_viewport_size({'width': 390, 'height': 780})

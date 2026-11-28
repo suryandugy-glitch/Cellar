@@ -1,92 +1,107 @@
 'use strict';
-// Intentionally local-only: there is no submission endpoint or email recipient.
+
 (() => {
   const form = document.querySelector('#enquiry-form');
   if (!form) return;
+
+  const inbox = document.querySelector('#studio-email');
   const status = document.querySelector('#enquiry-status');
+  const copy = document.querySelector('#enquiry-copy');
   const fallback = document.querySelector('#enquiry-fallback');
   const preview = document.querySelector('#enquiry-preview');
-  const fields = {
-    name: document.querySelector('#enquiry-name'),
-    email: document.querySelector('#enquiry-email'),
-    topic: document.querySelector('#enquiry-topic'),
-    message: document.querySelector('#enquiry-message'),
-    consent: document.querySelector('#enquiry-consent')
-  };
-  const errors = {
-    email: document.querySelector('#enquiry-email-error'),
-    topic: document.querySelector('#enquiry-topic-error'),
-    message: document.querySelector('#enquiry-message-error'),
-    consent: document.querySelector('#enquiry-consent-error')
-  };
+  const draftLink = document.querySelector('#enquiry-draft-link');
+  const { name, email, topic, message, consent } = form.elements;
 
-  function markError(name, message) {
-    errors[name].textContent = message;
-    fields[name].setAttribute('aria-invalid', String(Boolean(message)));
-    if (name === 'consent') {
-      fields[name].setAttribute('aria-describedby', message ? `consent-help ${errors[name].id}` : 'consent-help');
-    } else if (message) fields[name].setAttribute('aria-describedby', errors[name].id);
-    else fields[name].removeAttribute('aria-describedby');
-    return Boolean(message);
+  const validation = [
+    [email, () => email.validity.typeMismatch ? 'Enter a valid email address or leave this field blank.' : ''],
+    [topic, () => topic.value ? '' : 'Choose a topic.'],
+    [message, () => message.value.trim().length < 10 ? 'Write at least 10 characters.' : ''],
+    [consent, () => consent.checked ? '' : 'Confirm that you understand how the email will be shared.']
+  ].map(([field, getError]) => ({
+    field,
+    getError,
+    error: document.querySelector(`#${field.id}-error`),
+    help: field.getAttribute('aria-describedby')
+  }));
+
+  function showError({ field, error, help }, text) {
+    error.textContent = text;
+    field.setAttribute('aria-invalid', String(Boolean(text)));
+    const descriptions = [help, text && error.id].filter(Boolean).join(' ');
+    if (descriptions) field.setAttribute('aria-describedby', descriptions);
+    else field.removeAttribute('aria-describedby');
   }
 
-  function validate() {
-    const invalid = [];
-    if (markError('email', fields.email.value.trim() && fields.email.validity.typeMismatch ? 'Enter a valid email address or leave this optional field blank.' : '')) invalid.push(fields.email);
-    if (markError('topic', !fields.topic.value ? 'Choose a topic.' : '')) invalid.push(fields.topic);
-    const length = fields.message.value.trim().length;
-    if (markError('message', length < 10 ? 'Write at least 10 characters.' : '')) invalid.push(fields.message);
-    if (markError('consent', !fields.consent.checked ? 'Confirm that you understand this is a local draft, not a message being sent.' : '')) invalid.push(fields.consent);
-    return invalid;
+  function readDraft() {
+    fallback.hidden = true;
+    preview.value = '';
+    draftLink.removeAttribute('href');
+    let firstInvalid;
+    for (const item of validation) {
+      const error = item.getError();
+      showError(item, error);
+      if (error) firstInvalid ??= item.field;
+    }
+    if (firstInvalid) {
+      status.textContent = 'Please correct the highlighted fields.';
+      firstInvalid.focus();
+      return null;
+    }
+
+    const sender = [];
+    if (name.value.trim()) sender.push('Name: ' + name.value.trim());
+    if (email.value.trim()) sender.push('Preferred reply email: ' + email.value.trim());
+    return {
+      subject: 'Cellar Studio | ' + topic.value,
+      body: [...sender, message.value.trim()].join('\r\n\r\n').replace(/\r?\n/g, '\r\n')
+    };
   }
 
-  for (const [name, field] of Object.entries(fields)) {
-    if (name === 'name') continue;
-    field.addEventListener(name === 'consent' ? 'change' : 'blur', () => {
-      if (errors[name]?.textContent) {
-        if (name === 'email') markError('email', field.value.trim() && field.validity.typeMismatch ? 'Enter a valid email address or leave this optional field blank.' : '');
-        else if (name === 'topic') markError('topic', !field.value ? 'Choose a topic.' : '');
-        else if (name === 'message') markError('message', field.value.trim().length < 10 ? 'Write at least 10 characters.' : '');
-        else markError('consent', !field.checked ? 'Confirm this is a local-only draft.' : '');
-      }
+  for (const item of validation) {
+    item.field.addEventListener('input', () => {
+      if (item.error.textContent) showError(item, item.getError());
     });
   }
 
-  form.addEventListener('submit', async event => {
+  form.addEventListener('submit', event => {
     event.preventDefault();
-    fallback.hidden = true;
-    const invalid = validate();
-    if (invalid.length) {
-      status.textContent = 'Please correct the highlighted fields. Nothing has been sent.';
-      invalid[0].focus();
-      return;
-    }
-    const draft = [
-      'Cellar Studio enquiry draft — NOT SENT',
-      'Topic: ' + fields.topic.value,
-      fields.name.value.trim() ? 'Name: ' + fields.name.value.trim() : '',
-      fields.email.value.trim() ? 'Email: ' + fields.email.value.trim() : '',
-      '',
-      fields.message.value.trim(),
-      '',
-      'Prepared locally. No data was submitted to Cellar Studio.'
-    ].filter((line, i, array) => line !== '' || (i > 0 && array[i - 1] !== '')).join('\n');
-    try {
-      if (!navigator.clipboard?.writeText) throw new Error('Clipboard API unavailable');
-      await navigator.clipboard.writeText(draft);
-      status.textContent = 'Copied to clipboard. The enquiry has NOT been sent. You can paste it into a message when a contact channel becomes available.';
-    } catch (_) {
-      preview.value = draft;
-      fallback.hidden = false;
-      status.textContent = 'Automatic copying is unavailable. Select and copy the prepared text below. Nothing has been sent.';
-      preview.focus();
-      preview.select();
-    }
+    const draft = readDraft();
+    if (!draft) return;
+
+    draftLink.href = inbox.getAttribute('href') +
+      '?subject=' + encodeURIComponent(draft.subject) + '&body=' + encodeURIComponent(draft.body);
+    status.textContent = 'Select Send in your email app. If it does not open, choose Copy message.';
+    draftLink.click();
   });
+
+  copy.addEventListener('click', async () => {
+    const draft = readDraft();
+    if (!draft) return;
+
+    const text = 'Subject: ' + draft.subject + '\n\n' + draft.body;
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        status.textContent = 'Message copied. Paste it into an email to ' + inbox.textContent.trim() + '.';
+        return;
+      } catch {
+        // Offer manual copying if the browser denies clipboard access.
+      }
+    }
+    preview.value = text;
+    fallback.hidden = false;
+    status.textContent = 'Copy the text below and paste it into an email to ' + inbox.textContent.trim() + '.';
+    preview.focus();
+    preview.select();
+  });
+
   form.addEventListener('reset', () => {
-    for (const name of Object.keys(errors)) markError(name, '');
-    status.textContent = 'Form cleared. No data was submitted or saved.';
+    for (const item of validation) showError(item, '');
     fallback.hidden = true;
     preview.value = '';
+    draftLink.removeAttribute('href');
+    status.textContent = 'Form cleared.';
   });
+
+  form.elements['enquiry-fields'].disabled = false;
 })();
