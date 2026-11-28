@@ -99,3 +99,29 @@ body.studio-detail :is(.card,.doc):nth-child(3n+3){border-top-color:var(--studio
 @media(forced-colors:active) {
   body:is(.cellar-home,.cellar-product,.company-page,.studio-detail,.cellar-workspace-demo) :is(.site-header,.company-header,.bar,.topbar) {border-image:none}
 }
+
+/* One shared brand motion treatment on every page: nav, footer and showcase marks. */
+img[src="./logo.svg"] {
+  transform-origin:50% 52%;
+  animation:cellar-logo-breathe 6s ease-in-out infinite;
+  will-change:transform;
+}
+a:hover > img[src="./logo.svg"],
+a:focus-visible > img[src="./logo.svg"] {
+  animation:cellar-logo-greet .65s cubic-bezier(.25,.85,.25,1) both;
+}
+@keyframes cellar-logo-breathe {
+  0%,100% {transform:translateY(0) rotate(0deg) scale(1)}
+  46% {transform:translateY(-2px) rotate(-4deg) scale(1.045)}
+  60% {transform:translateY(-1px) rotate(2deg) scale(1.02)}
+}
+@keyframes cellar-logo-greet {
+  0% {transform:translateY(0) rotate(0deg) scale(1)}
+  45% {transform:translateY(-4px) rotate(-9deg) scale(1.13)}
+  75% {transform:translateY(-1px) rotate(5deg) scale(1.07)}
+  100% {transform:translateY(0) rotate(0deg) scale(1)}
+}
+@media(prefers-reduced-motion:reduce) {
+  img[src="./logo.svg"],a:hover > img[src="./logo.svg"],a:focus-visible > img[src="./logo.svg"] {animation:none;will-change:auto}
+}
+html[data-theme-motion="reduced"] img[src="./logo.svg"] {animation:none;will-change:auto}
