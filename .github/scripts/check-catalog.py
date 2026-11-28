@@ -142,30 +142,64 @@ with sync_playwright() as playwright:
     page.goto(BASE + 'manual.html')
     assert page.locator('#pr').count() == 1
 
-    # Check uploaded and pasted exports using the production worker policy.
+    # Exercise actual JSON and CSV file selection using the production worker policy.
     page.route(BASE + 'guard-app.html', serve_contact_with_policy)
     for width in (390, 1440):
         page.set_viewport_size({'width': width, 'height': 900})
         page.goto(BASE + 'guard-app.html')
+        contract = page.locator('#contract-file')
+        contract.set_input_files({
+            'name': 'invalid.json', 'mimeType': 'application/json', 'buffer': b'{"integrations": []}',
+        })
+        page.get_by_text('Contract error. Provide 1–100 integrations.', exact=True).wait_for()
+        assert contract.get_attribute('aria-invalid') == 'true'
+
+        example = Path('cellar.json').read_bytes()
+        contract.set_input_files({
+            'name': 'Cellar-Guard-Example-Contract.json', 'mimeType': 'application/json', 'buffer': example,
+        })
+        page.get_by_text('Contract valid. Choose a CSV or load an example to run a check.', exact=True).wait_for()
+        assert contract.get_attribute('aria-invalid') == 'false'
+        assert json.loads(page.locator('#contract-text').input_value()) == json.loads(example)
+
         page.get_by_role('button', name='Load breaking example').click()
-        page.get_by_text('Example loaded. Select Check export.', exact=True).wait_for()
-        check = page.get_by_role('button', name='Check export')
-        check.click()
         page.get_by_role('heading', name='Release blocked').wait_for()
         assert page.get_by_text('MISSING_COLUMN', exact=True).is_visible()
         assert page.get_by_text('order_id · record 1', exact=True).is_visible()
+        assert 'Cellar-Guard-Example-Contract.json' in page.locator('#contract-file-status').inner_text()
 
         page.locator('#csv-file').set_input_files({
             'name': 'valid.csv', 'mimeType': 'text/csv',
             'buffer': b'order_id,sku,total_cents,currency\nPRIVATE-TEST-ORDER,SKU1,100,INR\n',
         })
-        check.click()
         page.get_by_role('heading', name='Ready to ship').wait_for()
         with page.expect_download() as saved:
             page.get_by_role('button', name='Download report').click()
         report_text = saved.value.path().read_text()
         assert json.loads(report_text)['passed'] is True
         assert 'PRIVATE-TEST-ORDER' not in report_text
+
+        with page.expect_download() as saved:
+            page.get_by_role('button', name='Download contract', exact=True).click()
+        assert json.loads(saved.value.path().read_text()) == json.loads(example)
+        page.get_by_text('Create a starter contract from a known-good CSV', exact=True).click()
+        with page.expect_download() as saved:
+            page.get_by_role('button', name='Download starter JSON').click()
+        starter = json.loads(saved.value.path().read_text())
+        assert starter['integrations'][0]['required'] == ['order_id', 'sku', 'total_cents', 'currency']
+        assert 'PRIVATE-TEST-ORDER' not in json.dumps(starter)
+
+        page.get_by_role('button', name='Clear inputs').click()
+        assert page.locator('#contract-text').input_value() == ''
+        assert page.locator('#csv-text').input_value() == ''
+        assert page.get_by_role('button', name='Download report').is_disabled()
+        page.locator('#csv-file').set_input_files({
+            'name': 'first.csv', 'mimeType': 'text/csv',
+            'buffer': b'order_id,sku,total_cents,currency\nO-1,SKU1,100,INR\n',
+        })
+        page.get_by_text('CSV selected. Choose a JSON contract to run the check.', exact=True).wait_for()
+        contract.set_input_files({'name': 'contract.json', 'mimeType': 'application/json', 'buffer': example})
+        page.get_by_role('heading', name='Ready to ship').wait_for()
 
         page.get_by_role('button', name='Switch to dark mode').click()
         assert page.locator('html').get_attribute('data-theme') == 'dark'

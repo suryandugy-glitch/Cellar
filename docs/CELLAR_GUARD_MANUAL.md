@@ -7,9 +7,11 @@ Cellar Guard is a Java 21+ CSV contract checker. It compares a candidate CSV exp
 ## Use the browser checker on a phone or computer
 
 1. Open the [Cellar Guard CSV checker](https://cellar-csv.vercel.app/guard-app.html).
-2. Choose **Load breaking example**, then **Check export**. The inventory report fails because the export renamed `order_id` to `id`. Load the passing example to see the expected structure.
+2. Choose **Load breaking example**. The inventory report fails because the export renamed `order_id` to `id`. Load the passing example to see the expected structure.
 3. Open your own UTF-8 CSV using **Choose CSV file** or paste its text. Load a JSON contract or edit the example. Use the receiving application's expected column names and rules.
-4. Read the verdict, expand each integration for record numbers and suggested fixes, and use **Download report** to save the JSON result.
+4. Select a file to validate the contract or run the check automatically when both files are ready. If you paste or edit text, select **Validate contract** or **Check export**. Expand each integration for record numbers and suggested fixes, then use **Download report** to save the JSON result.
+
+Use **Download contract** to save valid JSON. To build a contract that requires all columns from a known-good CSV, open **Create a starter contract from a known-good CSV**, choose its delimiter, and select **Download starter JSON**. Review the draft before using it as your import contract.
 
 The app checks files on the device, up to 8 MiB for a CSV and 1 MiB for a contract. Selecting a file uses its contents. Editing the text field switches back to pasted text. The [contract reference](CONTRACTS.md) lists the rules. Use the Java CLI for merge gates and the local Java workspace for comparisons and history.
 

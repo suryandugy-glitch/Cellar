@@ -22,7 +22,7 @@
       <div>
         <p class="guard-kicker">Cellar Guard</p>
         <h1 id="guard-title">CSV <span>Checker</span></h1>
-        <p>Catch export changes before they break a customer’s import. Your CSV and contract stay in this browser.</p>
+        <p>Choose a JSON contract with the import rules and a CSV with the data to check. Both files stay in this browser.</p>
       </div>
       <div class="guard-hero-actions">
         <button type="button" id="load-passing">Load passing example</button>
@@ -31,29 +31,41 @@
     </section>
     <noscript><p class="guard-notice">Enable JavaScript to use the browser checker, or <a href="./manual.html#install">download the Java app</a>.</p></noscript>
     <form id="guard-form" novalidate>
+      <p id="guard-status" class="guard-notice" role="status">Choose a JSON contract and a CSV, or try an example above.</p>
       <div class="guard-inputs">
         <section class="guard-card guard-contract" aria-labelledby="contract-title">
           <header><h2 id="contract-title">Import contract</h2><p>Set the columns and rules your customer expects.</p></header>
           <label class="guard-upload" for="contract-file">Choose JSON contract</label>
-          <input id="contract-file" type="file" accept=".json,application/json">
+          <input id="contract-file" type="file" accept=".json,application/json" aria-describedby="contract-file-status">
           <p id="contract-file-status" class="guard-file-status" aria-live="polite"></p>
           <label for="contract-text">Contract JSON</label>
-          <textarea id="contract-text" rows="10" spellcheck="false" autocomplete="off"></textarea>
+          <textarea id="contract-text" rows="10" spellcheck="false" autocomplete="off" aria-describedby="contract-file-status"></textarea>
+          <div class="guard-field-actions">
+            <button type="button" id="validate-contract">Validate contract</button>
+            <button type="button" id="download-contract" disabled>Download contract</button>
+          </div>
         </section>
         <section class="guard-card guard-csv" aria-labelledby="csv-title">
           <header><h2 id="csv-title">Proposed export</h2><p>Choose a UTF-8 CSV up to 8 MiB, or paste CSV text.</p></header>
           <label class="guard-upload" for="csv-file">Choose CSV file</label>
-          <input id="csv-file" type="file" accept=".csv,.tsv,text/csv,text/tab-separated-values,text/plain">
+          <input id="csv-file" type="file" accept=".csv,.tsv,text/csv,text/tab-separated-values,text/plain" aria-describedby="csv-file-status">
           <p id="csv-file-status" class="guard-file-status" aria-live="polite"></p>
           <label for="csv-text">CSV text</label>
-          <textarea id="csv-text" rows="10" spellcheck="false" autocomplete="off" placeholder="order_id,sku,total_cents,currency"></textarea>
+          <textarea id="csv-text" rows="10" spellcheck="false" autocomplete="off" placeholder="order_id,sku,total_cents,currency" aria-describedby="csv-file-status"></textarea>
+          <details class="guard-draft">
+            <summary>Create a starter contract from a known-good CSV</summary>
+            <p>The draft uses all the header names as required columns. Review it against what the receiving app expects.</p>
+            <label for="draft-delimiter">CSV delimiter</label>
+            <select id="draft-delimiter"><option value=",">Comma</option><option value=";">Semicolon</option><option value="tab">Tab</option></select>
+            <button type="button" id="draft-contract">Download starter JSON</button>
+          </details>
         </section>
       </div>
       <div class="guard-action-bar">
         <button type="submit" id="run-check" disabled>Check export</button>
         <button type="button" id="cancel-check" hidden>Cancel</button>
         <button type="button" id="download-report" disabled>Download report</button>
-        <p id="guard-status" role="status"></p>
+        <button type="button" id="clear-inputs">Clear inputs</button>
       </div>
     </form>
     <section id="guard-results" class="guard-results" aria-label="Check results" hidden></section>

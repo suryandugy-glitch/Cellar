@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { checkExport } from './pages/guard-engine.js';
+import { checkExport, draftHeaderContract } from './pages/guard-engine.js';
 
 const contract = readFileSync(new URL('../cellar.json', import.meta.url), 'utf8');
 const fixture = name => readFileSync(new URL('./pages/samples/' + name, import.meta.url), 'utf8');
@@ -42,4 +42,15 @@ test('invalid bounds and duplicate JSON keys fail closed', () => {
   assert.throws(() => checkExport('{"validateRows":true,"validateRows":false,"integrations":[]}', 'a'), /duplicate property/);
   const fakeBound = '{"integrations":[{"id":"a","required":["x"],"rules":{"x":{"type":"integer","min":{"source":"0"}}}}]}';
   assert.throws(() => checkExport(fakeBound, 'x\n1'), /JSON number/);
+});
+
+test('starter contracts keep headers and enforce row structure without collecting values', () => {
+  const source = draftHeaderContract('id;"item;name"\n1;private-data', ';');
+  const draft = JSON.parse(source);
+  assert.equal(draft.delimiter, ';');
+  assert.deepEqual(draft.integrations[0].required, ['id', 'item;name']);
+  assert.equal(draft.validateRows, true);
+  assert.ok(!source.includes('private-data'));
+  assert.equal(checkExport(source, 'id;"item;name"\n2;next').passed, true);
+  assert.throws(() => draftHeaderContract('id;item\n1', ';'), /column count/);
 });

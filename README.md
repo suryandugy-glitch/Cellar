@@ -47,9 +47,11 @@ Use the browser checker for one-off checks on mobile or desktop. The Java 21+ ap
 ### Use Cellar Guard on mobile or desktop
 
 1. Open the [CSV checker](https://cellar-csv.vercel.app/guard-app.html) on your phone or computer.
-2. Try **Load breaking example → Check export**. The report identifies the missing `order_id` column. Try the passing example next.
+2. Try **Load breaking example**. The report identifies the missing `order_id` column. Try the passing example next.
 3. For your own export, **Choose CSV file** or paste CSV text. **Choose JSON contract** or edit the example contract to describe what the receiving system needs.
-4. Select **Check export** and review the result by integration. Select **Download report** to save JSON findings.
+4. File selection validates the JSON immediately and runs the check when both inputs are ready. After pasting or editing text, select **Check export**. Use **Download report** to save the findings.
+
+Use **Validate contract** to check edited JSON without a CSV. To start from a known-good file, open **Create a starter contract from a known-good CSV** and download its header rules.
 
 The browser reads UTF-8 CSV files up to 8 MiB and contracts up to 1 MiB. Your CSV and contract stay on your device. Use the Java workspace for revisions, history and side-by-side header comparisons, and the CLI for release gates.
 
