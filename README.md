@@ -53,6 +53,8 @@ Use the browser checker for one-off checks on mobile or desktop. The Java 21+ ap
 3. Under **Import rules**, enter one required column per line, choose the delimiter, and tap **Use these rules**. Then select a CSV or paste its text. Open **Import or edit JSON** if you already have a contract or need advanced rules.
 4. File selection validates the JSON immediately and runs the check when both inputs are ready. After pasting or editing text, select **Check export**. Use **Download report** to save the findings.
 
+Use **Remember these rules on this device** to reuse required columns and the delimiter. Select **Get help** in the checker for quick answers or to contact Cellar Guard support.
+
 Use **Validate contract** to check edited JSON without a CSV. To start from a known-good file, open **Create a starter contract from a known-good CSV** and download its header rules.
 
 The browser reads UTF-8 CSV files up to 8 MiB and contracts up to 1 MiB. Your CSV and contract stay on your device. Use the Java workspace for revisions, history and side-by-side header comparisons, and the CLI for release gates.

@@ -14,7 +14,7 @@
   <header class="guard-header">
     <div class="guard-wrap guard-nav">
       <a class="guard-brand" href="./"><img src="./logo.svg" width="32" height="32" alt="">Cellar Studio</a>
-      <nav aria-label="Guard navigation"><a href="./guard.html">Cellar Guard</a><a href="./manual.html#web-app">How to use</a></nav>
+      <nav aria-label="Guard navigation"><a href="./guard.html">Cellar Guard</a><a href="#guard-help">Get help</a></nav>
     </div>
   </header>
   <main id="main" class="guard-wrap">
@@ -30,11 +30,16 @@
       </div>
     </section>
     <noscript><p class="guard-notice">Enable JavaScript to use the browser checker, or <a href="./manual.html#install">download the Java app</a>.</p></noscript>
+    <nav class="guard-shortcuts" aria-label="Check a CSV">
+      <a href="#contract-title">Set import rules</a>
+      <a href="#csv-title">Add CSV</a>
+      <a href="#guard-actions">Go to check</a>
+    </nav>
     <form id="guard-form" novalidate>
       <p id="guard-status" class="guard-notice" role="status">Enter the required columns, choose a CSV, or try an example above.</p>
       <div class="guard-inputs">
         <section class="guard-card guard-contract" aria-labelledby="contract-title">
-          <header><h2 id="contract-title">Import rules</h2><p>Build a contract here or use an existing JSON contract.</p></header>
+          <header><h2 id="contract-title" tabindex="-1">Import rules</h2><p>Build a contract here or use an existing JSON contract.</p></header>
           <div class="guard-builder">
             <label for="builder-columns">Required columns</label>
             <p id="builder-help">Enter one column name per line, using the names the receiving app expects.</p>
@@ -42,7 +47,14 @@
               aria-describedby="builder-help" placeholder="order_id&#10;sku"></textarea>
             <label for="builder-delimiter">Contract delimiter</label>
             <select id="builder-delimiter"><option value=",">Comma</option><option value=";">Semicolon</option><option value="tab">Tab</option></select>
-            <button type="button" id="apply-rules">Use these rules</button>
+            <label class="guard-remember" for="remember-rules">
+              <input type="checkbox" id="remember-rules"> Remember these rules on this device
+            </label>
+            <div class="guard-builder-actions">
+              <button type="button" id="apply-rules">Use these rules</button>
+              <button type="button" id="forget-rules" hidden>Forget saved rules</button>
+            </div>
+            <p id="saved-rules-status" role="status"></p>
           </div>
           <p id="contract-file-status" class="guard-file-status" aria-live="polite"></p>
           <details class="guard-json">
@@ -58,7 +70,7 @@
           </details>
         </section>
         <section class="guard-card guard-csv" aria-labelledby="csv-title">
-          <header><h2 id="csv-title">Proposed export</h2><p>Choose a UTF-8 CSV up to 8 MiB, or paste CSV text.</p></header>
+          <header><h2 id="csv-title" tabindex="-1">Proposed export</h2><p>Choose a UTF-8 CSV up to 8 MiB, or paste CSV text.</p></header>
           <label class="guard-upload" for="csv-file">Choose CSV file</label>
           <input id="csv-file" type="file" accept=".csv,.tsv,text/csv,text/tab-separated-values,text/plain" aria-describedby="csv-file-status">
           <p id="csv-file-status" class="guard-file-status" aria-live="polite"></p>
@@ -74,7 +86,7 @@
           </details>
         </section>
       </div>
-      <div class="guard-action-bar">
+      <div class="guard-action-bar" id="guard-actions" tabindex="-1">
         <button type="submit" id="run-check" disabled>Check export</button>
         <button type="button" id="cancel-check" hidden>Cancel</button>
         <button type="button" id="download-report" disabled>Download report</button>
@@ -82,6 +94,28 @@
       </div>
     </form>
     <section id="guard-results" class="guard-results" aria-label="Check results" hidden></section>
+    <section id="guard-help" tabindex="-1" class="guard-card guard-help" aria-labelledby="guard-help-title">
+      <header><h2 id="guard-help-title">Help with Cellar Guard</h2><p>Find an answer or send the team a question.</p></header>
+      <div class="guard-help-content">
+        <details>
+          <summary>Can I check a CSV without a JSON file?</summary>
+          <p>Yes. Enter one required column name per line under Import rules, choose the delimiter, then tap Use these rules. Add your CSV file or paste its text and tap Check export.</p>
+        </details>
+        <details>
+          <summary>Where do I find my CSV on a phone?</summary>
+          <p>In your spreadsheet app, export or save a copy as CSV. Then use Choose CSV file to find it in Files or Downloads. You can also paste CSV text into the checker.</p>
+        </details>
+        <details>
+          <summary>Why was my export blocked?</summary>
+          <p>Open the failing integration to see the column name, record number, and suggested fix. A missing column means the export header differs from what the import rules require.</p>
+        </details>
+        <p>For a reply, include your email and the error message. Keep customer records out of the message.</p>
+        <div class="guard-help-actions">
+          <a href="./contact.html?topic=guard#enquiry-form" target="_blank" rel="noopener">Ask for help <span>(opens a new tab)</span></a>
+          <a href="./manual.html#web-app">Read the guide</a>
+        </div>
+      </div>
+    </section>
   </main>
   <!-- STUDIO_FOOTER -->
 </body>
