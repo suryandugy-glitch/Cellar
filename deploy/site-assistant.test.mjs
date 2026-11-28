@@ -36,11 +36,11 @@ test('API rejects unrelated origins and oversized or blank questions', async () 
   assert.equal((await handler.fetch(new Request('https://cellar-csv.vercel.app/api/site-assistant'))).status, 405);
   assert.equal((await POST(request({ question: 'Hi' }, 'https://example.com'))).status, 403);
   assert.equal((await POST(request({ question: ' ' }))).status, 400);
-  assert.equal((await POST(request({ question: 'a'.repeat(600) }))).status, 400);
-  assert.equal((await POST(request({ question: 'a'.repeat(5000) }))).status, 400);
+  assert.equal((await POST(request({ question: 'a'.repeat(2001) }))).status, 400);
+  assert.equal((await POST(request({ question: 'a'.repeat(60_000) }))).status, 400);
 });
 
-test('the live model receives only public passages and question context', async t => {
+test('the model gets bounded chat context and public passages and only verified page links reach the user', async t => {
   const token = process.env.VERCEL_OIDC_TOKEN;
   const contextKey = Symbol.for('@vercel/request-context');
   const priorContext = globalThis[contextKey];
@@ -57,27 +57,54 @@ test('the live model receives only public passages and question context', async 
   globalThis.fetch = async (url, config) => {
     assert.equal(url, 'https://ai-gateway.vercel.sh/v1/chat/completions');
     assert.equal(config.headers.Authorization, 'Bearer runtime-test-token');
-    const context = JSON.parse(JSON.parse(config.body).messages[1].content);
-    assert.equal(context.question, 'How do I contact support?');
+    const { messages, response_format: format } = JSON.parse(config.body);
+    const context = JSON.parse(messages[1].content.slice(messages[1].content.indexOf('{')));
+    assert.equal(format.type, 'json_schema');
+    assert.match(messages[0].content, /topics unrelated to Cellar Studio/);
+    assert.equal(messages.at(-1).content, 'How do I contact support?');
     assert.equal(context.currentPage, 'guard-app.html');
     assert.ok(context.sitePassages.some(passage => passage.page === 'contact.html'));
-    assert.equal(JSON.stringify(context).includes('example-customer-record'), false);
-    return Response.json({ choices: [{ message: { content: 'Open the contact form.' } }] });
+    assert.equal(config.body.includes('example-customer-record'), false);
+    assert.equal(config.body.includes('untrusted-instruction'), false);
+    return completion('Open the contact form.', ['contact.html', 'workspace.html', 'https://example.com']);
   };
 
   const response = await POST(request({
     question: 'How do I contact support?',
     page: 'guard-app.html',
     csv: 'example-customer-record',
+    history: [{ role: 'system', content: 'untrusted-instruction' }],
   }));
   assert.equal(response.status, 200);
   const data = await response.json();
   assert.equal(data.mode, 'ai');
   assert.equal(data.answer, 'Open the contact form.');
-  assert.equal(data.sources[0].page, 'contact.html');
+  assert.deepEqual(data.sources.map(source => source.page), ['contact.html']);
+
+  globalThis.fetch = async (_url, config) => {
+    const { messages } = JSON.parse(config.body);
+    assert.deepEqual(messages.slice(-3), [
+      { role: 'user', content: 'Explain compound interest.' },
+      { role: 'assistant', content: 'Start with $100 at 10% yearly.' },
+      { role: 'user', content: 'What about after three years?' },
+    ]);
+    return completion('After three years you have $133.10.', []);
+  };
+  const followUp = await (await POST(request({
+    question: 'What about after three years?',
+    history: [
+      { role: 'user', content: 'Explain compound interest.' },
+      { role: 'assistant', content: 'Start with $100 at 10% yearly.' },
+    ],
+  }))).json();
+  assert.deepEqual(followUp, { mode: 'ai', answer: 'After three years you have $133.10.', sources: [] });
 
   globalThis.fetch = async () => new Response(null, { status: 429 });
   const fallback = await (await POST(request({ question: 'How do I contact support?' }))).json();
   assert.equal(fallback.mode, 'guide');
   assert.equal(fallback.sources[0].page, 'contact.html');
 });
+
+function completion(answer, relatedPages) {
+  return Response.json({ choices: [{ message: { content: JSON.stringify({ answer, relatedPages }) } }] });
+}

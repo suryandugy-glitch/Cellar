@@ -61,7 +61,7 @@ The browser reads UTF-8 CSV files up to 8 MiB and contracts up to 1 MiB. Your CS
 
 ### Ask the website assistant
 
-Select **Ask Cellar** on the public website. The assistant answers questions using public site pages and links to the relevant instructions. On static hosting or when the model is unavailable, it shows matching passages from the site guide. The checker keeps CSVs and contracts on the device.
+Open [Ask Cellar](https://cellar-csv.vercel.app/?ask=1) on your phone or computer. Ask a general question, choose **Show me a CSV demo** for a worked Cellar Guard example, or ask about the page you’re on. The assistant can follow recent turns and links to relevant public pages when it uses them. Select **Expand** for a larger chat and **New chat** to clear the conversation on the page. When the model is unavailable, the site guide provides public help. The checker keeps CSVs and contracts on the device.
 
 ### Download and run (no source build)
 

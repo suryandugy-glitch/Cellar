@@ -357,6 +357,41 @@ with sync_playwright() as playwright:
             'element => element === document.activeElement')
         page.unroute(BASE + 'api/site-assistant')
 
+    # General chat carries follow-up context and New chat clears it.
+    requests = []
+
+    def mock_assistant(route):
+        requests.append(route.request.post_data_json)
+        route.fulfill(json={'mode': 'ai', 'answer': 'Worked example reply.', 'sources': []})
+
+    page.set_viewport_size({'width': 320, 'height': 650})
+    page.route(BASE + 'api/site-assistant', mock_assistant)
+    page.goto(BASE + 'guard-app.html?ask=1')
+    assistant = page.get_by_role('dialog', name='Ask Cellar')
+    assistant.get_by_role('button', name='Expand').click()
+    assert assistant.get_by_role('button', name='Expand').get_attribute('aria-pressed') == 'true'
+    layout = assistant.evaluate('''element => ({
+        fits: element.scrollWidth <= element.clientWidth + 1,
+        overflow: [element, ...element.querySelectorAll('*')]
+            .filter(node => node.scrollWidth > node.clientWidth + 1)
+            .map(node => [node.className || node.tagName, node.clientWidth, node.scrollWidth]),
+    })''')
+    assert layout['fits'], layout['overflow']
+    assistant.get_by_role('button', name='Explain a general topic').click()
+    assistant.get_by_text('Worked example reply.', exact=True).wait_for()
+    assistant.get_by_label('Your question').fill('What happens in year three?')
+    assistant.get_by_role('button', name='Ask', exact=True).click()
+    assistant.get_by_text('Worked example reply.', exact=True).nth(1).wait_for()
+    assert requests[1]['history'] == [
+        {'role': 'user', 'content': requests[0]['question']},
+        {'role': 'assistant', 'content': 'Worked example reply.'},
+    ]
+    assistant.get_by_role('button', name='New chat').click()
+    assert assistant.get_by_text('Worked example reply.', exact=True).count() == 0
+    assistant.get_by_role('button', name='Show me a CSV demo').click()
+    assistant.get_by_text('Worked example reply.', exact=True).wait_for()
+    assert requests[2]['history'] == []
+
     assert not errors, errors
     print(f'Checked {len(ROUTES)} routes at four widths, privacy choices, enquiry validation and mobile menu.')
     browser.close()
