@@ -72,7 +72,8 @@
       trigger.setAttribute('aria-label', 'Change theme. Current selection: ' + visibleName);
       trigger.setAttribute('title', 'Change theme (currently ' + visibleName + ')');
       trigger.querySelector('.studio-theme-glyph').textContent = resolved === 'dark' ? '☾' : '☼';
-      trigger.querySelector('.studio-theme-caption').textContent = 'THEME · ' + visibleName.toUpperCase();
+      const status = document.querySelector('#studio-theme-current');
+      if (status) status.textContent = visibleName + ' selected';
     }
     document.querySelectorAll('input[name="studio-theme-choice"]').forEach(input => {
       input.checked = input.value === preference;
@@ -88,7 +89,7 @@
     picker.className = 'studio-theme-picker';
     picker.innerHTML = `
       <div id="studio-theme-menu" class="studio-theme-menu" hidden>
-        <p class="studio-theme-heading">Appearance</p>
+        <div class="studio-theme-menu-head"><p class="studio-theme-heading">Appearance</p><span id="studio-theme-current" class="studio-theme-current"></span></div>
         <p class="studio-theme-hint">Choose a theme for all Cellar Studio pages.</p>
         <fieldset class="studio-theme-options">
           <legend class="studio-theme-sr-only">Choose site theme</legend>
@@ -100,9 +101,8 @@
         <a class="studio-theme-editor-link" href="./themes.html">Customize colors and settings</a>
       </div>
       <button id="studio-theme-toggle" class="studio-theme-toggle" type="button"
-        aria-controls="studio-theme-menu" aria-expanded="false">
+        aria-label="Change theme" aria-haspopup="true" aria-controls="studio-theme-menu" aria-expanded="false">
         <span class="studio-theme-glyph" aria-hidden="true"></span>
-        <span class="studio-theme-caption"></span>
       </button>`;
     document.body.appendChild(picker);
 
