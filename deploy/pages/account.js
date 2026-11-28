@@ -55,8 +55,10 @@ async function signInPage() {
   const name = element('account-name');
   const password = element('account-password');
   const remember = element('account-remember');
+  const providerStatus = element('provider-status');
   let mode = 'signin';
   let available = false;
+  const enabledProviders = new Set();
 
   function setMode(next) {
     mode = next;
@@ -65,7 +67,6 @@ async function signInPage() {
     element('name-field').hidden = !signup;
     name.disabled = !signup;
     name.required = signup;
-    element('account-title').textContent = signup ? 'Create your account' : 'Welcome back';
     element('account-hint').textContent = signup ? 'Verify your email to activate your account.' : 'Enter your email and password to continue.';
     const label = signup ? 'Create account' : 'Sign in';
     element('account-submit').firstChild.textContent = label + ' ';
@@ -77,7 +78,9 @@ async function signInPage() {
 
   function busy(active) {
     fields.disabled = active || !available;
-    for (const button of [...modes, ...providers]) button.disabled = active;
+    remember.disabled = active || !available;
+    for (const button of modes) button.disabled = active;
+    for (const button of providers) button.disabled = active || !enabledProviders.has(button.dataset.provider);
   }
 
   for (const button of modes) button.addEventListener('click', () => setMode(button.dataset.accountMode));
@@ -120,16 +123,27 @@ async function signInPage() {
     const result = await request('session');
     if (result.user) return goToAccount();
     available = result.available;
+    for (const provider of result.providers || []) {
+      if (available) enabledProviders.add(provider);
+    }
+    const pending = providers.filter(button => !enabledProviders.has(button.dataset.provider));
+    providerStatus.hidden = pending.length === 0;
+    if (pending.length === providers.length) {
+      providerStatus.textContent = 'Google and Microsoft sign-in are awaiting setup.';
+    } else if (pending.length === 1) {
+      const providerName = pending[0].dataset.provider === 'google' ? 'Google' : 'Microsoft';
+      providerStatus.textContent = `${providerName} sign-in is awaiting setup.`;
+    }
+    element('remember-field').hidden = !available;
+    element('email-account').hidden = !available;
     busy(false);
-    for (const button of providers) button.hidden = !result.providers?.includes(button.dataset.provider);
-    element('account-providers').hidden = providers.every(button => button.hidden);
-    if (!available) return message('Accounts are not available yet. You can still explore the site as a guest.');
+    if (!available) return;
     const notice = params.get('notice');
     if (notice === 'provider') message('Provider sign-in could not be completed. Try again.', true);
     if (notice === 'confirm') message('This confirmation link is invalid or has expired.', true);
     if (notice === 'verified') message('Email verified. Sign in to access your account.');
   } catch {
-    message('Sign-in could not be loaded. You can still explore the site as a guest.', true);
+    providerStatus.textContent = 'Sign-in could not be loaded. You can still explore the site as a guest.';
   }
 }
 

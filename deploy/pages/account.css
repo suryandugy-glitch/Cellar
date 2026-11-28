@@ -99,7 +99,7 @@ html[data-theme="dark"] .account-page {
   background: var(--account-surface);
   box-shadow: 0 18px 46px #22351b14;
 }
-.account-tabs { display: flex; gap: 5px; padding: 4px; margin-bottom: 22px; border: 1px solid var(--account-line); background: var(--account-soft); border-radius: 8px; }
+.account-tabs { display: flex; gap: 5px; padding: 4px; margin-bottom: 12px; border: 1px solid var(--account-line); background: var(--account-soft); border-radius: 8px; }
 .account-tabs button { flex: 1; min-height: 40px; padding: 6px 4px; color: var(--account-muted); background: transparent; border: 1px solid transparent; border-radius: 5px; font: 650 13px/1.2 system-ui, sans-serif; }
 .account-tabs [aria-pressed="true"] { color: var(--account-ink); background: var(--account-surface); border-color: var(--account-line); }
 .account-card h2 { font-size: clamp(27px, 3.2vw, 36px); line-height: 1.05; margin: 0 0 7px; letter-spacing: -.05em; color: var(--account-ink); }
@@ -118,7 +118,7 @@ html[data-theme="dark"] .account-page {
   font-size: 16px;
 }
 .account-card input::placeholder { color: var(--account-muted); opacity: .88; }
-.account-card label.account-check { display: flex; align-items: flex-start; gap: 7px; margin: 2px 0 0; font-size: 12px; font-weight: 550; }
+.account-card label.account-check { display: flex; align-items: flex-start; gap: 7px; margin: 12px 0 0; font-size: 12px; font-weight: 550; }
 .account-check input { accent-color: #4e7137; width: 16px; height: 16px; margin: 1px 0 0; flex: none; }
 .account-page button:not(:disabled) { cursor: pointer; }
 .account-page button:disabled, .account-page fieldset:disabled { opacity: .67; }
@@ -139,9 +139,10 @@ html[data-theme="dark"] .account-page {
 .account-primary:hover { background: #366747; }
 .account-divider { display: flex; align-items: center; gap: 10px; color: var(--account-muted); font-size: 11px; margin: 17px 0 10px; }
 .account-divider::before, .account-divider::after { content: ""; flex: 1; border-top: 1px solid var(--account-line); }
-.account-providers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
-.account-providers button { display: flex; justify-content: center; align-items: center; gap: 7px; min-height: 43px; padding: 6px; border-radius: 7px; border: 1px solid var(--account-line); background: var(--account-surface); color: var(--account-ink); font: 650 13px/1.2 system-ui, sans-serif; }
-.account-providers button:hover { background: var(--account-soft); }
+.account-providers { display: grid; gap: 8px; }
+.account-providers button { display: flex; justify-content: center; align-items: center; gap: 9px; min-height: 44px; padding: 7px; border-radius: 7px; border: 1px solid var(--account-line); background: var(--account-surface); color: var(--account-ink); font: 650 14px/1.2 system-ui, sans-serif; }
+.account-providers button:hover:not(:disabled) { background: var(--account-soft); }
+.account-provider-status { color: var(--account-muted); font-size: 13px; margin: 10px 0 0; }
 .provider-google { color: #2457c6; font-weight: 850; font-size: 16px; width: 16px; line-height: 1; text-align: center; background: #fff; border-radius: 50%; }
 .provider-microsoft { display: grid; grid-template-columns: repeat(2, 7px); grid-auto-rows: 7px; gap: 1px; }
 .provider-microsoft i:nth-child(1) { background: #f25022; }
