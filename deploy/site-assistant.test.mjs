@@ -7,8 +7,9 @@ import handler, { POST } from '../api/site-assistant.mjs';
 const output = new URL('../build/vercel/', import.meta.url);
 const documents = JSON.parse(await readFile(new URL('assistant-index.json', output), 'utf8'));
 
-test('assistant indexes the public pages and excludes the workspace', async () => {
-  const pages = (await readdir(output)).filter(name => name.endsWith('.html') && name !== 'workspace.html');
+test('assistant indexes public pages and excludes account and workspace pages', async () => {
+  const excluded = new Set(['workspace.html', 'signin.html', 'account.html']);
+  const pages = (await readdir(output)).filter(name => name.endsWith('.html') && !excluded.has(name));
   assert.deepEqual(documents.map(doc => doc.page).sort(), pages.sort());
   assert.ok(documents.every(doc => doc.sections.length > 0));
   for (const page of pages) {

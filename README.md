@@ -20,9 +20,13 @@
 
 ## Cellar Studio
 
-[Cellar Studio](https://cellar-csv.vercel.app/) is the main company identity and homepage. Products, team information, documentation and policy pages live beneath that identity. The studio works on practical software problems with careful engineering and reproducible evidence.
+[Cellar Studio](https://cellar-csv.vercel.app/studio.html) is the public studio homepage. Products, team information, documentation and policy pages live beneath that identity. The studio works on practical software problems with careful engineering and reproducible evidence.
 
 **Site appearance:** Select the compact sun/moon icon in the bottom-right corner of any page to open the **Appearance** dropdown and choose **System**, **Light**, **Dark**, or a saved **Custom** theme. [Theme Studio](https://cellar-csv.vercel.app/themes.html) includes **12 curated presets** in Minimalist, Brutalist and Studio styles, plus **30 mix-and-match palette swatches** and manual HEX input. Users can create up to 12 named themes, adjust eight colors, choose a visual style (flat minimalist surfaces or bold brutalist borders and shadows), select larger text/rounded corners/reduced motion, preview, and import/export theme JSON. Saving applies the choice to Studio, Guard, the browser checker, manuals, Products, About and policy pages. Preferences stay in that browser, not on an account or server. System follows the device's light/dark setting.
+
+## Cellar Studio accounts
+
+The [sign-in page](https://cellar-csv.vercel.app/signin.html) supports email registration and verification, Google and Microsoft OAuth, and a **Keep me signed in** option. Returning users with a valid session open their account automatically. Guests can continue to the public studio. Accounts and the sign-in landing are activated through the [Supabase and Vercel setup guide](docs/ACCOUNTS.md).
 
 ## Products
 
@@ -62,7 +66,7 @@ The browser reads UTF-8 CSV files up to 8 MiB and contracts up to 1 MiB. Your CS
 
 ### Ask the website assistant
 
-Open [Ask Cellar](https://cellar-csv.vercel.app/?ask=1) on your phone or computer. Ask a general question, choose **Show me a CSV demo** for a worked Cellar Guard example, or ask about the page you’re on. The assistant can follow recent turns and links to relevant public pages when it uses them. Select **Expand** for a larger chat and **New chat** to clear the conversation on the page. When the model is unavailable, the site guide provides public help. The checker keeps CSVs and contracts on the device.
+Open [Ask Cellar](https://cellar-csv.vercel.app/studio.html?ask=1) on your phone or computer. Ask a general question, choose **Show me a CSV demo** for a worked Cellar Guard example, or ask about the page you’re on. The assistant can follow recent turns and links to relevant public pages when it uses them. Select **Expand** for a larger chat and **New chat** to clear the conversation on the page. When the model is unavailable, the site guide provides public help. The checker keeps CSVs and contracts on the device.
 
 ### Download and run (no source build)
 

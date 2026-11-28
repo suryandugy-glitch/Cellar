@@ -10,8 +10,8 @@ const footerMarker = '<!-- STUDIO_FOOTER -->';
 const links = '  <link rel="stylesheet" href="./theme-system.css">\n' +
   '  <link rel="stylesheet" href="./studio-maximal.css">\n' +
   '  <link rel="stylesheet" href="./studio-footer.css">\n' +
-  '  <link rel="stylesheet" href="./cookie-consent.css">\n' +
-  '  <script src="./theme-system.js"></script>\n' +
+  '  <script src="./theme-system.js"></script>\n';
+const consentLinks = '  <link rel="stylesheet" href="./cookie-consent.css">\n' +
   '  <script src="./cookie-consent.js" defer></script>\n';
 const assistantLinks = '  <link rel="stylesheet" href="./site-assistant.css">\n' +
   '  <script src="./site-assistant.js" type="module"></script>\n';
@@ -20,7 +20,8 @@ let count = 0;
 for (const name of pages) {
   const path = resolve(root, name);
   let html = await readFile(path, 'utf8');
-  if (name !== 'workspace.html' && !html.includes('site-assistant.js')) {
+  const accountPage = html.includes('data-account-page=');
+  if (name !== 'workspace.html' && !html.includes('site-assistant.js') && !accountPage) {
     html = html.replace(/<\/head>/i, assistantLinks + '</head>');
   }
   if (html.includes(footerMarker)) html = html.replace(footerMarker, footerTemplate.trim());
@@ -29,7 +30,7 @@ for (const name of pages) {
     continue;
   }
   if (!/<\/head>/i.test(html)) throw new Error(`Missing closing head in ${name}`);
-  await writeFile(path, html.replace(/<\/head>/i, `${links}</head>`));
+  await writeFile(path, html.replace(/<\/head>/i, `${links}${accountPage ? '' : consentLinks}</head>`));
   count++;
 }
 await buildAssistantIndex(root, pages);

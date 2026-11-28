@@ -9,3 +9,5 @@ build/
 data/
 master.key
 dist/
+
+node_modules/

@@ -14,12 +14,13 @@ const files = (await readdir(root)).filter(file => file.endsWith('.html'));
 assert.ok(files.length >= 23, 'expected Guard, theme editor, manual, sample, and company pages');
 for (const file of files) {
   const html = await readFile(resolve(root, file), 'utf8');
+  const accountPage = html.includes('data-account-page=');
   assert.equal(html.split('theme-system.css').length - 1, 1, `${file}: missing/duplicate theme CSS`);
   assert.equal(html.split('studio-maximal.css').length - 1, 1, `${file}: missing/duplicate Studio style`);
   assert.equal(html.split('studio-footer.css').length - 1, 1, `${file}: missing/duplicate footer CSS`);
-  assert.equal(html.split('cookie-consent.css').length - 1, 1, `${file}: missing/duplicate consent CSS`);
+  assert.equal(html.split('cookie-consent.css').length - 1, accountPage ? 0 : 1, `${file}: consent CSS`);
   assert.equal(html.split('theme-system.js').length - 1, 1, `${file}: missing/duplicate theme JS`);
-  assert.equal(html.split('cookie-consent.js').length - 1, 1, `${file}: missing/duplicate consent JS`);
+  assert.equal(html.split('cookie-consent.js').length - 1, accountPage ? 0 : 1, `${file}: consent JS`);
   for (const image of html.matchAll(/<img\b[^>]*>/gi)) {
     assert.match(image[0], /\balt\s*=/i, `${file}: image missing alt attribute`);
   }

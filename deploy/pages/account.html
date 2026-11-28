@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>My account | Cellar Studio</title>
+  <link rel="icon" href="./logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./account.css">
+  <script type="module" src="./account.js"></script>
+</head>
+<body class="account-page" data-account-page="profile">
+  <header class="account-header">
+    <a class="account-brand" href="./studio.html"><span class="account-mark"><img src="./logo.svg" alt="" width="23" height="23"></span>Cellar<span>Studio</span></a>
+    <a class="account-top-link" href="./studio.html">Explore the studio</a>
+  </header>
+  <main class="account-main">
+    <section class="account-intro" aria-labelledby="profile-title">
+      <div class="account-motif" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
+      <h1 id="profile-title">Your Cellar<br><em>Studio account.</em></h1>
+      <p>See which account you’re signed in with.</p>
+    </section>
+    <section class="account-card" aria-labelledby="account-title">
+      <h2 id="account-title">My account</h2>
+      <p class="account-status" id="account-status" role="status" aria-live="polite">Checking your session…</p>
+      <dl class="account-profile" id="account-profile" hidden>
+        <div><dt>Name</dt><dd id="profile-name"></dd></div>
+        <div><dt>Email address</dt><dd id="profile-email"></dd></div>
+      </dl>
+      <div class="account-profile-actions" id="profile-actions" hidden>
+        <a class="account-primary" href="./studio.html">Go to Cellar Studio <span aria-hidden="true">→</span></a>
+        <button id="account-logout" class="account-guest" type="button">Sign out</button>
+      </div>
+    </section>
+  </main>
+  <footer class="account-footer"><span>Cellar Studio</span><nav aria-label="Account policies"><a href="./privacy.html">Privacy</a><a href="./terms.html">Terms</a><a href="./contact.html">Help</a></nav></footer>
+</body>
+</html>

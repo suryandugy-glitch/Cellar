@@ -11,6 +11,7 @@ mkdir -p "$samples"
 cp cellar.json "$samples/contract.json"
 cp "$web/app.css" "$web/app.js" "$web/logo.svg" "$site/"
 cp deploy/pages/*.html deploy/pages/*.css deploy/pages/*.js deploy/pages/*.svg "$site/"
+rm -f "$site/signin.html" "$site/account.html"
 # Company homepage at /; preserve the existing CSV product page at /guard.html.
 cp "$site/index.html" "$site/guard.html"
 cp "$site/studio.html" "$site/index.html"

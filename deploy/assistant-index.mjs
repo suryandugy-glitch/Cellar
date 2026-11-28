@@ -16,6 +16,7 @@ export async function buildAssistantIndex(directory, files) {
   for (const page of files) {
     if (!/^[a-z0-9-]+\.html$/.test(page) || page === 'workspace.html') continue;
     const html = await readFile(resolve(directory, page), 'utf8');
+    if (html.includes('data-account-page=')) continue;
     const label = plainText(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1] ?? page);
     const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i)?.[1] ?? '';
     const content = main.replace(/<(script|style|svg|template)\b[^>]*>[\s\S]*?<\/\1>/gi, ' ');
