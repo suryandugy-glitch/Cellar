@@ -4,7 +4,14 @@
 
 Cellar Guard is a Java 21+ CSV contract checker. It compares a candidate CSV export with the expectations of one or more downstream consumers. When a required header disappears or a declared value rule fails, its command-line checker returns a blocking exit code that CI can use as a release gate.
 
-The [Studio homepage](https://cellar-csv.vercel.app/) and [Guard product page](https://cellar-csv.vercel.app/guard.html) are static sites containing synthetic examples. Actual CSV validation runs locally, in CI, or on a separately operated Java workspace. The public Vercel site does not analyze customer CSV files.
+## Use the browser checker on a phone or computer
+
+1. Open the [Cellar Guard CSV checker](https://cellar-csv.vercel.app/guard-app.html).
+2. Choose **Load breaking example**, then **Check export**. The inventory report fails because the export renamed `order_id` to `id`. Load the passing example to see the expected structure.
+3. Open your own UTF-8 CSV using **Choose CSV file** or paste its text. Load a JSON contract or edit the example. Use the receiving application's expected column names and rules.
+4. Read the verdict, expand each integration for record numbers and suggested fixes, and use **Download report** to save the JSON result.
+
+The app checks files on the device, up to 8 MiB for a CSV and 1 MiB for a contract. Selecting a file uses its contents. Editing the text field switches back to pasted text. The [contract reference](CONTRACTS.md) lists the rules. Use the Java CLI for merge gates and the local Java workspace for comparisons and history.
 
 ## Fastest start — download the ready-to-run ZIP
 
@@ -192,7 +199,7 @@ Open the address printed by the process (usually `http://127.0.0.1:8080`). You c
 | Exit code `1` in CI | Read the blocking integration, expected header/value rule and affected CSV row numbers |
 | Exit code `2` in CI | Check contract JSON, paths, permissions and export generator logs; do not treat it as success |
 | CI always green | Confirm the CSV is generated from PR code and the correct reviewed contract is used |
-| Browser demo doesn't accept your CSV | Expected: public demo is static; run Java locally or operate a backend |
+| Browser checker cannot read your CSV | Check that the file is UTF-8 and no larger than 8 MiB |
 
 ## 8. Security and limitations
 

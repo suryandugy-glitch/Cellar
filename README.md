@@ -10,6 +10,7 @@
   <a href="https://cellar-csv.vercel.app/products.html">Products</a> ·
   <a href="https://cellar-csv.vercel.app/about.html">About</a> ·
   <a href="https://cellar-csv.vercel.app/guard.html">Cellar Guard</a> ·
+  <a href="https://cellar-csv.vercel.app/guard-app.html">Browser checker</a> ·
   <a href="https://github.com/suryandugy-glitch/Cellar-Studio/releases/tag/guard-v3.1.0">Download Guard</a> ·
   <a href="https://cellar-csv.vercel.app/manual.html">Online manual</a> ·
   <a href="docs/CELLAR_GUARD_MANUAL.md">Technical manual</a> ·
@@ -41,7 +42,16 @@ Cellar Guard: Required column "order_id" is missing.
 Release gate: BLOCK (exit 1)
 ```
 
-This is a **working Java pilot** with a local web workspace, CLI, tests, and an example GitHub Actions workflow. It is not a hosted SaaS. The public Studio homepage and product page are static, synthetic demonstrations; they do not run checks on uploaded customer files.
+Use the browser checker for one-off checks on mobile or desktop. The Java 21+ app provides a local workspace, CLI and pull-request checks.
+
+### Use Cellar Guard on mobile or desktop
+
+1. Open the [CSV checker](https://cellar-csv.vercel.app/guard-app.html) on your phone or computer.
+2. Try **Load breaking example → Check export**. The report identifies the missing `order_id` column. Try the passing example next.
+3. For your own export, **Choose CSV file** or paste CSV text. **Choose JSON contract** or edit the example contract to describe what the receiving system needs.
+4. Select **Check export** and review the result by integration. Select **Download report** to save JSON findings.
+
+The browser reads UTF-8 CSV files up to 8 MiB and contracts up to 1 MiB. Your CSV and contract stay on your device. Use the Java workspace for revisions, history and side-by-side header comparisons, and the CLI for release gates.
 
 ### Download and run (no source build)
 
@@ -184,7 +194,7 @@ The primary website remains **[Cellar Studio](https://cellar-csv.vercel.app/)**.
 - Run `java Build.java test` for Java changes and `node deploy/build-vercel.mjs && node --test deploy/theme.test.mjs` for website changes.
 - Reports avoid storing CSV cell values; treat customer data, headers, and contract metadata as sensitive nonetheless.
 - Validation proves only that the **declared rules** passed, not that every downstream behavior is correct.
-- The public site is informational and does not expose the Java backend or a customer-data upload endpoint.
+- The public checker validates files in a browser worker. The Java workspace and CLI handle saved history and CI runs.
 - No commercial service, security certification, or production SLA is claimed.
 
 Contributions are welcome: read [CONTRIBUTING.md](CONTRIBUTING.md), [security guidance](SECURITY.md) and [the docs index](docs/README.md). The code is provided under the [MIT license](LICENSE).

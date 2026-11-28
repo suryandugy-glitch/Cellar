@@ -7,6 +7,7 @@ const root = resolve(directory);
 const footerTemplate = await readFile(new URL('./site-footer.html', import.meta.url), 'utf8');
 const footerMarker = '<!-- STUDIO_FOOTER -->';
 const links = '  <link rel="stylesheet" href="./theme-system.css">\n' +
+  '  <link rel="stylesheet" href="./studio-maximal.css">\n' +
   '  <link rel="stylesheet" href="./studio-footer.css">\n' +
   '  <link rel="stylesheet" href="./cookie-consent.css">\n' +
   '  <script src="./theme-system.js"></script>\n' +
