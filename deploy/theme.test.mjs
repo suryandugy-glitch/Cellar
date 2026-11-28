@@ -4,10 +4,10 @@ import { resolve } from 'node:path';
 
 const root = resolve('build/vercel');
 const redirects = JSON.parse(await readFile(resolve('vercel.json'), 'utf8')).redirects;
-assert.ok(redirects.some(route => route.source === '/' && route.destination === '/guard.html' &&
-  route.has?.some(check => check.type === 'host' && check.value === 'cellar-csv.vercel.app')),
-  'CSV domain must open Cellar Guard');
-assert.ok(redirects.some(route => route.source === '/' && route.destination === 'https://cellar-csv.vercel.app/studio.html' &&
+assert.ok(!redirects.some(route => route.source === '/' &&
+  (!route.has || route.has.some(check => check.type === 'host' && check.value === 'cellar-csv.vercel.app'))),
+  'CSV domain root must serve the Studio index without a redirect');
+assert.ok(redirects.some(route => route.source === '/' && route.destination === 'https://cellar-csv.vercel.app/' &&
   route.has?.some(check => check.type === 'host' && check.value === 'cellar-studio-hq.vercel.app')),
   'legacy studio domain must lead to the CSV domain');
 const files = (await readdir(root)).filter(file => file.endsWith('.html'));
@@ -34,16 +34,18 @@ assert.match(home, /We build what/);
 assert.match(home, /comes next/);
 assert.match(home, /studio-vision\.css/);
 assert.match(home, /studio-vision\.js/);
+assert.match(home, /id="possibilities"/);
+assert.match(home, /rel="canonical" href="https:\/\/cellar-csv\.vercel\.app\/"/);
 const guard = await readFile(resolve(root, 'guard.html'), 'utf8');
-assert.match(guard, /href="\.\/studio\.html#possibilities"/);
+assert.match(guard, /href="\.\/#possibilities"/);
 const studio = await readFile(resolve(root, 'studio.html'), 'utf8');
-assert.match(studio, /href="https:\/\/cellar-csv\.vercel\.app\/studio\.html"/);
+assert.match(studio, /href="https:\/\/cellar-csv\.vercel\.app\/"/);
 assert.match(studio, /href="\.\/guard\.html"/);
 assert.match(studio, /id="possibilities"/);
 for (const file of files) {
   const html = await readFile(resolve(root, file), 'utf8');
   assert.doesNotMatch(html, /cellar-studio-hq\.vercel\.app/, `${file}: old public hostname`);
-  assert.doesNotMatch(html, /href="\.\/#possibilities"/, `${file}: dead root anchor`);
+  assert.doesNotMatch(html, /href="\.\/studio\.html#possibilities"/, `${file}: obsolete studio subpage anchor`);
 }
 for (const page of ['about.html', 'licenses.html', 'certifications.html', 'privacy.html', 'terms.html', 'policies.html', 'cookie-policy.html', 'refund-policy.html', 'business.html', 'contact.html']) {
   assert.match(home, new RegExp(`href="\\./${page}"`), `home: missing ${page}`);
@@ -52,7 +54,7 @@ for (const page of ['about.html', 'licenses.html', 'certifications.html', 'priva
   assert.match(html, /company-pages\.js/);
   assert.match(html, /studio-site-footer/);
   assert.doesNotMatch(html, /STUDIO_FOOTER/);
-  assert.match(html, /href="\.\/studio\.html#possibilities"/, `${page}: studio navigation`);
+  assert.match(html, /href="\.\/#possibilities"/, `${page}: studio navigation`);
 }
 for (const page of ['about.html', 'licenses.html', 'certifications.html']) {
   const html = await readFile(resolve(root, page), 'utf8');

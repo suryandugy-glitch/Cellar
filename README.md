@@ -8,7 +8,7 @@
 <p align="center">An independent creative technology studio exploring software, products, services and meaningful experiments. Our first public product direction is still taking shape.</p>
 
 <p align="center">
-  <a href="https://cellar-csv.vercel.app/studio.html">Company website</a> ·
+  <a href="https://cellar-csv.vercel.app/">Company website</a> ·
   <a href="https://cellar-csv.vercel.app/about.html">About us</a> ·
   <a href="https://cellar-csv.vercel.app/licenses.html">Licensing</a> ·
   <a href="https://cellar-csv.vercel.app/certifications.html">Credentials</a> ·
@@ -19,7 +19,7 @@
   <a href="https://cellar-csv.vercel.app/business.html">Business details</a> ·
   <a href="https://cellar-csv.vercel.app/contact.html">Enquiries</a> ·
   <a href="https://cellar-csv.vercel.app/policies.html">Policies</a> ·
-  <a href="https://cellar-csv.vercel.app/">Cellar Guard</a> ·
+  <a href="https://cellar-csv.vercel.app/guard.html">Cellar Guard</a> ·
   <a href="https://cellar-csv.vercel.app/explore.html">Product briefs</a> ·
   <a href="docs/README.md">Documentation</a> ·
   <a href="CONTRIBUTING.md">Contribute</a>
@@ -61,7 +61,7 @@ This repository was renamed from **Cellar** to **Cellar-Studio**. It still conta
 
 | Project | The problem it tackles | Status | Explore |
 | --- | --- | --- | --- |
-| **Cellar Guard** | CSV exports silently break downstream imports when columns or contracts change | **Working pilot** — Java checker, CLI and local web workspace | [Live demo](https://cellar-csv.vercel.app/) |
+| **Cellar Guard** | CSV exports silently break downstream imports when columns or contracts change | **Working pilot** — Java checker, CLI and local web workspace | [Live demo](https://cellar-csv.vercel.app/guard.html) |
 | **Cellar SpaceFix** | Free space on a crowded drive by copying personal files to a second volume and verifying their contents before recycling originals | Downloadable Java desktop pilot | [Download and instructions](https://cellar-csv.vercel.app/explore.html#spacefix) · [Source](products/spacefix/) |
 | **Deadlock Sentinel** | Circular waits in JVM thread dumps are difficult to diagnose | **Java prototype / research demo** | [Trace explorer](https://cellar-csv.vercel.app/deadlock.html) · [Run locally](products/deadlock-sentinel/README.md) |
 | **BuildClinic** | Build failures are buried in noisy logs | Early-stage standalone tool | [Product brief](https://cellar-csv.vercel.app/explore.html#buildclinic) |
@@ -83,7 +83,7 @@ Triage: "order_id" may have been renamed to "id".
 Verdict: do not ship.                         (exit code 1)
 ```
 
-The [public Guard website](https://cellar-csv.vercel.app/) includes **synthetic demonstrations and sample reports**. It does not run the complete Java backend. To upload your own CSV, edit contracts or keep local run history, start the Java application.
+The [public Guard website](https://cellar-csv.vercel.app/guard.html) includes **synthetic demonstrations and sample reports**. It does not run the complete Java backend. To upload your own CSV, edit contracts or keep local run history, start the Java application.
 
 <a id="quick-start"></a>
 
@@ -192,8 +192,8 @@ New contributors can use [GitHub Codespaces](docs/DEVELOPMENT_ENVIRONMENT.md) or
 
 | Component | Deployment | Important distinction |
 | --- | --- | --- |
-| [Cellar Studio](https://cellar-csv.vercel.app/studio.html) | Vercel static website | Company pages, product briefs and demonstrations |
-| [Cellar Guard](https://cellar-csv.vercel.app/) | Vercel static demonstration, using the same web build | Synthetic examples; not the persistent Java workspace |
+| [Cellar Studio](https://cellar-csv.vercel.app/) | Vercel static website (primary homepage) | Company pages, product briefs and demonstrations |
+| [Cellar Guard](https://cellar-csv.vercel.app/guard.html) | Vercel static demonstration, using the same web build | Synthetic examples; not the persistent Java workspace |
 | Guard Java workspace | Local machine or separately provisioned Java host | Real CSV checks, contract editing, history and API |
 
 Vercel uses `vercel.json` and `node deploy/build-vercel.mjs` to build the public pages. The Guard-specific hostname opens `/guard.html`; the Studio hostname opens the company homepage.

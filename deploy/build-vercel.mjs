@@ -14,12 +14,12 @@ function restrictConnections(html, origin = '') {
 
 let landing = await readFile(new URL(site + '/index.html', root), 'utf8');
 let studio = await readFile(new URL(site + '/studio.html', root), 'utf8');
-studio = studio.replace(/  <link rel="canonical" href="[^"]*">\r?\n/, siteOrigin
-  ? '  <link rel="canonical" href="' + siteOrigin + '/studio.html">\n' : '');
-landing = landing.replace(/  <link rel="canonical" href="[^"]*">\r?\n/, siteOrigin
-  ? '  <link rel="canonical" href="' + siteOrigin + '/guard.html">\n' +
-    '  <meta property="og:url" content="' + siteOrigin + '/guard.html">\n'
-  : '');
+const canonicalOrigin = siteOrigin || 'https://cellar-csv.vercel.app';
+studio = studio.replace(/  <link rel="canonical" href="[^"]*">\r?\n/,
+  '  <link rel="canonical" href="' + canonicalOrigin + '/">\n');
+landing = landing.replace(/  <link rel="canonical" href="[^"]*">\r?\n/,
+  '  <link rel="canonical" href="' + canonicalOrigin + '/guard.html">\n' +
+  '  <meta property="og:url" content="' + canonicalOrigin + '/guard.html">\n');
 if (workspaceOrigin) {
   landing = landing.replace('href="./guide.html#quick-start">Open workspace',
     'href="./workspace.html">Open workspace');
@@ -65,21 +65,17 @@ const { fileURLToPath } = await import('node:url');
 execFileSync(process.execPath, [fileURLToPath(new URL('deploy/catalog.mjs', root)), fileURLToPath(output)]);
 execFileSync(process.execPath, [fileURLToPath(new URL('deploy/theme-inject.mjs', root)), fileURLToPath(output)]);
 
-// Publish one public domain. Preserve company pages as /studio.html and
-// /about.html, while keeping Cellar Guard as the main /guard.html page.
-// Rewriting after catalog/theme generation also handles their injected links.
+// Publish one primary domain: Studio HQ lives at / (index.html), while
+// Cellar Guard remains a separate product page at /guard.html.
+// Rewriting after catalog/theme generation also handles injected links.
 const publicOrigin = 'https://cellar-csv.vercel.app';
 for (const entry of await readdir(output, { withFileTypes: true })) {
   if (!entry.isFile() || !/\.html$/.test(entry.name)) continue;
   const file = new URL(entry.name, output);
   const original = await readFile(file, 'utf8');
   let html = original
-    .replace(/https:\/\/cellar-studio-hq\.vercel\.app\/(?=[#"'])/g, publicOrigin + '/studio.html')
     .replace(/https:\/\/cellar-studio-hq\.vercel\.app/g, publicOrigin)
-    .replaceAll('href="./#possibilities"', 'href="./studio.html#possibilities"');
-  if (html.includes('class="company-page"')) {
-    html = html.replaceAll('class="company-brand" href="./"', 'class="company-brand" href="./studio.html"');
-  }
+    .replaceAll('href="./studio.html#possibilities"', 'href="./#possibilities"');
   if (html !== original) await writeFile(file, html);
 }
 console.log('Built the Cellar Studio company site and Guard product site in build/vercel.');
