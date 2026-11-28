@@ -36,7 +36,7 @@ jobs:
             sed '/<meta http-equiv="Content-Security-Policy"/d' "build/vercel/$page" | diff "build/pages/$page" -
           done
       - name: Test the browser checker and shared site styles
-        run: node --test deploy/guard-engine.test.mjs deploy/theme.test.mjs
+        run: node --test deploy/guard-engine.test.mjs deploy/theme.test.mjs deploy/site-assistant.test.mjs
       - name: Verify catalog navigation and responsive layouts
         run: |
           python -m pip install playwright==1.56.0

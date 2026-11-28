@@ -32,6 +32,7 @@ with sync_playwright() as playwright:
             response = page.goto(BASE + route + '.html')
             assert response.status == 200, route
             assert page.locator('h1').count() == 1, route
+            page.get_by_role('button', name='Ask Cellar', exact=True).wait_for()
             overflow = page.evaluate('document.documentElement.scrollWidth - innerWidth')
             assert overflow <= 1, (width, route, overflow)
 
@@ -337,6 +338,24 @@ with sync_playwright() as playwright:
         assert page.locator('#studio-theme-toggle').is_visible()
         assert page.locator('html').get_attribute('data-theme') == 'light'
         assert page.evaluate('document.documentElement.scrollWidth - innerWidth') <= 1
+
+    # Exercise the assistant without consuming model credits.
+    for width in (390, 1440):
+        page.set_viewport_size({'width': width, 'height': 850})
+        page.goto(BASE + 'guard-app.html')
+        page.route(BASE + 'api/site-assistant', lambda route: route.fulfill(status=503))
+        page.get_by_role('button', name='Ask Cellar', exact=True).click()
+        assistant = page.get_by_role('dialog', name='Ask Cellar')
+        assert assistant.is_visible()
+        assistant.get_by_role('button', name='How do I contact support?').click()
+        assistant.get_by_text('Site guide', exact=True).wait_for()
+        assert assistant.locator('a[href$="contact.html"]').first.is_visible()
+        assert page.evaluate('document.documentElement.scrollWidth - innerWidth') <= 1
+        assistant.get_by_role('button', name='Close', exact=True).click()
+        assert not assistant.is_visible()
+        assert page.get_by_role('button', name='Ask Cellar', exact=True).evaluate(
+            'element => element === document.activeElement')
+        page.unroute(BASE + 'api/site-assistant')
 
     assert not errors, errors
     print(f'Checked {len(ROUTES)} routes at four widths, privacy choices, enquiry validation and mobile menu.')

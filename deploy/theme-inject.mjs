@@ -1,5 +1,6 @@
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { buildAssistantIndex } from './assistant-index.mjs';
 
 const directory = process.argv[2];
 if (!directory) throw new Error('Provide the generated website output directory.');
@@ -12,11 +13,16 @@ const links = '  <link rel="stylesheet" href="./theme-system.css">\n' +
   '  <link rel="stylesheet" href="./cookie-consent.css">\n' +
   '  <script src="./theme-system.js"></script>\n' +
   '  <script src="./cookie-consent.js" defer></script>\n';
+const assistantLinks = '  <link rel="stylesheet" href="./site-assistant.css">\n' +
+  '  <script src="./site-assistant.js" type="module"></script>\n';
+const pages = (await readdir(root)).filter(name => name.endsWith('.html'));
 let count = 0;
-for (const name of await readdir(root)) {
-  if (!name.endsWith('.html')) continue;
+for (const name of pages) {
   const path = resolve(root, name);
   let html = await readFile(path, 'utf8');
+  if (name !== 'workspace.html' && !html.includes('site-assistant.js')) {
+    html = html.replace(/<\/head>/i, assistantLinks + '</head>');
+  }
   if (html.includes(footerMarker)) html = html.replace(footerMarker, footerTemplate.trim());
   if (html.includes('theme-system.js')) {
     await writeFile(path, html);
@@ -26,4 +32,5 @@ for (const name of await readdir(root)) {
   await writeFile(path, html.replace(/<\/head>/i, `${links}</head>`));
   count++;
 }
+await buildAssistantIndex(root, pages);
 console.log(`Shared theme installed on ${count} HTML pages.`);

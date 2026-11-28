@@ -4,6 +4,12 @@
   "installCommand": "",
   "buildCommand": "node deploy/build-vercel.mjs",
   "outputDirectory": "build/vercel",
+  "functions": {
+    "api/site-assistant.mjs": {
+      "includeFiles": "build/vercel/assistant-index.json",
+      "maxDuration": 15
+    }
+  },
   "redirects": [
     {
       "source": "/",
